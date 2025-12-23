@@ -12,9 +12,6 @@ if (process.env.NODE_ENV === 'development') {
     global.adminOtpStore = otpStore;
 }
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // Allowed admin emails (in production, store in database or env)
 const ALLOWED_ADMIN_EMAILS = [
     'wesalapp.x@gmail.com',
@@ -53,14 +50,14 @@ export async function POST(request: Request) {
             }
         }
 
-        // In development, log OTP to console
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`\n🔐 Admin OTP for ${email}: ${otp}\n`);
-        }
+        // Always log to console (for Vercel logs)
+        console.log(`🔐 Admin OTP for ${email}: ${otp}`);
 
-        // Send OTP via email using Resend
-        if (process.env.RESEND_API_KEY) {
+        // Send OTP via email using Resend (only if API key is configured)
+        const resendApiKey = process.env.RESEND_API_KEY;
+        if (resendApiKey) {
             try {
+                const resend = new Resend(resendApiKey);
                 await resend.emails.send({
                     from: 'Wesal Admin <onboarding@resend.dev>',
                     to: email,
@@ -89,6 +86,8 @@ export async function POST(request: Request) {
                 console.error('Failed to send email:', emailError);
                 // Don't fail the request, OTP is still stored
             }
+        } else {
+            console.log('⚠️ RESEND_API_KEY not configured, email not sent');
         }
 
         return NextResponse.json({
