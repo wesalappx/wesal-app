@@ -128,16 +128,26 @@ export function usePairing() {
         setError(null);
 
         try {
-            // Find the code
+            const trimmedCode = code.trim();
+            console.log('Looking for pairing code:', trimmedCode);
+
+            // Find the code - no uppercase needed since codes are numeric
             const { data: pairingCode, error: findError } = await supabase
                 .from('pairing_codes')
                 .select('*')
-                .eq('code', code.toUpperCase())
+                .eq('code', trimmedCode)
                 .is('used_at', null)
                 .gt('expires_at', new Date().toISOString())
-                .single();
+                .maybeSingle();
 
-            if (findError || !pairingCode) {
+            console.log('Pairing code search result:', { pairingCode, findError });
+
+            if (findError) {
+                console.error('Database error:', findError);
+                throw new Error('حدث خطأ في البحث عن الرمز');
+            }
+
+            if (!pairingCode) {
                 throw new Error('الرمز غير صالح أو منتهي الصلاحية');
             }
 
