@@ -62,23 +62,30 @@ export default function RegisterPage() {
 
         setIsLoading(true);
 
-        const { error: signUpError } = await supabase.auth.signUp({
-            email: formData.email,
-            password: formData.password,
-            options: {
-                data: {
-                    display_name: formData.displayName,
-                    date_of_birth: formData.dateOfBirth,
-                    gender: formData.gender,
+        try {
+            const { error: signUpError } = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+                options: {
+                    data: {
+                        display_name: formData.displayName,
+                        date_of_birth: formData.dateOfBirth,
+                        gender: formData.gender,
+                    },
+                    emailRedirectTo: `${window.location.origin}/auth/callback`,
                 },
-            },
-        });
+            });
 
-        if (signUpError) {
-            setError(getArabicError(signUpError.message));
-            setIsLoading(false);
-        } else {
-            setSuccess(true);
+            if (signUpError) {
+                setError(getArabicError(signUpError.message));
+                setIsLoading(false);
+            } else {
+                setSuccess(true);
+                setIsLoading(false);
+            }
+        } catch (err: unknown) {
+            console.error('Registration error:', err);
+            setError('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
             setIsLoading(false);
         }
     };
