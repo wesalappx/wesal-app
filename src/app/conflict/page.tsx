@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -46,57 +46,84 @@ const rules = [
 
 // Helper function to render AI response with proper formatting
 const renderFormattedText = (text: string) => {
-    const lines = text.split('\n');
+    // First, clean up the text - remove --- dividers
+    const cleanedText = text.replace(/^---+$/gm, '').replace(/---/g, '');
+    const lines = cleanedText.split('\n');
 
     return lines.map((line, i) => {
-        const trimmedLine = line.trim();
+        let trimmedLine = line.trim();
 
         // Empty line = spacing
-        if (!trimmedLine) return <div key={i} className="h-3" />;
+        if (!trimmedLine) return <div key={i} className="h-2" />;
 
-        // Emoji headers (📋, ⚖️, 💡, ✅, 💬)
-        if (/^[📋⚖️💡✅💬🎯📌🔍💭🤝]/.test(trimmedLine)) {
+        // Remove any remaining --- 
+        trimmedLine = trimmedLine.replace(/---/g, '');
+
+        // Emoji headers (📋, ⚖️, 💡, ✅, 💬, etc.)
+        if (/^[📋⚖️💡✅💬🎯📌🔍💭🤝🔴🟡🟢⭐🌟💫✨🔷🔶]/.test(trimmedLine)) {
+            // Clean any ** from the header
+            const cleanHeader = trimmedLine.replace(/\*\*/g, '');
             return (
-                <h3 key={i} className="text-lg font-bold text-white mt-4 mb-2 flex items-center gap-2">
-                    {trimmedLine}
+                <h3 key={i} className="text-base font-bold text-white mt-5 mb-2 pb-1 border-b border-purple-500/20">
+                    {cleanHeader}
                 </h3>
             );
         }
 
-        // ## Markdown headers
-        if (trimmedLine.startsWith('##')) {
+        // ## or # Markdown headers - convert to styled headers
+        if (trimmedLine.startsWith('#')) {
+            const cleanHeader = trimmedLine.replace(/^#+\s*/, '').replace(/\*\*/g, '');
             return (
                 <h3 key={i} className="text-base font-bold text-purple-200 mt-4 mb-2">
-                    {trimmedLine.replace(/^#+\s*/, '')}
+                    {cleanHeader}
                 </h3>
             );
         }
 
-        // Bullet points (- or • or ١. ٢. ٣.)
-        if (/^[-•]/.test(trimmedLine) || /^[١٢٣\d]\./.test(trimmedLine)) {
-            const content = trimmedLine.replace(/^[-•]\s*/, '').replace(/^[١٢٣\d]\.\s*/, '');
+        // Bullet points (-, •, *, or Arabic numbers ١. ٢. ٣.)
+        if (/^[-•*]/.test(trimmedLine) || /^[١٢٣٤٥٦٧٨٩\d]+[\.\)]/.test(trimmedLine)) {
+            const content = trimmedLine
+                .replace(/^[-•*]\s*/, '')
+                .replace(/^[١٢٣٤٥٦٧٨٩\d]+[\.\)]\s*/, '');
             return (
-                <div key={i} className="flex gap-2 items-start py-1 pr-2">
-                    <span className="text-purple-400 mt-0.5">•</span>
-                    <span className="text-surface-200">{renderInlineFormatting(content)}</span>
+                <div key={i} className="flex gap-3 items-start py-1 mr-2">
+                    <span className="text-purple-400 mt-1 text-sm">◆</span>
+                    <span className="text-surface-200 leading-relaxed">{renderInlineFormatting(content)}</span>
                 </div>
             );
         }
 
+        // Labels like "الطرف الأول:" or "من المسؤول:"
+        if (trimmedLine.includes(':') && trimmedLine.indexOf(':') < 30) {
+            const colonIndex = trimmedLine.indexOf(':');
+            const label = trimmedLine.substring(0, colonIndex + 1).replace(/\*\*/g, '');
+            const value = trimmedLine.substring(colonIndex + 1).trim();
+            return (
+                <p key={i} className="text-surface-200 py-1 leading-relaxed">
+                    <strong className="text-purple-300">{label}</strong> {renderInlineFormatting(value)}
+                </p>
+            );
+        }
+
         // Regular paragraph with inline formatting
-        return <p key={i} className="text-surface-200 py-1">{renderInlineFormatting(trimmedLine)}</p>;
+        return <p key={i} className="text-surface-200 py-1 leading-relaxed">{renderInlineFormatting(trimmedLine)}</p>;
     });
 };
 
-// Helper to render inline bold text
-const renderInlineFormatting = (text: string) => {
-    // Replace **bold** with styled spans
+// Helper to render inline bold text - strips ** and renders as bold
+const renderInlineFormatting = (text: string): React.ReactNode => {
+    if (!text) return null;
+
+    // Split by **bold** pattern
     const parts = text.split(/(\*\*[^*]+\*\*)/g);
+
     return parts.map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
+            // Extract text between ** and render as bold
             return <strong key={i} className="text-white font-semibold">{part.slice(2, -2)}</strong>;
         }
-        return part;
+        // Also handle any stray * that might be left
+        return part.replace(/\*/g, '');
     });
 };
 
