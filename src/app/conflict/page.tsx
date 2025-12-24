@@ -44,6 +44,62 @@ const rules = [
     { icon: ThumbsUp, ar: "موافقين نطلع بحل يرضينا", en: "Agree to find a mutual solution" }
 ];
 
+// Helper function to render AI response with proper formatting
+const renderFormattedText = (text: string) => {
+    const lines = text.split('\n');
+
+    return lines.map((line, i) => {
+        const trimmedLine = line.trim();
+
+        // Empty line = spacing
+        if (!trimmedLine) return <div key={i} className="h-3" />;
+
+        // Emoji headers (📋, ⚖️, 💡, ✅, 💬)
+        if (/^[📋⚖️💡✅💬🎯📌🔍💭🤝]/.test(trimmedLine)) {
+            return (
+                <h3 key={i} className="text-lg font-bold text-white mt-4 mb-2 flex items-center gap-2">
+                    {trimmedLine}
+                </h3>
+            );
+        }
+
+        // ## Markdown headers
+        if (trimmedLine.startsWith('##')) {
+            return (
+                <h3 key={i} className="text-base font-bold text-purple-200 mt-4 mb-2">
+                    {trimmedLine.replace(/^#+\s*/, '')}
+                </h3>
+            );
+        }
+
+        // Bullet points (- or • or ١. ٢. ٣.)
+        if (/^[-•]/.test(trimmedLine) || /^[١٢٣\d]\./.test(trimmedLine)) {
+            const content = trimmedLine.replace(/^[-•]\s*/, '').replace(/^[١٢٣\d]\.\s*/, '');
+            return (
+                <div key={i} className="flex gap-2 items-start py-1 pr-2">
+                    <span className="text-purple-400 mt-0.5">•</span>
+                    <span className="text-surface-200">{renderInlineFormatting(content)}</span>
+                </div>
+            );
+        }
+
+        // Regular paragraph with inline formatting
+        return <p key={i} className="text-surface-200 py-1">{renderInlineFormatting(trimmedLine)}</p>;
+    });
+};
+
+// Helper to render inline bold text
+const renderInlineFormatting = (text: string) => {
+    // Replace **bold** with styled spans
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={i} className="text-white font-semibold">{part.slice(2, -2)}</strong>;
+        }
+        return part;
+    });
+};
+
 export default function ConflictPage() {
     const supabase = createClient();
     const { user } = useAuth();
@@ -843,23 +899,8 @@ export default function ConflictPage() {
                                                         </div>
 
                                                         {/* Content */}
-                                                        <div className="relative p-5 text-surface-200 text-sm leading-relaxed space-y-3">
-                                                            {msg.content.split('\n').map((line: string, i: number) => {
-                                                                const cleanLine = line.trim();
-                                                                if (!cleanLine) return <br key={i} />;
-                                                                if (cleanLine.startsWith('**') || cleanLine.startsWith('##')) {
-                                                                    return <p key={i} className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-indigo-200 mt-2 text-base shadow-sm">{cleanLine.replace(/\*\*/g, '').replace(/##/g, '')}</p>;
-                                                                }
-                                                                if (cleanLine.startsWith('-') || cleanLine.startsWith('•')) {
-                                                                    return (
-                                                                        <div key={i} className="flex gap-3 items-start pl-1 group/item">
-                                                                            <span className="text-purple-400 mt-1.5 transition-transform group-hover/item:scale-125 duration-300">•</span>
-                                                                            <span className="group-hover/item:text-white transition-colors duration-300">{cleanLine.replace(/^[-•]\s*/, '')}</span>
-                                                                        </div>
-                                                                    );
-                                                                }
-                                                                return <p key={i}>{cleanLine}</p>;
-                                                            })}
+                                                        <div className="relative p-5 text-surface-200 text-sm leading-relaxed">
+                                                            {renderFormattedText(msg.content)}
                                                         </div>
 
                                                         {/* Action Buttons */}
@@ -894,7 +935,7 @@ export default function ConflictPage() {
                                                     ? 'bg-gradient-to-br from-indigo-600 to-blue-600 text-white rounded-tr-none'
                                                     : 'bg-surface-800/90 text-surface-100 rounded-tl-none border border-white/5'
                                                     }`}>
-                                                    {msg.content}
+                                                    {msg.role === 'assistant' ? renderFormattedText(msg.content) : msg.content}
                                                 </div>
                                             )}
                                         </motion.div>
