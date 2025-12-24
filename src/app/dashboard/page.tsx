@@ -55,27 +55,6 @@ export default function Dashboard() {
     // Fallback if progress isn't loaded yet
     const currentStreak = progress?.streak || 0;
 
-    useEffect(() => {
-        setMounted(true);
-
-        // Fetch partner info
-        const fetchPartner = async () => {
-            const { isPaired: paired, partner } = await getStatus();
-            setIsPaired(paired);
-            if (partner?.display_name) {
-                setPartnerName(partner.display_name);
-            }
-        };
-        fetchPartner();
-
-        // Fetch Daily Whisper
-        import('@/lib/ai').then(async (mod) => {
-            const whisper = await mod.generateDailyWhisper(language === 'ar' ? 'ar' : 'en');
-            setDailyWhisper(whisper);
-        });
-
-    }, [language]); // Re-fetch when language changes
-
     // Safe - White Saudi - Partner Neutral
     const actions = [
         {

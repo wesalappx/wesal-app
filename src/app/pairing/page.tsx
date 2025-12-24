@@ -21,6 +21,7 @@ export default function PairingPage() {
     const [success, setSuccess] = useState(false);
     const [copied, setCopied] = useState(false);
     const [checkingStatus, setCheckingStatus] = useState(true);
+    const [partnerInfo, setPartnerInfo] = useState<{ name: string; id: string } | null>(null);
 
     // Check if already paired on mount
     useEffect(() => {
@@ -33,6 +34,22 @@ export default function PairingPage() {
         };
         checkPairing();
     }, []);
+
+    // Fetch partner info when pairing succeeds
+    useEffect(() => {
+        if (success) {
+            const fetchPartner = async () => {
+                const { partner } = await getStatus();
+                if (partner) {
+                    setPartnerInfo({
+                        name: partner.display_name || 'شريكك',
+                        id: partner.id
+                    });
+                }
+            };
+            fetchPartner();
+        }
+    }, [success]);
 
     const handleGenerateCode = async () => {
         setIsLoading(true);
@@ -83,24 +100,6 @@ export default function PairingPage() {
             </main>
         );
     }
-
-    const [partnerInfo, setPartnerInfo] = useState<{ name: string; id: string } | null>(null);
-
-    // Fetch partner info when pairing succeeds
-    useEffect(() => {
-        if (success) {
-            const fetchPartner = async () => {
-                const { partner } = await getStatus();
-                if (partner) {
-                    setPartnerInfo({
-                        name: partner.display_name || 'شريكك',
-                        id: partner.id
-                    });
-                }
-            };
-            fetchPartner();
-        }
-    }, [success]);
 
     if (success) {
         return (
