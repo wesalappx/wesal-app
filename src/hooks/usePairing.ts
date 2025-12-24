@@ -7,6 +7,7 @@ import { useAuth } from './useAuth';
 export interface Partner {
     id: string;
     display_name: string;
+    email?: string;
     avatar_url?: string;
     is_online?: boolean;
 }
@@ -258,13 +259,19 @@ export function usePairing() {
             const partnerId = couple.partner1_id === user.id ? couple.partner2_id : couple.partner1_id;
             const { data: partner } = await supabase
                 .from('profiles')
-                .select('id, display_name, avatar_url')
+                .select('id, display_name, avatar_url, email')
                 .eq('id', partnerId)
                 .single();
 
+            // Use email username as fallback if display_name is empty
+            const partnerWithFallback = partner ? {
+                ...partner,
+                display_name: partner.display_name || partner.email?.split('@')[0] || 'شريكك'
+            } : null;
+
             return {
                 isPaired: true,
-                partner: partner as Partner,
+                partner: partnerWithFallback as Partner,
                 coupleId: couple.id,
                 error: null,
             };
