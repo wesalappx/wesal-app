@@ -14,6 +14,11 @@ export const metadata: Metadata = {
     description: 'تطبيق وصال - لتعزيز العلاقة والمودة بين الأزواج',
     keywords: ['زواج', 'حب', 'علاقة', 'لعبة', 'تواصل', 'وصال'],
     authors: [{ name: 'فريق وصال' }],
+    icons: {
+        icon: '/favicon.svg',
+        shortcut: '/favicon.svg',
+        apple: '/favicon.svg',
+    },
     openGraph: {
         title: 'تطبيق وصال',
         description: 'مساحتكم الخاصة للحب والتواصل واللعب',
