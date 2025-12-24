@@ -956,13 +956,35 @@ export default function ConflictPage() {
                                                         </div>
                                                     </div>
                                                 </div>
+                                            ) : msg.role === 'assistant' ? (
+                                                // Follow-up AI responses - Same styled card as first
+                                                <div className="flex-1 max-w-[90%]">
+                                                    <div className="relative overflow-hidden rounded-2xl backdrop-blur-md bg-surface-800/80 border border-white/10 shadow-xl">
+                                                        {/* Card Glow */}
+                                                        <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/15 rounded-full blur-[50px]" />
+
+                                                        {/* Header */}
+                                                        <div className="relative p-4 border-b border-white/5 bg-gradient-to-r from-purple-500/10 to-transparent">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="p-1.5 rounded-lg bg-purple-500/20 text-purple-300">
+                                                                    <MessageCircle className="w-4 h-4" />
+                                                                </div>
+                                                                <span className="text-sm font-semibold text-white">
+                                                                    {language === 'ar' ? 'رد المستشار' : 'Consultant Reply'}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Content */}
+                                                        <div className="relative p-5 text-surface-200 text-sm leading-relaxed">
+                                                            {renderFormattedText(msg.content)}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             ) : (
-                                                // Regular messages
-                                                <div className={`relative max-w-[85%] px-5 py-3.5 rounded-2xl text-sm leading-relaxed shadow-lg backdrop-blur-sm ${msg.role === 'user'
-                                                    ? 'bg-gradient-to-br from-indigo-600 to-blue-600 text-white rounded-tr-none'
-                                                    : 'bg-surface-800/90 text-surface-100 rounded-tl-none border border-white/5'
-                                                    }`}>
-                                                    {msg.role === 'assistant' ? renderFormattedText(msg.content) : msg.content}
+                                                // User messages - Simple bubble
+                                                <div className="relative max-w-[85%] px-5 py-3.5 rounded-2xl rounded-tr-none text-sm leading-relaxed shadow-lg bg-gradient-to-br from-indigo-600 to-blue-600 text-white">
+                                                    {msg.content}
                                                 </div>
                                             )}
                                         </motion.div>
