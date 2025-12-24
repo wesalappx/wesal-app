@@ -130,15 +130,22 @@ export default function Dashboard() {
 
     const greeting = getGreeting();
 
+    // Store couple and partner IDs for presence
+    const [coupleId, setCoupleId] = useState<string | null>(null);
+    const [partnerId, setPartnerId] = useState<string | null>(null);
+
     useEffect(() => {
         setMounted(true);
 
         // Fetch partner info & Mood
         const fetchPartnerData = async () => {
-            const { isPaired: paired, partner, coupleId } = await getStatus();
+            const { isPaired: paired, partner, coupleId: cId } = await getStatus();
             setIsPaired(paired);
+            setCoupleId(cId || null);
+
             if (partner?.display_name) {
                 setPartnerName(partner.display_name);
+                setPartnerId(partner.id);
             }
 
             if (paired && partner?.id) {
@@ -164,6 +171,38 @@ export default function Dashboard() {
         });
 
     }, [language]); // Re-fetch when language changes
+
+    // Real-time Presence for partner online status
+    useEffect(() => {
+        if (!coupleId || !user || !partnerId) return;
+
+        const presenceChannel = supabase.channel(`presence-couple-${coupleId}`);
+
+        presenceChannel
+            .on('presence', { event: 'sync' }, () => {
+                const state = presenceChannel.presenceState();
+                // Check if partner is present
+                const partnerPresent = Object.values(state).some((presences: any) =>
+                    presences.some((p: any) => p.user_id === partnerId)
+                );
+                setPartnerStatus(partnerPresent ? 'online' : 'offline');
+            })
+            .subscribe(async (status) => {
+                if (status === 'SUBSCRIBED' && user) {
+                    // Broadcast our presence
+                    await presenceChannel.track({
+                        user_id: user.id,
+                        online_at: new Date().toISOString()
+                    });
+                }
+            });
+
+        // Cleanup on unmount
+        return () => {
+            presenceChannel.untrack();
+            supabase.removeChannel(presenceChannel);
+        };
+    }, [coupleId, user, partnerId]);
 
     if (!mounted) return null;
 

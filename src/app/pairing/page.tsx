@@ -8,7 +8,7 @@ import { usePairing } from '@/hooks/usePairing';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function PairingPage() {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const router = useRouter();
     const { generateCode, acceptCode, getStatus, getMyCode, isLoading: hookLoading } = usePairing();
 
@@ -84,19 +84,70 @@ export default function PairingPage() {
         );
     }
 
+    const [partnerInfo, setPartnerInfo] = useState<{ name: string; id: string } | null>(null);
+
+    // Fetch partner info when pairing succeeds
+    useEffect(() => {
+        if (success) {
+            const fetchPartner = async () => {
+                const { partner } = await getStatus();
+                if (partner) {
+                    setPartnerInfo({
+                        name: partner.display_name || 'شريكك',
+                        id: partner.id
+                    });
+                }
+            };
+            fetchPartner();
+        }
+    }, [success]);
+
     if (success) {
         return (
-            <main className="min-h-screen flex items-center justify-center p-4">
-                <div className="text-center glass-card p-12 max-w-md">
-                    <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                        <span className="text-5xl">💕</span>
+            <main className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+                {/* Confetti-like particles */}
+                <div className="absolute inset-0 pointer-events-none">
+                    {[...Array(20)].map((_, i) => (
+                        <div
+                            key={i}
+                            className="absolute w-3 h-3 rounded-full animate-float"
+                            style={{
+                                left: `${Math.random() * 100}%`,
+                                top: `${Math.random() * 100}%`,
+                                backgroundColor: ['#f472b6', '#a78bfa', '#60a5fa', '#34d399'][i % 4],
+                                animationDelay: `${Math.random() * 2}s`,
+                                animationDuration: `${3 + Math.random() * 2}s`,
+                                opacity: 0.6
+                            }}
+                        />
+                    ))}
+                </div>
+
+                <div className="text-center glass-card p-12 max-w-md relative z-10">
+                    {/* Success Icon */}
+                    <div className="w-28 h-28 mx-auto mb-6 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-xl shadow-pink-500/30 animate-pulse">
+                        <span className="text-6xl">💕</span>
                     </div>
-                    <h1 className="text-3xl font-bold mb-4">{t('pairing.success')}</h1>
+
+                    <h1 className="text-3xl font-bold mb-3 text-white">{t('pairing.success')}</h1>
+
+                    {/* Partner Name Display */}
+                    <div className="my-6 py-4 px-6 rounded-2xl bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/30">
+                        <p className="text-surface-400 text-sm mb-1">
+                            {language === 'ar' ? 'أنتما الآن مرتبطان' : 'You are now paired with'}
+                        </p>
+                        <p className="text-2xl font-bold text-white">
+                            {partnerInfo?.name || '...'}
+                        </p>
+                    </div>
+
                     <p className="text-surface-400 mb-8">
                         {t('pairing.successMsg')}
                     </p>
-                    <Link href="/dashboard" className="btn-primary">
+
+                    <Link href="/dashboard" className="btn-primary inline-flex items-center gap-2 px-8 py-4 text-lg">
                         {t('pairing.startJourney')}
+                        <Heart className="w-5 h-5" />
                     </Link>
                 </div>
             </main>

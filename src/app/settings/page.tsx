@@ -8,13 +8,16 @@ import {
     Shield,
     Key,
     LogOut,
-    Settings
+    Settings,
+    UserMinus,
+    Users
 } from 'lucide-react';
 import Link from 'next/link';
 import SettingsCard, { ToggleSwitch } from '@/components/SettingsCard';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from '@/hooks/useTranslation';
+import { usePairing } from '@/hooks/usePairing';
 import { useState, useEffect } from 'react';
 
 export default function SettingsPage() {
@@ -26,6 +29,30 @@ export default function SettingsPage() {
     } = useSettingsStore();
 
     const { user: authUser, signOut } = useAuth();
+    const { getStatus, unpair, isLoading: unpairLoading } = usePairing();
+
+    const [partnerInfo, setPartnerInfo] = useState<{ name: string; isPaired: boolean } | null>(null);
+    const [showUnpairConfirm, setShowUnpairConfirm] = useState(false);
+
+    // Fetch partner info
+    useEffect(() => {
+        const fetchPartner = async () => {
+            const { isPaired, partner } = await getStatus();
+            setPartnerInfo({
+                name: partner?.display_name || '',
+                isPaired
+            });
+        };
+        fetchPartner();
+    }, []);
+
+    const handleUnpair = async () => {
+        const { success } = await unpair();
+        if (success) {
+            setPartnerInfo({ name: '', isPaired: false });
+            setShowUnpairConfirm(false);
+        }
+    };
 
     const user = {
         name: authUser?.user_metadata?.display_name || (language === 'ar' ? 'مستخدم' : 'User'),
@@ -117,6 +144,62 @@ export default function SettingsPage() {
                         </div>
                     </div>
                 </motion.section>
+
+                {/* Partner Section */}
+                {partnerInfo?.isPaired && (
+                    <motion.section variants={itemVariants} className="space-y-3">
+                        <h2 className="text-sm font-bold text-surface-400 px-1">
+                            {isRTL ? 'الشريك' : 'Partner'}
+                        </h2>
+
+                        <div className="p-5 rounded-2xl glass-card border-surface-700/50">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg">
+                                    <Users className="w-7 h-7 text-white" />
+                                </div>
+                                <div className={isRTL ? 'text-right' : 'text-left'}>
+                                    <p className="text-surface-400 text-sm">
+                                        {isRTL ? 'مرتبط مع' : 'Paired with'}
+                                    </p>
+                                    <p className="text-lg font-bold text-white">
+                                        {partnerInfo.name || (isRTL ? 'الشريك' : 'Partner')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {!showUnpairConfirm ? (
+                                <button
+                                    onClick={() => setShowUnpairConfirm(true)}
+                                    className="w-full p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-colors font-medium flex items-center justify-center gap-2"
+                                >
+                                    <UserMinus className="w-4 h-4" />
+                                    {isRTL ? 'إلغاء الربط' : 'Unpair'}
+                                </button>
+                            ) : (
+                                <div className="space-y-3">
+                                    <p className="text-sm text-center text-surface-300">
+                                        {isRTL ? 'هل أنت متأكد؟ سيتم إلغاء الربط بينكما.' : 'Are you sure? This will unpair you both.'}
+                                    </p>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setShowUnpairConfirm(false)}
+                                            className="flex-1 p-3 rounded-xl bg-surface-800 text-surface-300 hover:bg-surface-700 transition-colors font-medium"
+                                        >
+                                            {isRTL ? 'إلغاء' : 'Cancel'}
+                                        </button>
+                                        <button
+                                            onClick={handleUnpair}
+                                            disabled={unpairLoading}
+                                            className="flex-1 p-3 rounded-xl bg-red-600 text-white hover:bg-red-500 transition-colors font-medium"
+                                        >
+                                            {unpairLoading ? '...' : (isRTL ? 'نعم، ألغِ الربط' : 'Yes, Unpair')}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </motion.section>
+                )}
 
                 {/* Preferences Section */}
                 <motion.section variants={itemVariants} className="space-y-3">
