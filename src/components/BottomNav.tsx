@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Map, Gamepad2, Scale } from 'lucide-react';
+import { Home, Map, Gamepad2, Scale, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSound } from '@/hooks/useSound';
 import { useState, useEffect } from 'react';
@@ -17,11 +17,12 @@ export default function BottomNav() {
         { name: 'الرئيسية', href: '/dashboard', icon: Home },
         { name: 'رحلات', href: '/journeys', icon: Map },
         { name: 'لعب', href: '/play', icon: Gamepad2 },
+        { name: 'همسة', href: '/whisper', icon: Moon },
         { name: 'المستشار', href: '/conflict', icon: Scale },
     ];
 
     // Don't show nav on immersive pages or auth pages
-    const hiddenRoutes = ['/', '/game-session', '/onboarding', '/pairing', '/auth', '/conflict'];
+    const hiddenRoutes = ['/', '/game-session', '/onboarding', '/pairing', '/auth', '/conflict', '/whisper'];
 
     // Check if current route should hide the nav
     const shouldHide = hiddenRoutes.some(route => pathname === route || pathname.startsWith(route + '/'));
