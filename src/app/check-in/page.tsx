@@ -369,9 +369,20 @@ export default function CheckInPage() {
                                 {QUESTIONS.map((q) => {
                                     const val = scores[q.id] || 0;
                                     const pct = (val / 5) * 100;
+                                    // Extract short label from question
+                                    const getShortLabel = (label: string) => {
+                                        const labels: Record<string, string> = {
+                                            'mood': 'المود',
+                                            'energy': 'طاقتك',
+                                            'stress': 'الضغط',
+                                            'sleep': 'نومك',
+                                            'connection': 'تجاه'
+                                        };
+                                        return labels[q.id] || label.replace('؟', '').split(' ').pop() || '';
+                                    };
                                     return (
                                         <div key={q.id} className="flex items-center gap-3">
-                                            <span className="text-xs text-surface-400 w-16 whitespace-nowrap">{q.label.split(' ')[1]}</span>
+                                            <span className="text-xs text-surface-400 w-16 whitespace-nowrap">{getShortLabel(q.label)}</span>
                                             <div className="h-2 flex-1 bg-surface-800 rounded-full overflow-hidden">
                                                 <motion.div
                                                     initial={{ width: 0 }}
@@ -394,7 +405,7 @@ export default function CheckInPage() {
                                     <h3 className="text-sm font-bold text-white">تطور الأسبوع</h3>
                                 </div>
                                 <div className="space-y-4">
-                                    {['mood', 'energy', 'stress', 'connection'].map((metric) => {
+                                    {['mood', 'energy', 'stress', 'sleep', 'connection'].map((metric) => {
                                         const question = QUESTIONS.find(q => q.id === metric);
                                         if (!question) return null;
 
