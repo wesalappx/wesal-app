@@ -41,38 +41,48 @@ function JourneyExerciseContent() {
         const memories = sessionData['memory-lane'] || [];
         const roulette = sessionData['love-roulette'] || [];
 
+        // New specific content
+        const loveLanguages = sessionData['love-languages'] || [];
+        const listeningSkills = sessionData['listening-skills'] || [];
+        const echoExercise = sessionData['echo-exercise'] || [];
+        const bodyLanguage = sessionData['body-language'] || [];
+        const conflictStyles = sessionData['conflict-styles'] || [];
+        const financialGoals = sessionData['financial-goals'] || [];
+        const familyValues = sessionData['family-values'] || [];
+        const retirementPlans = sessionData['retirement-plans'] || [];
+
         // Map each step to appropriate content based on theme
         if (journeyId === 'basics') {
             // 5 steps: لغات الحب, جلسة مصارحة, قيمنا المشتركة, تحدي الامتنان, رسالة للمستقبل
             const stepContent: Record<number, any[]> = {
-                0: values.slice(0, 8),  // love/spark questions
-                1: deepQuestions.slice(0, 8),  // honesty/openness
-                2: values.slice(5, 13),  // shared values
-                3: [...compliments.slice(0, 5), ...roulette.slice(0, 3)],  // gratitude/appreciation
-                4: deepQuestions.slice(20, 28),  // future messages
+                0: loveLanguages,            // Step 1: Love Languages
+                1: deepQuestions.slice(30, 38), // Step 2: Session (Openness)
+                2: values.slice(5, 13),      // Step 3: Shared Values
+                3: compliments.slice(0, 8),  // Step 4: Gratitude Challenge
+                4: deepQuestions.slice(20, 28), // Step 5: Message to Future
             };
             return stepContent[stepIndex] || values.slice(0, 8);
         } else if (journeyId === 'communication') {
             // 7 steps: المستمع الجيد, تمرين الصدى, لغة الجسد, درس في التقدير, طرق الزعل, أنا أشعر, حديث الوسادة
             const stepContent: Record<number, any[]> = {
-                0: deepQuestions.slice(0, 8),  // listening skills
-                1: deepQuestions.slice(8, 16),  // echo exercise - understanding
-                2: deepQuestions.slice(16, 24),  // body language
-                3: compliments.slice(0, 8),  // appreciation
-                4: deepQuestions.slice(24, 32),  // handling anger
-                5: deepQuestions.slice(32, 40),  // expressing feelings
-                6: [...deepQuestions.slice(40, 44), ...roulette.slice(0, 4)],  // pillow talk - connection
+                0: listeningSkills,          // Step 1: Good Listener
+                1: echoExercise,             // Step 2: Echo Exercise
+                2: bodyLanguage,             // Step 3: Body Language
+                3: compliments.slice(30, 38), // Step 4: Appreciation Lesson
+                4: conflictStyles,           // Step 5: Conflict Styles
+                5: deepQuestions.slice(0, 8),   // Step 6: I feel...
+                6: roulette.slice(0, 8),     // Step 7: Pillow Talk
             };
             return stepContent[stepIndex] || deepQuestions.slice(0, 8);
         } else if (journeyId === 'future') {
             // 6 steps: لوحة الأحلام, الأهداف المالية, العائلة والتربية, قائمة الأمنيات, التقاعد السعيد, الإرث
             const stepContent: Record<number, any[]> = {
-                0: deepQuestions.slice(20, 28),  // dreams
-                1: deepQuestions.slice(28, 36),  // financial goals
-                2: deepQuestions.slice(36, 44),  // family & parenting
-                3: memories.slice(0, 8),  // bucket list
-                4: deepQuestions.slice(44, 52),  // retirement
-                5: values.slice(10, 18),  // legacy
+                0: deepQuestions.slice(20, 28), // Step 1: Dream Board
+                1: financialGoals,           // Step 2: Financial Goals
+                2: familyValues,             // Step 3: Family & Parenting
+                3: memories.slice(0, 8),     // Step 4: Bucket List
+                4: retirementPlans,          // Step 5: Happy Retirement
+                5: values.slice(10, 18),     // Step 6: Legacy
             };
             return stepContent[stepIndex] || deepQuestions.slice(0, 8);
         }

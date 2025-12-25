@@ -157,6 +157,9 @@ export default function ConflictPage() {
     const [partnerId, setPartnerId] = useState<string | null>(null);
     const [hasSubmitted, setHasSubmitted] = useState(false);
 
+    // Pending session that requires user confirmation before restoring
+    const [pendingSession, setPendingSession] = useState<any | null>(null);
+
     // Chat & Verdict State
     const [messages, setMessages] = useState<any[]>([]); // Deprecated? No using chatHistory
     const [chatHistory, setChatHistory] = useState<any[]>([]);
@@ -196,31 +199,30 @@ export default function ConflictPage() {
                     .maybeSingle();
 
                 if (data) {
-                    setMode('joint');
-                    setSessionId(data.id);
-                    setIsInitiator(data.initiator_id === user.id);
-                    setTopic(data.topic || '');
+                    // If I am the PARTNER (not initiator) being invited - allow auto-restore
+                    // This enables the collaborative flow when partner clicks the notification
+                    if (data.initiator_id !== user.id) {
+                        // Partner joining - restore immediately
+                        setMode('joint');
+                        setSessionId(data.id);
+                        setIsInitiator(false);
+                        setTopic(data.topic || '');
 
-                    // Determine step based on status
-                    if (data.status === 'created') {
-                        if (data.initiator_id !== user.id) {
-                            // I am the partner, joining
+                        if (data.status === 'created') {
                             await supabase.from('conflict_sessions').update({ status: 'joined' }).eq('id', data.id);
                             setStep('rules');
-                        } else {
-                            setStep('waiting_partner');
+                        } else if (data.status === 'joined' || data.status === 'inputting') {
+                            setStep('joint_input');
+                            if (data.p2_submitted) setHasSubmitted(true);
+                        } else if (data.status === 'analyzing') {
+                            setStep('analysis');
+                        } else if (data.status === 'verdict') {
+                            setStep('verdict');
+                            if (data.chat_history) setChatHistory(data.chat_history);
                         }
-                    } else if (data.status === 'joined' || data.status === 'inputting') {
-                        setStep('joint_input');
-                        // Check if I already submitted
-                        if ((data.initiator_id === user.id && data.p1_submitted) || (data.initiator_id !== user.id && data.p2_submitted)) {
-                            setHasSubmitted(true);
-                        }
-                    } else if (data.status === 'analyzing') {
-                        setStep('analysis');
-                    } else if (data.status === 'verdict') {
-                        setStep('verdict');
-                        if (data.chat_history) setChatHistory(data.chat_history);
+                    } else {
+                        // I am the INITIATOR - store as pending and let user choose to resume
+                        setPendingSession(data);
                     }
                 }
             }
@@ -636,6 +638,55 @@ export default function ConflictPage() {
                             </p>
 
                             <div className="space-y-4">
+                                {/* Resume Session Banner - shown when there's a pending session */}
+                                {pendingSession && (
+                                    <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 mb-4">
+                                        <p className="text-amber-300 text-sm mb-3">
+                                            {language === 'ar'
+                                                ? 'لديك جلسة سابقة لم تكتمل. هل تريد استكمالها؟'
+                                                : 'You have an unfinished session. Resume?'}
+                                        </p>
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={() => {
+                                                    // Resume the pending session
+                                                    setMode('joint');
+                                                    setSessionId(pendingSession.id);
+                                                    setIsInitiator(true);
+                                                    setTopic(pendingSession.topic || '');
+
+                                                    if (pendingSession.status === 'created') {
+                                                        setStep('waiting_partner');
+                                                    } else if (pendingSession.status === 'joined' || pendingSession.status === 'inputting') {
+                                                        setStep('joint_input');
+                                                        if (pendingSession.p1_submitted) setHasSubmitted(true);
+                                                    } else if (pendingSession.status === 'analyzing') {
+                                                        setStep('analysis');
+                                                    } else if (pendingSession.status === 'verdict') {
+                                                        setStep('verdict');
+                                                        if (pendingSession.chat_history) setChatHistory(pendingSession.chat_history);
+                                                    }
+                                                    setPendingSession(null);
+                                                    playSound('pop');
+                                                }}
+                                                className="flex-1 py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all"
+                                            >
+                                                {language === 'ar' ? 'استكمال' : 'Resume'}
+                                            </button>
+                                            <button
+                                                onClick={async () => {
+                                                    // Discard the session
+                                                    await supabase.from('conflict_sessions').update({ status: 'completed' }).eq('id', pendingSession.id);
+                                                    setPendingSession(null);
+                                                }}
+                                                className="flex-1 py-2 bg-surface-700 hover:bg-surface-600 text-white rounded-xl transition-all"
+                                            >
+                                                {language === 'ar' ? 'تجاهل' : 'Discard'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <button
                                     onClick={() => {
                                         setMode('solo');
