@@ -170,7 +170,6 @@ export default function CheckInPage() {
             playSound('success');
 
             // Save
-            console.log('📊 Saving check-in with scores:', newScores);
             const { error } = await createCheckIn({
                 mood: newScores.mood,
                 energy: newScores.energy,

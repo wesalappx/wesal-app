@@ -229,6 +229,9 @@ export default function ConflictPage() {
     }, [user]);
 
     // Realtime Subscription
+    const stepRef = useRef(step);
+    stepRef.current = step;
+
     useEffect(() => {
         if (!sessionId || mode !== 'joint') return;
 
@@ -246,19 +249,21 @@ export default function ConflictPage() {
                 if (newData.topic) setTopic(newData.topic);
                 if (newData.chat_history) setChatHistory(newData.chat_history || []);
 
-                // Status transitions
-                if (newData.status === 'joined' && step === 'waiting_partner') {
+                // Status transitions - use ref to avoid dependency
+                const currentStep = stepRef.current;
+
+                if (newData.status === 'joined' && currentStep === 'waiting_partner') {
                     setStep('joint_input');
                     playSound('pop');
                 }
 
-                if (newData.status === 'verdict' && step !== 'verdict') {
+                if (newData.status === 'verdict' && currentStep !== 'verdict') {
                     setStep('verdict');
                     playSound('success');
                     setShowConfetti(true);
                 }
 
-                if (newData.status === 'analyzing') {
+                if (newData.status === 'analyzing' && currentStep !== 'analysis') {
                     setStep('analysis');
                 }
 
@@ -280,7 +285,7 @@ export default function ConflictPage() {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [sessionId, mode, isInitiator, step]);
+    }, [sessionId, mode, isInitiator]);
 
     const triggerJointAnalysis = async (sessionData: any) => {
         setIsAnalyzing(true);
