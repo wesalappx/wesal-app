@@ -153,7 +153,6 @@ function GameSessionContent() {
             if (journeyId) {
                 const currentProgress = progressMap[journeyId]?.completed_steps || 0;
                 const newProgress = Math.max(currentProgress, stepNumber);
-                console.log('Saving progress:', { journeyId, stepNumber, currentProgress, newProgress });
                 await updateProgress(journeyId, newProgress);
             }
         }
@@ -196,7 +195,6 @@ function GameSessionContent() {
             if (journeyId) {
                 const currentProgress = progressMap[journeyId]?.completed_steps || 0;
                 const newProgress = Math.max(currentProgress, stepNumber);
-                console.log('Saving progress (addScore):', { journeyId, stepNumber, currentProgress, newProgress });
                 await updateProgress(journeyId, newProgress);
             }
         }
@@ -690,7 +688,6 @@ function GameSessionContent() {
         if (journeyId) {
             const currentProgress = progressMap[journeyId]?.completed_steps || 0;
             const newProgress = Math.max(currentProgress, stepNumber);
-            console.log('Saving progress on finish:', { journeyId, stepNumber, currentProgress, newProgress });
             await updateProgress(journeyId, newProgress);
         }
     };
