@@ -428,16 +428,28 @@ export default function CheckInPage() {
                                                 </div>
 
                                                 {/* Sparkline Bars */}
-                                                <div className="h-8 flex-1 flex items-end gap-1">
+                                                <div className="h-12 flex-1 flex items-end gap-1.5 pt-2">
                                                     {weeklyData.slice(0, 7).reverse().map((checkIn, idx) => {
                                                         const value = checkIn[metric as keyof CheckIn] as number || 0;
                                                         const height = (value / 5) * 100;
                                                         return (
-                                                            <motion.div
-                                                                key={idx}
-                                                                initial={{ height: 0 }}
-                                                                animate={{ height: `${height}%` }}
-                                                                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                                                            <div key={idx} className="flex-1 h-full flex items-end relative group bg-surface-800/30 rounded-sm overflow-hidden">
+                                                                <motion.div
+                                                                    initial={{ height: 0 }}
+                                                                    animate={{ height: `${height}%` }}
+                                                                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                                                                    className={`w-full ${question.color.replace('text', 'bg')} opacity-60 group-hover:opacity-100 transition-opacity`}
+                                                                />
+                                                                {/* Tooltip on Hover */}
+                                                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap">
+                                                                    <span className="text-[10px] font-bold text-white bg-surface-900 border border-white/10 px-2 py-1 rounded shadow-xl">
+                                                                        {value}/5
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
                                                                 className={`flex-1 rounded-sm ${question.color.replace('text', 'bg')}/40 hover:${question.color.replace('text', 'bg')}/80 transition-colors relative group min-w-[4px]`}
                                                             >
                                                                 {/* Tooltip on Hover */}
@@ -461,66 +473,67 @@ export default function CheckInPage() {
                             </div>
                         )}
 
-                        {/* 3. BOTTOM SECTION: "ROYA" INSIGHTS (3 Cards) */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 px-2">
-                                <Sparkles className="w-5 h-5 text-primary-400" />
-                                <h3 className="text-lg font-bold text-white">رؤية (Roya)</h3>
-                            </div>
+            {/* 3. BOTTOM SECTION: "ROYA" INSIGHTS (3 Cards) */}
+            <div className="space-y-4">
+                <div className="flex items-center gap-2 px-2">
+                    <Sparkles className="w-5 h-5 text-primary-400" />
+                    <h3 className="text-lg font-bold text-white">رؤية (Roya)</h3>
+                </div>
 
-                            {/* Card 1: The Insight (Jawhar) */}
-                            <div className="glass-card p-5 border-l-4 border-l-primary-500 bg-gradient-to-r from-surface-800 to-surface-800/50">
-                                <h4 className="text-sm font-bold text-primary-300 mb-2">الرؤية</h4>
-                                <p className="text-white leading-relaxed">
-                                    {aiData?.insight || <Loader2 className="w-4 h-4 animate-spin inline" />}
-                                </p>
-                            </div>
+                {/* Card 1: The Insight (Jawhar) */}
+                <div className="glass-card p-5 border-l-4 border-l-primary-500 bg-gradient-to-r from-surface-800 to-surface-800/50">
+                    <h4 className="text-sm font-bold text-primary-300 mb-2">الرؤية</h4>
+                    <p className="text-white leading-relaxed">
+                        {aiData?.insight || <Loader2 className="w-4 h-4 animate-spin inline" />}
+                    </p>
+                </div>
 
-                            {/* Card 2: The Action (Khutwa) */}
-                            <div className="glass-card p-5 border-l-4 border-l-blue-500 bg-gradient-to-r from-surface-800 to-surface-800/50">
-                                <h4 className="text-sm font-bold text-blue-300 mb-2">خطوة اليوم</h4>
-                                <div className="flex items-start gap-3">
-                                    <CheckCircle className="w-5 h-5 text-blue-400 mt-0.5" />
-                                    <p className="text-white">
-                                        {aiData?.action || "..."}
-                                    </p>
-                                </div>
-                            </div>
+                {/* Card 2: The Action (Khutwa) */}
+                <div className="glass-card p-5 border-l-4 border-l-blue-500 bg-gradient-to-r from-surface-800 to-surface-800/50">
+                    <h4 className="text-sm font-bold text-blue-300 mb-2">خطوة اليوم</h4>
+                    <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-blue-400 mt-0.5" />
+                        <p className="text-white">
+                            {aiData?.action || "..."}
+                        </p>
+                    </div>
+                </div>
 
-                            {/* Card 3: The Quote (Hamsa) */}
-                            <div className="glass-card p-5 border-l-4 border-l-rose-500 bg-gradient-to-r from-surface-800 to-surface-800/50 italic">
-                                <h4 className="text-sm font-bold text-rose-300 mb-2">همسة</h4>
-                                <div className="flex gap-2">
-                                    <Quote className="w-4 h-4 text-rose-400 transform rotate-180" />
-                                    <p className="text-surface-200">
-                                        {aiData?.quote || "..."}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-4 pt-4">
-                            <Link href="/dashboard" className="flex-1 py-4 bg-surface-800 hover:bg-surface-700 rounded-xl font-bold text-white text-center transition-colors">
-                                الرئيسية
-                            </Link>
-                            <button
-                                onClick={handleShare}
-                                disabled={isSharing}
-                                className="flex-1 py-4 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-white shadow-lg shadow-primary-900/40 flex items-center justify-center gap-2 transition-colors"
-                            >
-                                {isSharing ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                ) : (
-                                    <Share2 className="w-5 h-5" />
-                                )}
-                                مشاركة
-                            </button>
-                        </div>
-
-                    </motion.div>
-                )}
+                {/* Card 3: The Quote (Hamsa) */}
+                <div className="glass-card p-5 border-l-4 border-l-rose-500 bg-gradient-to-r from-surface-800 to-surface-800/50 italic">
+                    <h4 className="text-sm font-bold text-rose-300 mb-2">همسة</h4>
+                    <div className="flex gap-2">
+                        <Quote className="w-4 h-4 text-rose-400 transform rotate-180" />
+                        <p className="text-surface-200">
+                            {aiData?.quote || "..."}
+                        </p>
+                    </div>
+                </div>
             </div>
-        </main>
+
+            {/* Actions */}
+            <div className="flex gap-4 pt-4">
+                <Link href="/dashboard" className="flex-1 py-4 bg-surface-800 hover:bg-surface-700 rounded-xl font-bold text-white text-center transition-colors">
+                    الرئيسية
+                </Link>
+                <button
+                    onClick={handleShare}
+                    disabled={isSharing}
+                    className="flex-1 py-4 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-white shadow-lg shadow-primary-900/40 flex items-center justify-center gap-2 transition-colors"
+                >
+                    {isSharing ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                        <Share2 className="w-5 h-5" />
+                    )}
+                    مشاركة
+                </button>
+            </div>
+
+        </motion.div>
+    )
+}
+            </div >
+        </main >
     );
 }
