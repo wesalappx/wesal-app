@@ -521,5 +521,5 @@ export default function CheckInPage() {
             )}
         </div>
     </main>
-    );
+
 }
