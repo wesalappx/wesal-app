@@ -153,6 +153,14 @@ export default function SettingsPage() {
                     </div>
                 </motion.section>
 
+                <button
+                    onClick={() => setShowUnpairConfirm(true)}
+                    className="w-full p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-colors font-medium flex items-center justify-center gap-2"
+                >
+                    <UserMinus className="w-4 h-4" />
+                    {isRTL ? 'إلغاء الربط' : 'Unpair'}
+                </button>
+
                 {/* Partner Section */}
                 {partnerInfo?.isPaired && (
                     <motion.section variants={itemVariants} className="space-y-3">
@@ -175,35 +183,27 @@ export default function SettingsPage() {
                                 </div>
                             </div>
 
-                            {!showUnpairConfirm ? (
-                                <button
-                                    onClick={() => setShowUnpairConfirm(true)}
-                                    className="w-full p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-colors font-medium flex items-center justify-center gap-2"
-                                >
-                                    <UserMinus className="w-4 h-4" />
-                                    {isRTL ? 'إلغاء الربط' : 'Unpair'}
-                                </button>
                             ) : (
-                                <div className="space-y-3">
-                                    <p className="text-sm text-center text-surface-300">
-                                        {isRTL ? 'هل أنت متأكد؟ سيتم إلغاء الربط بينكما.' : 'Are you sure? This will unpair you both.'}
-                                    </p>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => setShowUnpairConfirm(false)}
-                                            className="flex-1 p-3 rounded-xl bg-surface-800 text-surface-300 hover:bg-surface-700 transition-colors font-medium"
-                                        >
-                                            {isRTL ? 'إلغاء' : 'Cancel'}
-                                        </button>
-                                        <button
-                                            onClick={handleUnpair}
-                                            disabled={unpairLoading}
-                                            className="flex-1 p-3 rounded-xl bg-red-600 text-white hover:bg-red-500 transition-colors font-medium"
-                                        >
-                                            {unpairLoading ? '...' : (isRTL ? 'نعم، ألغِ الربط' : 'Yes, Unpair')}
-                                        </button>
-                                    </div>
+                            <div className="space-y-3">
+                                <p className="text-sm text-center text-surface-300">
+                                    {isRTL ? 'هل أنت متأكد؟ سيتم إلغاء الربط بينكما.' : 'Are you sure? This will unpair you both.'}
+                                </p>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setShowUnpairConfirm(false)}
+                                        className="flex-1 p-3 rounded-xl bg-surface-800 text-surface-300 hover:bg-surface-700 transition-colors font-medium"
+                                    >
+                                        {isRTL ? 'إلغاء' : 'Cancel'}
+                                    </button>
+                                    <button
+                                        onClick={handleUnpair}
+                                        disabled={unpairLoading}
+                                        className="flex-1 p-3 rounded-xl bg-red-600 text-white hover:bg-red-500 transition-colors font-medium"
+                                    >
+                                        {unpairLoading ? '...' : (isRTL ? 'نعم، ألغِ الربط' : 'Yes, Unpair')}
+                                    </button>
                                 </div>
+                            </div>
                             )}
                         </div>
                     </motion.section>
