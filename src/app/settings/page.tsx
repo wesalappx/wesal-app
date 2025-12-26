@@ -135,71 +135,24 @@ export default function SettingsPage() {
                             >
                                 {t('settings.editProfile')}
                             </Link>
-                            <Link
-                                href="/pairing"
-                                className="block w-full py-3 text-center rounded-xl bg-primary-500/10 text-primary-400 hover:bg-primary-500/20 border border-primary-500/30 transition-colors font-medium"
-                            >
-                                {isRTL ? 'ربط الشريك' : 'Link Partner'}
-                            </Link>
+
+                            {!partnerInfo?.isPaired ? (
+                                <Link
+                                    href="/pairing"
+                                    className="block w-full py-3 text-center rounded-xl bg-primary-500/10 text-primary-400 hover:bg-primary-500/20 border border-primary-500/30 transition-colors font-medium"
+                                >
+                                    {isRTL ? 'ربط الشريك' : 'Link Partner'}
+                                </Link>
+                            ) : (
+                                <div className="block w-full py-3 text-center rounded-xl bg-green-500/10 text-green-400 border border-green-500/30 font-medium cursor-default">
+                                    {isRTL ? `مرتبط مع ${partnerInfo.name}` : `Paired: ${partnerInfo.name}`}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </motion.section>
 
-                {/* Partner Section */}
-                {partnerInfo?.isPaired && (
-                    <motion.section variants={itemVariants} className="space-y-3">
-                        <h2 className="text-sm font-bold text-surface-400 px-1">
-                            {isRTL ? 'الشريك' : 'Partner'}
-                        </h2>
 
-                        <div className="p-5 rounded-2xl glass-card border-surface-700/50">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg">
-                                    <Users className="w-7 h-7 text-white" />
-                                </div>
-                                <div className={isRTL ? 'text-right' : 'text-left'}>
-                                    <p className="text-surface-400 text-sm">
-                                        {isRTL ? 'مرتبط مع' : 'Paired with'}
-                                    </p>
-                                    <p className="text-lg font-bold text-white">
-                                        {partnerInfo.name || (isRTL ? 'الشريك' : 'Partner')}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {!showUnpairConfirm ? (
-                                <button
-                                    onClick={() => setShowUnpairConfirm(true)}
-                                    className="w-full p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-colors font-medium flex items-center justify-center gap-2"
-                                >
-                                    <UserMinus className="w-4 h-4" />
-                                    {isRTL ? 'إلغاء الربط' : 'Unpair'}
-                                </button>
-                            ) : (
-                                <div className="space-y-3">
-                                    <p className="text-sm text-center text-surface-300">
-                                        {isRTL ? 'هل أنت متأكد؟ سيتم إلغاء الربط بينكما.' : 'Are you sure? This will unpair you both.'}
-                                    </p>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => setShowUnpairConfirm(false)}
-                                            className="flex-1 p-3 rounded-xl bg-surface-800 text-surface-300 hover:bg-surface-700 transition-colors font-medium"
-                                        >
-                                            {isRTL ? 'إلغاء' : 'Cancel'}
-                                        </button>
-                                        <button
-                                            onClick={handleUnpair}
-                                            disabled={unpairLoading}
-                                            className="flex-1 p-3 rounded-xl bg-red-600 text-white hover:bg-red-500 transition-colors font-medium"
-                                        >
-                                            {unpairLoading ? '...' : (isRTL ? 'نعم، ألغِ الربط' : 'Yes, Unpair')}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </motion.section>
-                )}
 
                 {/* Preferences Section */}
                 <motion.section variants={itemVariants} className="space-y-3">
@@ -261,15 +214,52 @@ export default function SettingsPage() {
                 {/* Danger Zone */}
                 <motion.section variants={itemVariants} className="space-y-3">
                     <div className="space-y-2">
+                        {partnerInfo?.isPaired && (
+                            !showUnpairConfirm ? (
+                                <button
+                                    onClick={() => setShowUnpairConfirm(true)}
+                                    className="w-full p-4 rounded-2xl flex items-center justify-between glass-card hover:bg-red-500/10 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-red-500/10 group-hover:bg-red-500/20 flex items-center justify-center transition-colors">
+                                            <UserMinus className="w-5 h-5 text-red-400" />
+                                        </div>
+                                        <p className="font-medium text-red-400">{isRTL ? 'إلغاء الربط' : 'Unpair Partner'}</p>
+                                    </div>
+                                </button>
+                            ) : (
+                                <div className="p-4 rounded-2xl glass-card border border-red-500/30 bg-red-500/5 space-y-3">
+                                    <p className="text-sm text-center text-red-200">
+                                        {isRTL ? 'هل أنت متأكد؟ سيتم فصل الحسابين عن بعضهما.' : 'Are you sure? This will disconnect your accounts.'}
+                                    </p>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setShowUnpairConfirm(false)}
+                                            className="flex-1 p-2 rounded-lg bg-surface-800 text-surface-300 hover:bg-surface-700 transition-colors text-sm font-bold"
+                                        >
+                                            {isRTL ? 'إلغاء' : 'Cancel'}
+                                        </button>
+                                        <button
+                                            onClick={handleUnpair}
+                                            disabled={unpairLoading}
+                                            className="flex-1 p-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition-colors text-sm font-bold"
+                                        >
+                                            {unpairLoading ? '...' : (isRTL ? 'نعم، ألغِ الربط' : 'Yes, Unpair')}
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        )}
+
                         <button
                             onClick={() => signOut()}
-                            className="w-full p-4 rounded-2xl flex items-center justify-between glass-card hover:bg-red-500/10 transition-colors"
+                            className="w-full p-4 rounded-2xl flex items-center justify-between glass-card hover:bg-surface-700/50 transition-colors"
                         >
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
-                                    <LogOut className="w-5 h-5 text-red-400" />
+                                <div className="w-10 h-10 rounded-xl bg-surface-700 flex items-center justify-center">
+                                    <LogOut className="w-5 h-5 text-surface-400" />
                                 </div>
-                                <p className="font-medium text-red-400">{t('settings.logout')}</p>
+                                <p className="font-medium text-surface-400">{t('settings.logout')}</p>
                             </div>
                         </button>
                     </div>
