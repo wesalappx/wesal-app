@@ -11,7 +11,8 @@ import {
     Send,
     Clock,
     Sparkles,
-    X
+    X,
+    Wifi
 } from 'lucide-react';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useAuth } from '@/hooks/useAuth';
@@ -19,6 +20,8 @@ import { usePairing } from '@/hooks/usePairing';
 import { createClient } from '@/lib/supabase/client';
 import { useSound } from '@/hooks/useSound';
 import Confetti from '@/components/Confetti';
+import { useSessionSync } from '@/hooks/useSessionSync';
+import SessionModeModal from '@/components/SessionModeModal';
 import { whisperCards, responseOptions, timeOptions, WhisperCard } from './data/whisperCards';
 
 type WhisperStatus = 'pending' | 'accepted' | 'later' | 'not_now' | 'expired';
@@ -54,6 +57,32 @@ export default function WhisperPage() {
     const [selectedTime, setSelectedTime] = useState<string>('tonight');
     const [isSending, setIsSending] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
+    const [showModeModal, setShowModeModal] = useState(false); // Default false, triggered by button? Or true?
+
+    // Session Sync
+    const {
+        session,
+        mode: sessionMode,
+        initSession,
+        updateState,
+        isRemote
+    } = useSessionSync('whisper', 'daily');
+
+    // Sync Selected Card
+    useEffect(() => {
+        if (isRemote && session?.state?.cardId) {
+            const card = whisperCards.find(c => c.id === session.state.cardId);
+            if (card) setSelectedCard(card);
+        }
+    }, [isRemote, session?.state?.cardId]);
+
+    // Handle Card Selection with Sync
+    const handleCardSelect = (card: WhisperCard) => {
+        setSelectedCard(card);
+        if (isRemote) {
+            updateState({ cardId: card.id });
+        }
+    };
 
     // Load pairing status and active whisper
     useEffect(() => {
@@ -264,7 +293,16 @@ export default function WhisperPage() {
                     </h1>
                     <p className="text-xs text-purple-300/60">{partnerName}</p>
                 </div>
-                <div className="w-10" /> {/* Spacer */}
+                <button
+                    onClick={() => setShowModeModal(true)}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${isRemote
+                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                            : 'bg-white/5 text-surface-400 hover:bg-white/10'
+                        }`}
+                >
+                    <Wifi className={`w-3 h-3 ${isRemote ? 'animate-pulse' : ''}`} />
+                    {isRemote ? (language === 'ar' ? 'متصل' : 'Live') : (language === 'ar' ? 'ربط' : 'Connect')}
+                </button>
             </header>
 
             <AnimatePresence mode="wait">
@@ -466,12 +504,12 @@ export default function WhisperPage() {
                                     key={card.id}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => {
-                                        setSelectedCard(card);
+                                        handleCardSelect(card);
                                         playSound('pop');
                                     }}
                                     className={`relative p-4 rounded-2xl border transition-all ${selectedCard?.id === card.id
-                                            ? 'bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20'
-                                            : 'bg-surface-800/50 border-white/5 hover:border-white/10'
+                                        ? 'bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20'
+                                        : 'bg-surface-800/50 border-white/5 hover:border-white/10'
                                         }`}
                                 >
                                     <span className="text-3xl mb-2 block">{card.emoji}</span>
@@ -504,8 +542,8 @@ export default function WhisperPage() {
                                             key={time.id}
                                             onClick={() => setSelectedTime(time.id)}
                                             className={`px-4 py-2 rounded-full text-sm transition-all ${selectedTime === time.id
-                                                    ? 'bg-purple-500 text-white'
-                                                    : 'bg-surface-800 text-surface-300 hover:bg-surface-700'
+                                                ? 'bg-purple-500 text-white'
+                                                : 'bg-surface-800 text-surface-300 hover:bg-surface-700'
                                                 }`}
                                         >
                                             {language === 'ar' ? time.text_ar : time.text_en}
@@ -521,8 +559,8 @@ export default function WhisperPage() {
                             onClick={handleSendWhisper}
                             disabled={!selectedCard || isSending}
                             className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all ${selectedCard
-                                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-purple-500/30'
-                                    : 'bg-surface-800 text-surface-500'
+                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-purple-500/30'
+                                : 'bg-surface-800 text-surface-500'
                                 }`}
                         >
                             <Send className="w-5 h-5" />
@@ -534,6 +572,15 @@ export default function WhisperPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
+            {/* Session Mode Modal */}
+            <SessionModeModal
+                isOpen={showModeModal}
+                onSelectMode={(mode) => {
+                    initSession(mode);
+                    setShowModeModal(false);
+                }}
+                onClose={() => setShowModeModal(false)}
+            />
         </main>
     );
 }

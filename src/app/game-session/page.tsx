@@ -11,6 +11,8 @@ import { sessionData, getTruthsAndDares } from './data/gameContent';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useJourneys } from '@/hooks/useJourneys';
+import { useSessionSync } from '@/hooks/useSessionSync';
+import SessionModeModal from '@/components/SessionModeModal';
 
 
 // Map game modes to journey types
@@ -67,73 +69,67 @@ function GameSessionContent() {
     const question = currentQuestions?.[currentIndex];
     const progress = currentQuestions.length > 0 ? ((currentIndex + 1) / currentQuestions.length) * 100 : 0;
 
-    const [sessionId, setSessionId] = useState<string | null>(null);
-    const [isOnline, setIsOnline] = useState(false);
-    const supabase = createClient();
-    const { user } = useAuth();
+    // Session Sync
+    const {
+        session,
+        mode: sessionMode,
+        initSession: initGameSession,
+        updateState,
+        isRemote,
+        loading: sessionLoading
+    } = useSessionSync('game', mode);
+
     const { updateProgress, progressMap } = useJourneys();
+    const { user } = useAuth();
+    const [showModeModal, setShowModeModal] = useState(true);
 
-    // Randomize questions on mount
+    // Sync Game State
     useEffect(() => {
-        const shuffled = shuffleArray(questions.length > 0 ? questions : sessionData['values']);
-        setCurrentQuestions(shuffled);
-    }, [mode]);
-
-    // Check for existing active game session
-    useEffect(() => {
-        const initSession = async () => {
-            // If we passed a specific session ID
-            const sid = searchParams.get('sid');
-            if (sid) {
-                setSessionId(sid);
-                setIsOnline(true);
-                // Fetch initial state
-                const { data } = await supabase.from('game_sessions').select('*').eq('id', sid).single();
-                if (data && data.current_state) {
-                    syncState(data.current_state);
-                }
+        if (isRemote && session?.state) {
+            // Sync questions order if provided
+            if (session.state.questions && session.state.questions.length > 0) {
+                // Ensure we don't overwrite if already set to avoid re-render loops? 
+                // Actually we want to force sync.
+                // But we need to check if it's different.
+                // For simplicity, we trust the session state as source of truth.
+                setCurrentQuestions(session.state.questions);
             }
-        };
-        initSession();
-    }, [searchParams]);
 
-    // Realtime Sync
+            if (session.state.currentIndex !== undefined) setCurrentIndex(session.state.currentIndex);
+            if (session.state.turn) setTurn(session.state.turn as 'p1' | 'p2');
+            if (session.state.scores) setScores(session.state.scores);
+            // Sync specific game states
+            if (session.state.wyrChoice) setWyrChoice(session.state.wyrChoice);
+            if (session.state.spinResult) setSpinResult(session.state.spinResult);
+            if (session.state.isSpinning !== undefined) setIsSpinning(session.state.isSpinning);
+            if (session.state.todChoice) setTodChoice(session.state.todChoice);
+            // ... add others
+        }
+    }, [isRemote, session?.state]);
+
+    // Handle Mode Selection
+    const handleModeSelect = (selectedMode: 'local' | 'remote') => {
+        initGameSession(selectedMode);
+        setShowModeModal(false);
+    };
+
+    // Initialize Questions (Only if local or if Creator in remote)
     useEffect(() => {
-        if (!sessionId) return;
+        // If remote and NOT creator, wait for sync (handled above).
+        // If local OR (remote AND creator), shuffle and set.
+        const shouldInit = sessionMode === 'local' || (isRemote && session?.created_by === user?.id) || !sessionMode;
 
-        const channel = supabase
-            .channel(`game-${sessionId}`)
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'game_sessions', filter: `id=eq.${sessionId}` }, (payload) => {
-                const newState = payload.new.current_state;
-                if (newState) syncState(newState);
-            })
-            .subscribe();
+        if (shouldInit && questions.length > 0 && currentQuestions.length === 0) {
+            const shuffled = shuffleArray(questions);
+            setCurrentQuestions(shuffled);
 
-        return () => { supabase.removeChannel(channel); };
-    }, [sessionId]);
-
-    const syncState = (state: any) => {
-        if (state.index !== undefined) setCurrentIndex(state.index);
-        if (state.turn) setTurn(state.turn);
-        if (state.scores) setScores(state.scores);
-        if (state.wyrChoice !== undefined) setWyrChoice(state.wyrChoice);
-        if (state.spinResult !== undefined) setSpinResult(state.spinResult);
-        if (state.isFinished) setIsFinished(state.isFinished);
-    };
-
-    const updateOnlineState = async (updates: any) => {
-        if (!sessionId) return;
-        const newState = {
-            index: currentIndex,
-            turn,
-            scores,
-            wyrChoice,
-            spinResult,
-            isFinished,
-            ...updates
-        };
-        await supabase.from('game_sessions').update({ current_state: newState }).eq('id', sessionId);
-    };
+            // If remote creator, push state
+            if (isRemote) {
+                updateState({ questions: shuffled });
+            }
+        }
+    }, [mode, sessionMode, isRemote, session?.created_by, user?.id]);
+    // Removed legacy sync logic (replaced by useSessionSync hook)
 
     const handleNext = async () => {
         if (currentIndex < currentQuestions.length - 1) {
@@ -144,10 +140,10 @@ function GameSessionContent() {
             setTurn(nextTurn);
             setWyrChoice(null);
 
-            if (isOnline) updateOnlineState({ index: nextIndex, turn: nextTurn, wyrChoice: null });
+            if (isRemote) updateState({ currentIndex: nextIndex, turn: nextTurn, wyrChoice: null });
         } else {
             setIsFinished(true);
-            if (isOnline) updateOnlineState({ isFinished: true });
+            if (isRemote) updateState({ isFinished: true });
 
             // Save journey progress - use journey ID from URL directly
             if (journeyId) {
@@ -163,33 +159,32 @@ function GameSessionContent() {
         setIsSpinning(true);
         setSpinResult(null);
 
-        // In online mode, we determine result immediately but show animation locally? 
-        // Or simpler: One person spins, result is sent.
+        if (isRemote) updateState({ isSpinning: true, spinResult: null });
 
         setTimeout(() => {
+            // Only the one who clicked spins? Or centralized?
+            // For simplicity, local random then push
             const randomItem = currentQuestions[Math.floor(Math.random() * currentQuestions.length)];
             setSpinResult(randomItem);
             setIsSpinning(false);
-            if (isOnline) updateOnlineState({ spinResult: randomItem });
+            if (isRemote) updateState({ spinResult: randomItem, isSpinning: false });
         }, 2000);
     };
 
     const addScore = async (player: 'p1' | 'p2') => {
         const newScores = { ...scores, [player]: scores[player] + 1 };
         setScores(newScores);
-        // handleNext comes after, but we need to update state atomically if possible or sequential
-        // For simplicity, we just update local state then trigger next
-        // But handleNext also updates. optimize:
+
         if (currentIndex < currentQuestions.length - 1) {
             const nextIndex = currentIndex + 1;
             const nextTurn = turn === 'p1' ? 'p2' : 'p1';
             setCurrentIndex(nextIndex);
             setTurn(nextTurn);
             setWyrChoice(null);
-            if (isOnline) updateOnlineState({ scores: newScores, index: nextIndex, turn: nextTurn });
+            if (isRemote) updateState({ scores: newScores, currentIndex: nextIndex, turn: nextTurn, wyrChoice: null });
         } else {
             setIsFinished(true);
-            if (isOnline) updateOnlineState({ scores: newScores, isFinished: true });
+            if (isRemote) updateState({ scores: newScores, isFinished: true });
 
             // Save journey progress - use journey ID from URL directly
             if (journeyId) {
@@ -715,10 +710,11 @@ function GameSessionContent() {
             </header>
 
             {/* Main Content */}
+            {/* Main Content */}
             <div className="flex-1 flex flex-col justify-center px-6 pb-32 z-10">
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={question.id}
+                        key={question?.id || currentIndex}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
@@ -728,6 +724,13 @@ function GameSessionContent() {
                     </motion.div>
                 </AnimatePresence>
             </div>
+
+            {/* Session Mode Modal */}
+            <SessionModeModal
+                isOpen={showModeModal}
+                onSelectMode={handleModeSelect}
+                onClose={() => setShowModeModal(false)}
+            />
         </main>
     );
 }

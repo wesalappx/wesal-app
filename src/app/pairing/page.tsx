@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Heart, Copy, Check, QrCode, Users, ArrowLeft, Loader2, LogOut } from 'lucide-react';
+import { Heart, Copy, Check, QrCode, Users, ArrowLeft, Loader2, LogOut, Sparkles } from 'lucide-react';
 import { usePairing } from '@/hooks/usePairing';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/hooks/useAuth';
@@ -260,77 +260,115 @@ export default function PairingPage() {
                 )}
 
                 {mode === 'generate' && pairingCode && (
-                    <div className="glass-card p-8 text-center">
-                        <p className="text-surface-400 mb-4">{t('pairing.shareCode')}</p>
+                    <div className="glass-card p-8 text-center animate-in fade-in zoom-in duration-300">
+                        <p className="text-surface-400 mb-6 font-medium">{t('pairing.shareCode')}</p>
 
-                        <div className="relative mb-6">
-                            <div className="text-4xl font-mono font-bold tracking-widest py-4">
-                                {pairingCode}
+                        <div className="relative mb-8 group">
+                            <div className="flex gap-2 justify-center direction-ltr">
+                                {pairingCode.split('').map((digit, i) => (
+                                    <div
+                                        key={i}
+                                        className="w-12 h-16 rounded-xl bg-black/30 border border-white/10 flex items-center justify-center text-3xl font-mono font-bold text-primary-400 shadow-inner"
+                                    >
+                                        {digit}
+                                    </div>
+                                ))}
                             </div>
                             <button
                                 onClick={copyCode}
-                                className="absolute left-0 top-1/2 -translate-y-1/2 p-2 hover:bg-white/10 rounded-lg transition-colors"
+                                className="absolute -right-4 top-1/2 -translate-y-1/2 p-3 bg-surface-800 rounded-xl border border-white/10 shadow-xl hover:bg-surface-700 transition-all hover:scale-110"
+                                title={t('pairing.copy')}
                             >
                                 {copied ? (
                                     <Check className="w-5 h-5 text-green-500" />
                                 ) : (
-                                    <Copy className="w-5 h-5 text-surface-400" />
+                                    <Copy className="w-5 h-5 text-primary-400" />
                                 )}
                             </button>
                         </div>
 
-                        <p className="text-sm text-surface-400 mb-6">
-                            {t('pairing.expires')}
+                        <p className="text-sm text-surface-400 mb-8 bg-surface-800/50 py-2 px-4 rounded-full inline-block">
+                            ⏳ {t('pairing.expires')}
                         </p>
 
                         <div className="flex gap-4">
                             <button
                                 onClick={() => setMode('choose')}
-                                className="btn-secondary flex-1"
+                                className="btn-secondary flex-1 border-white/10 hover:bg-white/5"
                             >
                                 {t('common.back')}
                             </button>
                             <button
                                 onClick={copyCode}
-                                className="btn-primary flex-1"
+                                className="btn-primary flex-1 shadow-lg shadow-primary-500/20"
                             >
                                 {copied ? t('pairing.copied') : t('pairing.copy')}
                             </button>
                         </div>
 
-                        <p className="mt-6 text-sm text-surface-400">
+                        <p className="mt-8 text-sm text-surface-400 animate-pulse">
                             {t('pairing.waiting')}
                         </p>
                     </div>
                 )}
 
                 {mode === 'enter' && (
-                    <div className="glass-card p-8">
-                        <p className="text-center text-surface-400 mb-6">
+                    <div className="glass-card p-8 animate-in fade-in zoom-in duration-300">
+                        <p className="text-center text-surface-300 mb-8 text-lg">
                             {t('pairing.inputPlaceholder')}
                         </p>
 
-                        <input
-                            type="text"
-                            maxLength={6}
-                            value={inputCode}
-                            onChange={(e) => setInputCode(e.target.value.replace(/\D/g, ''))}
-                            placeholder="000000"
-                            className="input text-center text-3xl font-mono tracking-widest mb-6"
-                            dir="ltr"
-                        />
+                        <div className="relative mb-8 dir-ltr">
+                            {/* Ghost Input */}
+                            <input
+                                type="text"
+                                maxLength={6}
+                                value={inputCode}
+                                onChange={(e) => setInputCode(e.target.value.replace(/\D/g, ''))}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 font-mono tracking-[1em]"
+                                autoFocus
+                                inputMode="numeric"
+                                autoComplete="one-time-code"
+                            />
+
+                            {/* Visual Boxes */}
+                            <div className="flex gap-3 justify-center">
+                                {[...Array(6)].map((_, i) => {
+                                    const digit = inputCode[i];
+                                    const isActive = i === inputCode.length;
+                                    const isFilled = !!digit;
+
+                                    return (
+                                        <div
+                                            key={i}
+                                            className={`
+                                                w-12 h-16 rounded-xl border flex items-center justify-center text-3xl font-mono font-bold transition-all duration-200
+                                                ${isActive
+                                                    ? 'border-primary-500 bg-primary-500/10 scale-110 shadow-lg shadow-primary-500/20'
+                                                    : isFilled
+                                                        ? 'border-white/20 bg-black/20 text-white'
+                                                        : 'border-white/10 bg-black/10 text-white/20'
+                                                }
+                                            `}
+                                        >
+                                            {digit || (isActive ? '|' : '0')}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
 
                         <div className="flex gap-4">
                             <button
                                 onClick={() => setMode('choose')}
-                                className="btn-secondary flex-1"
+                                className="btn-secondary flex-1 border-white/10 hover:bg-white/5"
                             >
                                 {t('common.back')}
                             </button>
                             <button
                                 onClick={handleAcceptCode}
                                 disabled={isLoading || inputCode.length !== 6}
-                                className="btn-primary flex-1 flex items-center justify-center gap-2"
+                                className="btn-primary flex-1 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 disabled:opacity-50 disabled:shadow-none transition-all"
                             >
                                 {isLoading ? (
                                     <>
@@ -338,7 +376,10 @@ export default function PairingPage() {
                                         {t('pairing.connecting')}
                                     </>
                                 ) : (
-                                    t('pairing.connect')
+                                    <>
+                                        {t('pairing.connect')}
+                                        <Sparkles className="w-4 h-4" />
+                                    </>
                                 )}
                             </button>
                         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
@@ -14,6 +14,8 @@ import {
     MessageCircle
 } from 'lucide-react';
 import { useJourneys } from '@/hooks/useJourneys';
+import { useSessionSync } from '@/hooks/useSessionSync';
+import SessionModeModal from '@/components/SessionModeModal';
 import { journeysData, getJourneySteps } from '@/data/journeys';
 import { sessionData } from '@/app/game-session/data/gameContent';
 
@@ -26,8 +28,31 @@ function JourneyExerciseContent() {
     const stepParam = searchParams.get('step');
     const stepIndex = stepParam ? parseInt(stepParam) - 1 : 0;
 
+    // Session Sync
+    const {
+        session,
+        mode,
+        initSession,
+        updateState,
+        isRemote,
+        loading: sessionLoading
+    } = useSessionSync('journey', journeyId);
+
+    const [showModeModal, setShowModeModal] = useState(true);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
+
+    // Sync State Effect
+    useEffect(() => {
+        if (isRemote && session?.state?.stepIndex !== undefined) {
+            setCurrentQuestionIndex(session.state.stepIndex);
+        }
+    }, [isRemote, session?.state?.stepIndex]);
+
+    const handleModeSelect = (selectedMode: 'local' | 'remote') => {
+        initSession(selectedMode);
+        setShowModeModal(false);
+    };
 
     const journey = journeysData.find(j => j.id === journeyId);
     const steps = getJourneySteps(journeyId);
@@ -103,7 +128,9 @@ function JourneyExerciseContent() {
 
     const handleNext = async () => {
         if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
+            const nextIndex = currentQuestionIndex + 1;
+            setCurrentQuestionIndex(nextIndex);
+            if (isRemote) updateState({ stepIndex: nextIndex });
         } else {
             const newProgress = Math.max(completedSteps, stepIndex + 1);
             await updateProgress(journeyId, newProgress);
@@ -113,7 +140,9 @@ function JourneyExerciseContent() {
 
     const handlePrev = () => {
         if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(currentQuestionIndex - 1);
+            const prevIndex = currentQuestionIndex - 1;
+            setCurrentQuestionIndex(prevIndex);
+            if (isRemote) updateState({ stepIndex: prevIndex });
         }
     };
 
@@ -435,6 +464,12 @@ function JourneyExerciseContent() {
                     </div>
                 </div>
             </div>
+            {/* Session Mode Modal */}
+            <SessionModeModal
+                isOpen={showModeModal}
+                onSelectMode={handleModeSelect}
+                onClose={() => setShowModeModal(false)}
+            />
         </main>
     );
 }
