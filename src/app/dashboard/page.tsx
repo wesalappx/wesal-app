@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
     Heart,
@@ -34,7 +35,12 @@ import CoolDownModal from '@/components/CoolDownModal';
 export default function Dashboard() {
     const { user } = useAuth();
     const { getStatus } = usePairing();
+    const router = useRouter();
     const { theme } = useSettingsStore();
+
+    // ... (rest of component)
+
+
     const { t, language } = useTranslation();
     const isRTL = language === 'ar';
 
@@ -119,6 +125,8 @@ export default function Dashboard() {
         // Fetch partner info & Mood
         const fetchPartnerData = async () => {
             const { isPaired: paired, partner, coupleId: cId } = await getStatus();
+
+
             setIsPaired(paired);
             setCoupleId(cId || null);
 

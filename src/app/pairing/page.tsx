@@ -3,14 +3,16 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Heart, Copy, Check, QrCode, Users, ArrowLeft, Loader2 } from 'lucide-react';
+import { Heart, Copy, Check, QrCode, Users, ArrowLeft, Loader2, LogOut } from 'lucide-react';
 import { usePairing } from '@/hooks/usePairing';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function PairingPage() {
     const { t, language } = useTranslation();
     const router = useRouter();
     const { generateCode, acceptCode, getStatus, getMyCode, isLoading: hookLoading } = usePairing();
+    const { signOut } = useAuth();
 
     const [mode, setMode] = useState<'choose' | 'generate' | 'enter'>('choose');
     const [pairingCode, setPairingCode] = useState<string | null>(null);
@@ -21,7 +23,7 @@ export default function PairingPage() {
     const [success, setSuccess] = useState(false);
     const [copied, setCopied] = useState(false);
     const [checkingStatus, setCheckingStatus] = useState(true);
-    const [partnerInfo, setPartnerInfo] = useState<{ name: string; id: string } | null>(null);
+    const [partnerInfo, setPartnerInfo] = useState<{ name: string; id: string; avatar?: string } | null>(null);
 
     // Check if already paired on mount
     useEffect(() => {
@@ -43,7 +45,8 @@ export default function PairingPage() {
                 if (partner) {
                     setPartnerInfo({
                         name: partner.display_name || 'شريكك',
-                        id: partner.id
+                        id: partner.id,
+                        avatar: partner.avatar_url
                     });
                 }
             };
@@ -131,13 +134,26 @@ export default function PairingPage() {
                     <h1 className="text-3xl font-bold mb-3 text-white">{t('pairing.success')}</h1>
 
                     {/* Partner Name Display */}
-                    <div className="my-6 py-4 px-6 rounded-2xl bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/30">
-                        <p className="text-surface-400 text-sm mb-1">
-                            {language === 'ar' ? 'أنتما الآن مرتبطان' : 'You are now paired with'}
-                        </p>
-                        <p className="text-2xl font-bold text-white">
-                            {partnerInfo?.name || '...'}
-                        </p>
+                    <div className="my-6 py-6 px-6 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 flex flex-col items-center gap-3">
+                        {partnerInfo?.avatar ? (
+                            <img
+                                src={partnerInfo.avatar}
+                                alt={partnerInfo.name}
+                                className="w-20 h-20 rounded-full border-2 border-white/20 shadow-lg object-cover"
+                            />
+                        ) : (
+                            <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center border-2 border-white/20">
+                                <Users className="w-10 h-10 text-white/60" />
+                            </div>
+                        )}
+                        <div className="text-center">
+                            <p className="text-surface-300 text-sm mb-1">
+                                {language === 'ar' ? 'أنتما الآن مرتبطان مع' : 'You are now paired with'}
+                            </p>
+                            <p className="text-2xl font-bold text-white">
+                                {partnerInfo?.name || '...'}
+                            </p>
+                        </div>
                     </div>
 
                     <p className="text-surface-400 mb-8">
@@ -171,15 +187,27 @@ export default function PairingPage() {
                     {t('common.back')}
                 </Link>
 
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-500/20 flex items-center justify-center">
-                        <Users className="w-10 h-10 text-primary-500" />
-                    </div>
-                    <h1 className="text-2xl font-bold mb-2">{t('pairing.title')}</h1>
-                    <p className="text-surface-400">
-                        {t('pairing.desc')}
-                    </p>
+                {/* Header Controls */}
+                <div className="flex justify-between items-center mb-8 px-2">
+                    <button
+                        onClick={() => signOut()}
+                        className="p-2 text-surface-400 hover:text-red-400 transition-colors"
+                        title={t('auth.logout') || 'Logout'}
+                    >
+                        <LogOut className="w-5 h-5" />
+                    </button>
+                    {/* Add language toggle or other controls here if needed */}
+                </div>
+
+                {/* Header */}\
+                <div className="text-center mb-8">\
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-500/20 flex items-center justify-center">\
+                        <Users className="w-10 h-10 text-primary-500" />\
+                    </div>\
+                    <h1 className="text-2xl font-bold mb-2">{t('pairing.title')}</h1>\
+                    <p className="text-surface-400">\
+                        {t('pairing.desc')}\
+                    </p>\
                 </div>
 
                 {error && (
