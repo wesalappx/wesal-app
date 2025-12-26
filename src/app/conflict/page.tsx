@@ -199,31 +199,8 @@ export default function ConflictPage() {
                     .maybeSingle();
 
                 if (data) {
-                    // If I am the PARTNER (not initiator) being invited - allow auto-restore
-                    // This enables the collaborative flow when partner clicks the notification
-                    if (data.initiator_id !== user.id) {
-                        // Partner joining - restore immediately
-                        setMode('joint');
-                        setSessionId(data.id);
-                        setIsInitiator(false);
-                        setTopic(data.topic || '');
-
-                        if (data.status === 'created') {
-                            await supabase.from('conflict_sessions').update({ status: 'joined' }).eq('id', data.id);
-                            setStep('rules');
-                        } else if (data.status === 'joined' || data.status === 'inputting') {
-                            setStep('joint_input');
-                            if (data.p2_submitted) setHasSubmitted(true);
-                        } else if (data.status === 'analyzing') {
-                            setStep('analysis');
-                        } else if (data.status === 'verdict') {
-                            setStep('verdict');
-                            if (data.chat_history) setChatHistory(data.chat_history);
-                        }
-                    } else {
-                        // I am the INITIATOR - store as pending and let user choose to resume
-                        setPendingSession(data);
-                    }
+                    // Always require manual confirmation/action
+                    setPendingSession(data);
                 }
             }
         }
@@ -273,10 +250,7 @@ export default function ConflictPage() {
                 if (isInitiator) {
                     if (newData.p2_submitted) {
                         setPartnerStatus('submitted');
-                        // If both submitted and I am initiator -> Trigger Analysis
-                        if (newData.p1_submitted && newData.status !== 'analyzing' && newData.status !== 'verdict') {
-                            triggerJointAnalysis(newData);
-                        }
+                        // REMOVED AUTO-ANALYSIS: Wait for user to click button
                     }
                 } else {
                     if (newData.p1_submitted) setPartnerStatus('submitted');
@@ -320,6 +294,31 @@ export default function ConflictPage() {
 
         } catch (error) {
             console.error('Joint Analysis Error', error);
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    const handleManualAnalysisTrigger = async () => {
+        if (!sessionId) return;
+        setIsAnalyzing(true);
+        playSound('whoosh');
+
+        try {
+            // Fetch the latest session data to ensure we have both inputs
+            const { data: sessionData, error } = await supabase
+                .from('conflict_sessions')
+                .select('*')
+                .eq('id', sessionId)
+                .single();
+
+            if (error || !sessionData) throw error || new Error('Session data not found');
+
+            await triggerJointAnalysis(sessionData);
+
+        } catch (error) {
+            console.error('Manual Joint Analysis Error', error);
+            alert(language === 'ar' ? 'حدث خطأ أثناء تحليل المشكلة.' : 'Error analyzing conflict.');
         } finally {
             setIsAnalyzing(false);
         }
@@ -581,9 +580,24 @@ export default function ConflictPage() {
                                     <h3 className="text-xl font-bold mb-2">
                                         {language === 'ar' ? 'وصلت وجهة نظرك!' : 'Perspective Received!'}
                                     </h3>
-                                    <p className="text-surface-400 mb-8 animate-pulse">
-                                        {language === 'ar' ? 'ننتظر الشريك يخلص كتابة...' : 'Waiting for partner to finish typing...'}
-                                    </p>
+
+                                    {partnerStatus === 'submitted' && isInitiator ? (
+                                        <div className="animate-in fade-in zoom-in duration-300">
+                                            <p className="text-purple-300 mb-6 font-medium">
+                                                {language === 'ar' ? 'وصل رد الشريك! جاهز للتحليل؟' : 'Partner responded! Ready to analyze?'}
+                                            </p>
+                                            <button
+                                                onClick={handleManualAnalysisTrigger}
+                                                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold shadow-lg shadow-purple-500/30 animate-pulse hover:animate-none transform hover:scale-105 transition-all"
+                                            >
+                                                {language === 'ar' ? 'تحليل المشكلة الآن ✨' : 'Analyze Conflict Now ✨'}
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <p className="text-surface-400 mb-8 animate-pulse">
+                                            {language === 'ar' ? 'ننتظر الشريك يخلص كتابة...' : 'Waiting for partner to finish typing...'}
+                                        </p>
+                                    )}
                                 </div>
                             ) : (
                                 <>
@@ -642,24 +656,36 @@ export default function ConflictPage() {
                                 {pendingSession && (
                                     <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 mb-4">
                                         <p className="text-amber-300 text-sm mb-3">
-                                            {language === 'ar'
-                                                ? 'لديك جلسة سابقة لم تكتمل. هل تريد استكمالها؟'
-                                                : 'You have an unfinished session. Resume?'}
+                                            {pendingSession.initiator_id === user?.id
+                                                ? (language === 'ar' ? 'لديك جلسة سابقة لم تكتمل. هل تريد استكمالها؟' : 'You have an unfinished session. Resume?')
+                                                : (language === 'ar' ? `دعوة من الشريك لنقاش موضوع "${pendingSession.topic || 'بدون عنوان'}"` : `Invitation from partner to discuss "${pendingSession.topic || 'Untitled'}"`)
+                                            }
                                         </p>
                                         <div className="flex gap-3">
                                             <button
-                                                onClick={() => {
+                                                onClick={async () => {
                                                     // Resume the pending session
                                                     setMode('joint');
                                                     setSessionId(pendingSession.id);
-                                                    setIsInitiator(true);
                                                     setTopic(pendingSession.topic || '');
 
+                                                    // Determine role
+                                                    const amInitiator = pendingSession.initiator_id === user?.id;
+                                                    setIsInitiator(amInitiator);
+
                                                     if (pendingSession.status === 'created') {
-                                                        setStep('waiting_partner');
+                                                        if (amInitiator) {
+                                                            setStep('waiting_partner');
+                                                        } else {
+                                                            // Partner joining for first time
+                                                            await supabase.from('conflict_sessions').update({ status: 'joined' }).eq('id', pendingSession.id);
+                                                            setStep('rules'); // Or joint_input depending on flow preference
+                                                        }
                                                     } else if (pendingSession.status === 'joined' || pendingSession.status === 'inputting') {
                                                         setStep('joint_input');
-                                                        if (pendingSession.p1_submitted) setHasSubmitted(true);
+                                                        if (amInitiator ? pendingSession.p1_submitted : pendingSession.p2_submitted) {
+                                                            setHasSubmitted(true);
+                                                        }
                                                     } else if (pendingSession.status === 'analyzing') {
                                                         setStep('analysis');
                                                     } else if (pendingSession.status === 'verdict') {
@@ -671,7 +697,10 @@ export default function ConflictPage() {
                                                 }}
                                                 className="flex-1 py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all"
                                             >
-                                                {language === 'ar' ? 'استكمال' : 'Resume'}
+                                                {pendingSession.initiator_id === user?.id
+                                                    ? (language === 'ar' ? 'استكمال' : 'Resume')
+                                                    : (language === 'ar' ? 'قبول الدعوة' : 'Accept Invite')
+                                                }
                                             </button>
                                             <button
                                                 onClick={async () => {
