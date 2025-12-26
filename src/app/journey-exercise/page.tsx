@@ -50,6 +50,7 @@ function JourneyExerciseContent() {
         const financialGoals = sessionData['financial-goals'] || [];
         const familyValues = sessionData['family-values'] || [];
         const retirementPlans = sessionData['retirement-plans'] || [];
+        const futureLetter = sessionData['future-letter'] || [];
 
         // Map each step to appropriate content based on theme
         if (journeyId === 'basics') {
@@ -59,7 +60,7 @@ function JourneyExerciseContent() {
                 1: deepQuestions.slice(30, 38), // Step 2: Session (Openness)
                 2: values.slice(5, 13),      // Step 3: Shared Values
                 3: compliments.slice(0, 8),  // Step 4: Gratitude Challenge
-                4: deepQuestions.slice(20, 28), // Step 5: Message to Future
+                4: futureLetter,             // Step 5: Message to Future
             };
             return stepContent[stepIndex] || values.slice(0, 8);
         } else if (journeyId === 'communication') {
