@@ -187,7 +187,9 @@ export default function CheckInPage() {
                 const checkInSummary = [{
                     mood: newScores.mood,
                     energy: newScores.energy,
-                    stress: newScores.stress
+                    stress: newScores.stress,
+                    sleep: newScores.sleep,
+                    connection: newScores.connection
                 }];
                 const rawResponse = await analyzeMood(checkInSummary, 'ar');
 

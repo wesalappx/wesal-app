@@ -52,6 +52,11 @@ function JourneyExerciseContent() {
         const retirementPlans = sessionData['retirement-plans'] || [];
         const futureLetter = sessionData['future-letter'] || [];
 
+        // Fixes:
+        const pillowTalk = sessionData['pillow-talk'] || [];
+        const bucketList = sessionData['bucket-list'] || [];
+        const legacy = sessionData['legacy'] || [];
+
         // Map each step to appropriate content based on theme
         if (journeyId === 'basics') {
             // 5 steps: لغات الحب, جلسة مصارحة, قيمنا المشتركة, تحدي الامتنان, رسالة للمستقبل
@@ -72,7 +77,7 @@ function JourneyExerciseContent() {
                 3: compliments.slice(30, 38), // Step 4: Appreciation Lesson
                 4: conflictStyles,           // Step 5: Conflict Styles
                 5: deepQuestions.slice(0, 8),   // Step 6: I feel...
-                6: roulette.slice(0, 8),     // Step 7: Pillow Talk
+                6: pillowTalk,               // Step 7: Pillow Talk (Fixed)
             };
             return stepContent[stepIndex] || deepQuestions.slice(0, 8);
         } else if (journeyId === 'future') {
@@ -81,9 +86,9 @@ function JourneyExerciseContent() {
                 0: deepQuestions.slice(20, 28), // Step 1: Dream Board
                 1: financialGoals,           // Step 2: Financial Goals
                 2: familyValues,             // Step 3: Family & Parenting
-                3: memories.slice(0, 8),     // Step 4: Bucket List
+                3: bucketList,               // Step 4: Bucket List (Fixed)
                 4: retirementPlans,          // Step 5: Happy Retirement
-                5: values.slice(10, 18),     // Step 6: Legacy
+                5: legacy,                   // Step 6: Legacy (Fixed)
             };
             return stepContent[stepIndex] || deepQuestions.slice(0, 8);
         }
