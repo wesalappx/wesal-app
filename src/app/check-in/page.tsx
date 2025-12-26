@@ -14,7 +14,8 @@ import {
     Sun,
     BarChart3,
     Loader2,
-    Quote
+    Quote,
+    Moon
 } from 'lucide-react';
 import Confetti from '@/components/Confetti';
 import { useSound } from '@/hooks/useSound';
@@ -336,26 +337,33 @@ export default function CheckInPage() {
                         </div>
 
                         {/* 1. TOP SECTION: STATS GRID */}
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="glass-card p-4 flex flex-col items-center justify-center bg-amber-500/5 border-amber-500/20">
-                                <Sun className="w-6 h-6 text-amber-400 mb-2" />
-                                <span className="text-2xl font-bold text-white">{scores.mood}/5</span>
-                                <span className="text-xs text-surface-400">المزاج</span>
+                        <div className="flex flex-wrap gap-2 justify-center">
+                            <div className="glass-card p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center bg-amber-500/5 border-amber-500/20">
+                                <Sun className="w-5 h-5 text-amber-400 mb-1" />
+                                <span className="text-xl font-bold text-white">{scores.mood}/5</span>
+                                <span className="text-[10px] text-surface-400">المزاج</span>
                             </div>
-                            <div className="glass-card p-4 flex flex-col items-center justify-center bg-blue-500/5 border-blue-500/20">
-                                <Zap className="w-6 h-6 text-blue-400 mb-2" />
-                                <span className="text-2xl font-bold text-white">{scores.energy}/5</span>
-                                <span className="text-xs text-surface-400">الطاقة</span>
+                            <div className="glass-card p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center bg-blue-500/5 border-blue-500/20">
+                                <Zap className="w-5 h-5 text-blue-400 mb-1" />
+                                <span className="text-xl font-bold text-white">{scores.energy}/5</span>
+                                <span className="text-[10px] text-surface-400">الطاقة</span>
                             </div>
-                            <div className="glass-card p-4 flex flex-col items-center justify-center bg-rose-500/5 border-rose-500/20">
-                                <Brain className="w-6 h-6 text-rose-400 mb-2" />
-                                <span className="text-2xl font-bold text-white">{scores.stress}/5</span>
-                                <span className="text-xs text-surface-400">الراحة</span>
+                            <div className="glass-card p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center bg-rose-500/5 border-rose-500/20">
+                                <Brain className="w-5 h-5 text-rose-400 mb-1" />
+                                <span className="text-xl font-bold text-white">{scores.stress}/5</span>
+                                <span className="text-[10px] text-surface-400">الراحة</span>
                             </div>
-                            <div className="glass-card p-4 flex flex-col items-center justify-center bg-indigo-500/5 border-indigo-500/20">
-                                <Heart className="w-6 h-6 text-indigo-400 mb-2" />
-                                <span className="text-2xl font-bold text-white">{scores.connection}/5</span>
-                                <span className="text-xs text-surface-400">التواصل</span>
+                            <div className="w-full flex gap-2">
+                                <div className="glass-card p-3 flex-1 flex flex-col items-center justify-center bg-indigo-500/5 border-indigo-500/20">
+                                    <Moon className="w-5 h-5 text-indigo-400 mb-1" />
+                                    <span className="text-xl font-bold text-white">{scores.sleep}/5</span>
+                                    <span className="text-[10px] text-surface-400">النوم</span>
+                                </div>
+                                <div className="glass-card p-3 flex-1 flex flex-col items-center justify-center bg-pink-500/5 border-pink-500/20">
+                                    <Heart className="w-5 h-5 text-pink-400 mb-1" />
+                                    <span className="text-xl font-bold text-white">{scores.connection}/5</span>
+                                    <span className="text-[10px] text-surface-400">التواصل</span>
+                                </div>
                             </div>
                         </div>
 
@@ -404,18 +412,23 @@ export default function CheckInPage() {
                                     <BarChart3 className="w-4 h-4 text-primary-400" />
                                     <h3 className="text-sm font-bold text-white">تطور الأسبوع</h3>
                                 </div>
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     {['mood', 'energy', 'stress', 'sleep', 'connection'].map((metric) => {
                                         const question = QUESTIONS.find(q => q.id === metric);
                                         if (!question) return null;
 
                                         return (
-                                            <div key={metric}>
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <question.icon className={`w-3 h-3 ${question.color}`} />
-                                                    <span className="text-xs text-surface-400">{question.label}</span>
+                                            <div key={metric} className="flex items-center gap-4">
+                                                {/* Label Section */}
+                                                <div className="flex items-center gap-2 w-28 shrink-0">
+                                                    <div className={`p-1.5 rounded-lg ${question.color.replace('text', 'bg')}/10`}>
+                                                        <question.icon className={`w-3.5 h-3.5 ${question.color}`} />
+                                                    </div>
+                                                    <span className="text-xs font-medium text-surface-200">{question.label.split(' ').slice(1).join(' ')}</span>
                                                 </div>
-                                                <div className="h-16 flex items-end gap-1">
+
+                                                {/* Sparkline Bars */}
+                                                <div className="h-8 flex-1 flex items-end gap-1">
                                                     {weeklyData.slice(0, 7).reverse().map((checkIn, idx) => {
                                                         const value = checkIn[metric as keyof CheckIn] as number || 0;
                                                         const height = (value / 5) * 100;
@@ -425,10 +438,13 @@ export default function CheckInPage() {
                                                                 initial={{ height: 0 }}
                                                                 animate={{ height: `${height}%` }}
                                                                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                                                                className={`flex-1 rounded-t ${question.color.replace('text', 'bg')}/50 hover:${question.color.replace('text', 'bg')}/80 transition-colors relative group`}
+                                                                className={`flex-1 rounded-sm ${question.color.replace('text', 'bg')}/40 hover:${question.color.replace('text', 'bg')}/80 transition-colors relative group min-w-[4px]`}
                                                             >
-                                                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                    <span className="text-xs font-bold text-white bg-surface-900 px-1 rounded">{value}</span>
+                                                                {/* Tooltip on Hover */}
+                                                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                                                    <span className="text-[10px] font-bold text-white bg-surface-900 border border-white/10 px-1.5 py-0.5 rounded shadow-xl">
+                                                                        {value}
+                                                                    </span>
                                                                 </div>
                                                             </motion.div>
                                                         );
