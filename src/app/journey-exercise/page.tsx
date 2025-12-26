@@ -28,6 +28,8 @@ function JourneyExerciseContent() {
     const stepParam = searchParams.get('step');
     const stepIndex = stepParam ? parseInt(stepParam) - 1 : 0;
 
+    const modeParam = searchParams.get('mode') as 'local' | 'remote' | null;
+
     // Session Sync
     const {
         session,
@@ -38,9 +40,16 @@ function JourneyExerciseContent() {
         loading: sessionLoading
     } = useSessionSync('journey', journeyId);
 
-    const [showModeModal, setShowModeModal] = useState(true);
+    const [showModeModal, setShowModeModal] = useState(!modeParam);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
+
+    // Initial Mode Effect
+    useEffect(() => {
+        if (modeParam && !mode) {
+            initSession(modeParam);
+        }
+    }, [modeParam, initSession, mode]);
 
     // Sync State Effect
     useEffect(() => {

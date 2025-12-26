@@ -51,8 +51,13 @@ export function useCalendar() {
             let query = supabase
                 .from('user_calendar_events')
                 .select('*')
-                .eq('user_id', user.id)
                 .order('scheduled_date', { ascending: true });
+
+            if (coupleId) {
+                query = query.or(`user_id.eq.${user.id},couple_id.eq.${coupleId}`);
+            } else {
+                query = query.eq('user_id', user.id);
+            }
 
             if (month) {
                 const startOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);

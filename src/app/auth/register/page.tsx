@@ -128,24 +128,24 @@ export default function RegisterPage() {
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center p-4 font-sans">
+        <main className="min-h-[100dvh] flex items-center justify-center p-4 sm:p-6 font-sans supports-[min-height:100dvh]:min-h-[100dvh]">
             {/* Background */}
-            <div className="fixed inset-0 overflow-hidden -z-10">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-500/20 rounded-full blur-3xl" />
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-500/20 rounded-full blur-3xl" />
+            <div className="fixed inset-0 overflow-hidden -z-10 bg-surface-950">
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-500/10 rounded-full blur-3xl opacity-50" />
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl opacity-50" />
             </div>
 
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-md w-full">
                 {/* Logo */}
-                <div className="text-center mb-6">
-                    <Link href="/" className="inline-flex items-center gap-2">
-                        <img src="/wesal-logo.svg" alt="وصال" className="w-12 h-12" />
-                        <span className="text-2xl font-bold">وصال</span>
+                <div className="text-center mb-8">
+                    <Link href="/" className="inline-flex items-center gap-3">
+                        <img src="/wesal-logo.svg" alt="وصال" className="w-14 h-14" />
+                        <span className="text-3xl font-bold text-white tracking-wide">وصال</span>
                     </Link>
                 </div>
 
                 {/* Form Card */}
-                <div className="glass-card p-6">
+                <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-xl bg-surface-900/60">
                     <h1 className="text-2xl font-bold text-center mb-2">إنشاء حساب جديد</h1>
                     <p className="text-surface-400 text-center mb-6">
                         ابدأ رحلتك مع شريك حياتك
