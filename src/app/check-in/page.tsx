@@ -518,9 +518,8 @@ export default function CheckInPage() {
                     </div>
 
                 </motion.div>
-            )
-            }
-        </div >
-    </main >
+            )}
+        </div>
+    </main>
     );
 }
