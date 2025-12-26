@@ -135,12 +135,20 @@ export default function SettingsPage() {
                             >
                                 {t('settings.editProfile')}
                             </Link>
-                            <Link
-                                href="/pairing"
-                                className="block w-full py-3 text-center rounded-xl bg-primary-500/10 text-primary-400 hover:bg-primary-500/20 border border-primary-500/30 transition-colors font-medium"
-                            >
-                                {isRTL ? 'ربط الشريك' : 'Link Partner'}
-                            </Link>
+                            {partnerInfo?.isPaired ? (
+                                <div className="block w-full py-3 text-center rounded-xl bg-green-500/10 text-green-400 border border-green-500/30 font-medium cursor-default">
+                                    {isRTL
+                                        ? `مرتبط مع ${partnerInfo.name || 'شريكك'}`
+                                        : `Paired: ${partnerInfo.name || 'Partner'}`}
+                                </div>
+                            ) : (
+                                <Link
+                                    href="/pairing"
+                                    className="block w-full py-3 text-center rounded-xl bg-primary-500/10 text-primary-400 hover:bg-primary-500/20 border border-primary-500/30 transition-colors font-medium"
+                                >
+                                    {isRTL ? 'ربط الشريك' : 'Link Partner'}
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </motion.section>
