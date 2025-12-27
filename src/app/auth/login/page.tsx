@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Heart, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
-    const { signIn, isLoading: authLoading } = useAuth();
+    const { signIn, isLoading: authLoading, user, session } = useAuth();
+    const router = useRouter();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -15,6 +17,14 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+
+    // If user is already logged in, redirect to dashboard
+    useEffect(() => {
+        if (!authLoading && user && session) {
+            console.log('[LoginPage] User already authenticated, redirecting...');
+            router.push('/dashboard');
+        }
+    }, [authLoading, user, session, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

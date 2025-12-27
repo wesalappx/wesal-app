@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Eye, EyeOff, Lock, Check, X } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, Lock, Check, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { validationMessages, getPasswordStrength } from '@/lib/validation-messages';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function PasswordChangePage() {
+    const { updatePassword } = useAuth();
+
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -51,9 +54,16 @@ export default function PasswordChangePage() {
         if (!validateForm()) return;
 
         setIsLoading(true);
+        setErrors({});
 
-        // TODO: Call API to change password
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Call Supabase to update password
+        const { error } = await updatePassword(newPassword);
+
+        if (error) {
+            setErrors({ submit: 'حدث خطأ أثناء تحديث كلمة المرور. يرجى المحاولة مرة أخرى.' });
+            setIsLoading(false);
+            return;
+        }
 
         setIsLoading(false);
         setSuccess(true);
@@ -109,6 +119,13 @@ export default function PasswordChangePage() {
                             </div>
                             <p className="text-surface-400">أدخل كلمة المرور الحالية والجديدة</p>
                         </div>
+
+                        {/* Submit Error - Global Error Display */}
+                        {errors.submit && (
+                            <div className="p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-sm text-center mb-4">
+                                {errors.submit}
+                            </div>
+                        )}
 
                         {/* Current Password */}
                         <div className="space-y-2">
@@ -173,12 +190,12 @@ export default function PasswordChangePage() {
                                             <div
                                                 key={i}
                                                 className={`h-1 flex-1 rounded-full transition-colors ${i <= passwordStrength.score
-                                                        ? passwordStrength.score <= 2
-                                                            ? 'bg-red-500'
-                                                            : passwordStrength.score <= 4
-                                                                ? 'bg-yellow-500'
-                                                                : 'bg-emerald-500'
-                                                        : 'bg-surface-700'
+                                                    ? passwordStrength.score <= 2
+                                                        ? 'bg-red-500'
+                                                        : passwordStrength.score <= 4
+                                                            ? 'bg-yellow-500'
+                                                            : 'bg-emerald-500'
+                                                    : 'bg-surface-700'
                                                     }`}
                                             />
                                         ))}
