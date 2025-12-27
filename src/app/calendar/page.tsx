@@ -143,11 +143,11 @@ export default function CalendarPage() {
         // Ovulation: 12-16 (Peak 14)
         // Luteal: 17-28
 
-        if (currentCycleDay >= 1 && currentCycleDay <= 5) return { name: 'Menstruation', color: 'bg-rose-500', label: isRTL ? 'دورة' : 'Period', intensity: 3 };
-        if (currentCycleDay >= 12 && currentCycleDay <= 16) return { name: 'Ovulation', color: 'bg-purple-500', label: isRTL ? 'تبويض' : 'Fertile', intensity: 2 };
-        if (currentCycleDay >= 17) return { name: 'Luteal', color: 'bg-amber-500', label: isRTL ? 'تجهيز' : 'Luteal', intensity: 1 };
+        if (currentCycleDay >= 1 && currentCycleDay <= 5) return { name: 'Menstruation', bg: 'bg-rose-500/20', border: 'border-rose-500/30', dot: 'bg-rose-500', label: isRTL ? 'دورة' : 'Period' };
+        if (currentCycleDay >= 12 && currentCycleDay <= 16) return { name: 'Ovulation', bg: 'bg-purple-500/20', border: 'border-purple-500/30', dot: 'bg-purple-500', label: isRTL ? 'خصوبة' : 'Fertile' };
+        if (currentCycleDay >= 17) return { name: 'Luteal', bg: 'bg-amber-500/5', border: '', dot: 'bg-amber-500', label: isRTL ? 'تجهيز' : 'Luteal' };
 
-        return { name: 'Follicular', color: 'bg-blue-400', label: isRTL ? 'راحة' : 'Rest', intensity: 1 };
+        return { name: 'Follicular', bg: 'bg-blue-500/5', border: '', dot: 'bg-blue-400', label: isRTL ? 'راحة' : 'Follicular' };
     };
 
     // --- Actions ---
@@ -157,7 +157,8 @@ export default function CalendarPage() {
             type: mapLocalTypeToDb(data.type),
             scheduled_date: data.date.toISOString().split('T')[0],
             scheduled_time: data.time,
-            reminder_enabled: data.reminder
+            reminder_enabled: data.reminder,
+            is_recurring: data.is_recurring // Ensure this is passed
         });
         if (res.data) {
             refreshData();
@@ -222,7 +223,7 @@ export default function CalendarPage() {
                         ))}
                     </div>
 
-                    <div className="grid grid-cols-7 gap-y-4 gap-x-1">
+                    <div className="grid grid-cols-7 gap-y-2 gap-x-1">
                         {Array.from({ length: startingDay }).map((_, i) => <div key={`empty-${i}`} />)}
 
                         {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -239,30 +240,49 @@ export default function CalendarPage() {
                             const phase = getCyclePhase(date);
 
                             return (
-                                <div key={day} onClick={() => setSelectedDate(date)} className="relative flex flex-col items-center gap-1 cursor-pointer group">
-                                    {/* Selection/Today Circle */}
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all
-                                        ${isSelected ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/40 scale-110' :
-                                            isToday ? 'bg-surface-700 text-primary-400 border border-primary-500/50' :
-                                                'text-surface-300 group-hover:bg-white/5'}
+                                <div
+                                    key={day}
+                                    onClick={() => setSelectedDate(date)}
+                                    className={`relative flex flex-col items-center justify-start pt-1 gap-1 cursor-pointer group h-14 rounded-xl transition-all border 
+                                        ${phase?.bg || 'hover:bg-white/5'} 
+                                        ${phase?.border || 'border-transparent'}
+                                        ${isSelected ? 'ring-2 ring-primary-500 z-10' : ''}
+                                    `}
+                                >
+                                    {/* Day Number */}
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all
+                                        ${isSelected ? 'bg-primary-500 text-white' :
+                                            isToday ? 'bg-surface-700 text-primary-400' :
+                                                'text-surface-300'}
                                     `}>
                                         {day}
                                     </div>
 
                                     {/* Indicators */}
-                                    <div className="flex gap-0.5 h-1.5 items-end">
-                                        {/* Cycle Dot */}
-                                        {phase && (phase.name === 'Menstruation' || phase.name === 'Ovulation') && (
-                                            <div className={`w-1.5 h-1.5 rounded-full ${phase.name === 'Menstruation' ? 'bg-rose-500' : 'bg-purple-400'}`} />
-                                        )}
-                                        {/* Session Dots */}
-                                        {daySessions.slice(0, 2).map((s, idx) => (
-                                            <div key={idx} className={`w-1.5 h-1.5 rounded-full ${typeConfig[s.type]?.color.split(' ')[0].replace('/20', '')}`} />
+                                    <div className="flex gap-0.5 h-1 items-end mt-auto mb-1">
+                                        {daySessions.slice(0, 3).map((s, idx) => (
+                                            <div key={idx} className={`w-1 h-1 rounded-full ${typeConfig[s.type]?.color.split(' ')[0].replace('/20', '')}`} />
                                         ))}
                                     </div>
                                 </div>
                             );
                         })}
+                    </div>
+
+                    {/* Legend */}
+                    <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-center gap-4 text-[10px] text-surface-400">
+                        <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-rose-500/50 border border-rose-500/50" />
+                            <span>{isRTL ? 'دورة' : 'Period'}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-purple-500/50 border border-purple-500/50" />
+                            <span>{isRTL ? 'خصوبة' : 'Fertile'}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-primary-500" />
+                            <span>{isRTL ? 'اليوم' : 'Today'}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -283,10 +303,10 @@ export default function CalendarPage() {
                     </div>
 
                     {selectedDate && getCyclePhase(selectedDate) && (
-                        <div className="p-4 rounded-2xl bg-gradient-to-r from-surface-900 to-surface-800 border border-white/5 flex items-center justify-between">
+                        <div className={`p-4 rounded-2xl flex items-center justify-between border ${getCyclePhase(selectedDate)?.bg} ${getCyclePhase(selectedDate)?.border}`}>
                             <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCyclePhase(selectedDate)?.color} bg-opacity-20`}>
-                                    <Activity className={`w-5 h-5 ${getCyclePhase(selectedDate)?.color.replace('bg-', 'text-')}`} />
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCyclePhase(selectedDate)?.dot} bg-opacity-20`}>
+                                    <Activity className={`w-5 h-5 ${getCyclePhase(selectedDate)?.dot.replace('bg-', 'text-')}`} />
                                 </div>
                                 <div>
                                     <span className="text-xs text-surface-400 block">{isRTL ? 'الحالة الصحية' : 'Cycle Phase'}</span>

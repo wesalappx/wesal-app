@@ -236,9 +236,9 @@ export default function InsightsPage() {
                     >
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-xs text-surface-400 flex items-center gap-1">
-                                <MessageCircle className="w-3 h-3" /> الهدوء والاسترخاء
+                                <MessageCircle className="w-3 h-3" /> {mounted && (document.dir === 'rtl' ? 'الهدوء (عكس التوتر)' : 'Calmness (Low Stress)')}
                             </span>
-                            <span className="text-sm font-bold text-green-400">{insights.avgStress}%</span>
+                            <span className="text-sm font-bold text-emerald-400">{insights.avgStress}%</span>
                         </div>
                         <div className="w-full h-3 bg-surface-700 rounded-full overflow-hidden">
                             <motion.div
