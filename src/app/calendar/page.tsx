@@ -285,8 +285,8 @@ export default function CalendarPage() {
                     <button
                         onClick={() => setViewMode('month')}
                         className={`flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${viewMode === 'month'
-                                ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
-                                : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700'
+                            ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
+                            : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700'
                             }`}
                     >
                         <LayoutGrid className="w-4 h-4" />
@@ -295,8 +295,8 @@ export default function CalendarPage() {
                     <button
                         onClick={() => setViewMode('year')}
                         className={`flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${viewMode === 'year'
-                                ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
-                                : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700'
+                            ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
+                            : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700'
                             }`}
                     >
                         <Grid3X3 className="w-4 h-4" />
@@ -588,13 +588,29 @@ function AddEventModal({ date, isRTL, onClose, onSave }: {
     const [type, setType] = useState('date');
     const [time, setTime] = useState('');
     const [isRecurring, setIsRecurring] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    const monthNames = isRTL
+        ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+        : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const dayNames = isRTL
+        ? ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
+        : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    const handleSave = async () => {
+        if (!title.trim()) return;
+        setSaving(true);
+        await onSave({ title, type, time, isRecurring });
+        setSaving(false);
+    };
 
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-md"
             onClick={onClose}
         >
             <motion.div
@@ -603,85 +619,186 @@ function AddEventModal({ date, isRTL, onClose, onSave }: {
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 onClick={e => e.stopPropagation()}
-                className="w-full max-w-md bg-surface-900 border-t border-white/10 rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto"
+                className="w-full max-w-md bg-gradient-to-b from-surface-800 to-surface-900 border-t border-white/10 rounded-t-3xl overflow-hidden"
             >
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-bold text-white">
-                        {isRTL ? 'إضافة حدث' : 'Add Event'}
-                    </h3>
-                    <button onClick={onClose} className="p-2 text-surface-400 hover:text-white">
-                        <X className="w-5 h-5" />
-                    </button>
+                {/* Drag Handle */}
+                <div className="flex justify-center pt-3 pb-2">
+                    <div className="w-10 h-1 rounded-full bg-white/20" />
                 </div>
 
-                {/* Form */}
-                <div className="space-y-4">
-                    {/* Title */}
+                {/* Date Header - Premium Design */}
+                <div className="px-6 pb-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            {/* Big Date Number */}
+                            <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg shadow-primary-500/20">
+                                <span className="text-2xl font-bold text-white">{date.getDate()}</span>
+                            </div>
+                            {/* Date Info */}
+                            <div>
+                                <h3 className="text-lg font-bold text-white">
+                                    {isRTL ? 'إضافة حدث جديد' : 'Add New Event'}
+                                </h3>
+                                <p className="text-sm text-surface-400">
+                                    {dayNames[date.getDay()]}، {date.getDate()} {monthNames[date.getMonth()]}
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-surface-400 hover:text-white transition-all"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Form Content */}
+                <div className="px-6 pb-8 space-y-5 max-h-[60vh] overflow-y-auto">
+
+                    {/* Event Title */}
                     <div>
-                        <label className="text-xs text-surface-400 block mb-2">{isRTL ? 'العنوان' : 'Title'}</label>
+                        <label className="text-xs font-medium text-surface-400 block mb-2 uppercase tracking-wider">
+                            {isRTL ? 'عنوان الحدث' : 'Event Title'}
+                        </label>
                         <input
                             type="text"
                             value={title}
                             onChange={e => setTitle(e.target.value)}
-                            placeholder={isRTL ? 'عنوان الحدث...' : 'Event title...'}
-                            className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary-500 outline-none"
+                            placeholder={isRTL ? 'مثال: موعد عشاء رومانسي ❤️' : 'e.g., Romantic dinner date ❤️'}
+                            className="w-full bg-surface-800/80 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder-surface-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
                         />
                     </div>
 
-                    {/* Type Grid */}
+                    {/* Event Type - Enhanced Grid */}
                     <div>
-                        <label className="text-xs text-surface-400 block mb-2">{isRTL ? 'النوع' : 'Type'}</label>
-                        <div className="grid grid-cols-3 gap-2">
+                        <label className="text-xs font-medium text-surface-400 block mb-3 uppercase tracking-wider">
+                            {isRTL ? 'نوع الحدث' : 'Event Type'}
+                        </label>
+                        <div className="grid grid-cols-3 gap-2.5">
                             {Object.entries(typeConfig).map(([key, cfg]) => {
                                 const Icon = cfg.icon;
                                 const isSelected = type === key;
                                 return (
-                                    <button
+                                    <motion.button
                                         key={key}
                                         onClick={() => setType(key)}
-                                        className={`flex flex-col items-center justify-center py-3 rounded-xl border transition-all
-                                            ${isSelected ? `${cfg.bgColor}/20 border-current ${cfg.color}` : 'border-white/5 bg-white/5 text-surface-400'}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        className={`relative flex flex-col items-center justify-center py-4 px-2 rounded-xl border-2 transition-all overflow-hidden
+                                            ${isSelected
+                                                ? `border-current ${cfg.color} bg-gradient-to-br ${cfg.gradient}/20 shadow-lg`
+                                                : 'border-white/5 bg-white/5 text-surface-400 hover:bg-white/10 hover:border-white/10'
+                                            }
                                         `}
                                     >
-                                        <Icon className="w-5 h-5 mb-1" />
-                                        <span className="text-[10px]">{isRTL ? cfg.label : cfg.labelEn}</span>
-                                    </button>
+                                        {/* Glow Effect */}
+                                        {isSelected && (
+                                            <div className={`absolute inset-0 bg-gradient-to-br ${cfg.gradient} opacity-10`} />
+                                        )}
+                                        <Icon className={`w-6 h-6 mb-2 relative z-10 ${isSelected ? '' : ''}`} />
+                                        <span className={`text-xs font-medium relative z-10 ${isSelected ? 'text-white' : ''}`}>
+                                            {isRTL ? cfg.label : cfg.labelEn}
+                                        </span>
+                                        {/* Selection Indicator */}
+                                        {isSelected && (
+                                            <motion.div
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-lg"
+                                            >
+                                                <Check className={`w-3 h-3 ${cfg.color}`} />
+                                            </motion.div>
+                                        )}
+                                    </motion.button>
                                 );
                             })}
                         </div>
                     </div>
 
-                    {/* Time */}
+                    {/* Time Input - Enhanced */}
                     <div>
-                        <label className="text-xs text-surface-400 block mb-2">{isRTL ? 'الوقت (اختياري)' : 'Time (optional)'}</label>
-                        <input
-                            type="time"
-                            value={time}
-                            onChange={e => setTime(e.target.value)}
-                            className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary-500 outline-none"
-                        />
+                        <label className="text-xs font-medium text-surface-400 block mb-2 uppercase tracking-wider">
+                            {isRTL ? 'الوقت' : 'Time'}
+                            <span className="text-surface-500 normal-case font-normal mx-1">({isRTL ? 'اختياري' : 'optional'})</span>
+                        </label>
+                        <div className="relative">
+                            <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500" />
+                            <input
+                                type="time"
+                                value={time}
+                                onChange={e => setTime(e.target.value)}
+                                className="w-full bg-surface-800/80 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                            />
+                        </div>
                     </div>
 
-                    {/* Recurring */}
-                    <label className="flex items-center gap-3 p-3 bg-surface-800/50 rounded-xl border border-white/5 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={isRecurring}
-                            onChange={e => setIsRecurring(e.target.checked)}
-                            className="w-5 h-5 rounded border-white/20 bg-surface-900 text-primary-500 focus:ring-primary-500"
-                        />
-                        <span className="text-sm text-white">{isRTL ? 'يتكرر سنوياً' : 'Repeats yearly'}</span>
-                    </label>
-
-                    {/* Save Button */}
-                    <button
-                        onClick={() => onSave({ title, type, time, isRecurring })}
-                        disabled={!title.trim()}
-                        className="w-full py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                    {/* Recurring Toggle - Enhanced */}
+                    <motion.label
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all
+                            ${isRecurring
+                                ? 'bg-primary-500/10 border-primary-500/50'
+                                : 'bg-surface-800/50 border-white/5 hover:border-white/10'
+                            }`}
                     >
-                        {isRTL ? 'حفظ' : 'Save'}
-                    </button>
+                        <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg ${isRecurring ? 'bg-primary-500/20' : 'bg-white/5'}`}>
+                                <CalendarIcon className={`w-4 h-4 ${isRecurring ? 'text-primary-400' : 'text-surface-400'}`} />
+                            </div>
+                            <div>
+                                <p className={`text-sm font-medium ${isRecurring ? 'text-white' : 'text-surface-300'}`}>
+                                    {isRTL ? 'يتكرر كل سنة' : 'Repeat Every Year'}
+                                </p>
+                                <p className="text-xs text-surface-500">
+                                    {isRTL ? 'مثالي للأعياد والذكريات' : 'Perfect for birthdays & anniversaries'}
+                                </p>
+                            </div>
+                        </div>
+                        <div className={`relative w-12 h-6 rounded-full transition-colors ${isRecurring ? 'bg-primary-500' : 'bg-surface-700'}`}>
+                            <motion.div
+                                animate={{ x: isRecurring ? 24 : 2 }}
+                                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-md"
+                            />
+                            <input
+                                type="checkbox"
+                                checked={isRecurring}
+                                onChange={e => setIsRecurring(e.target.checked)}
+                                className="sr-only"
+                            />
+                        </div>
+                    </motion.label>
+
+                    {/* Save Button - Enhanced */}
+                    <motion.button
+                        onClick={handleSave}
+                        disabled={!title.trim() || saving}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className="w-full py-4 bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-500/25 relative overflow-hidden group"
+                    >
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                            {saving ? (
+                                <>
+                                    <motion.div
+                                        animate={{ rotate: 360 }}
+                                        transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                                        className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                                    />
+                                    {isRTL ? 'جاري الحفظ...' : 'Saving...'}
+                                </>
+                            ) : (
+                                <>
+                                    <Plus className="w-5 h-5" />
+                                    {isRTL ? 'إضافة الحدث' : 'Add Event'}
+                                </>
+                            )}
+                        </span>
+                        {/* Shine Effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                    </motion.button>
                 </div>
             </motion.div>
         </motion.div>
