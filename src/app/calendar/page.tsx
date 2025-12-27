@@ -610,195 +610,169 @@ function AddEventModal({ date, isRTL, onClose, onSave }: {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-md"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
             onClick={onClose}
         >
             <motion.div
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                initial={{ y: '100%', opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: '100%', opacity: 0 }}
+                transition={{ type: 'spring', damping: 30, stiffness: 400 }}
                 onClick={e => e.stopPropagation()}
-                className="w-full max-w-md bg-gradient-to-b from-surface-800 to-surface-900 border-t border-white/10 rounded-t-3xl overflow-hidden"
+                dir={isRTL ? 'rtl' : 'ltr'}
+                className="w-full sm:max-w-sm bg-surface-900 border-t sm:border border-white/10 rounded-t-2xl sm:rounded-2xl overflow-hidden max-h-[85vh]"
             >
-                {/* Drag Handle */}
-                <div className="flex justify-center pt-3 pb-2">
-                    <div className="w-10 h-1 rounded-full bg-white/20" />
+                {/* Drag Handle (mobile only) */}
+                <div className="flex justify-center pt-2 pb-1 sm:hidden">
+                    <div className="w-8 h-1 rounded-full bg-white/30" />
                 </div>
 
-                {/* Date Header - Premium Design */}
-                <div className="px-6 pb-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            {/* Big Date Number */}
-                            <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg shadow-primary-500/20">
-                                <span className="text-2xl font-bold text-white">{date.getDate()}</span>
-                            </div>
-                            {/* Date Info */}
-                            <div>
-                                <h3 className="text-lg font-bold text-white">
-                                    {isRTL ? 'إضافة حدث جديد' : 'Add New Event'}
-                                </h3>
-                                <p className="text-sm text-surface-400">
-                                    {dayNames[date.getDay()]}، {date.getDate()} {monthNames[date.getMonth()]}
-                                </p>
-                            </div>
+                {/* Header */}
+                <div className="px-4 py-3 border-b border-white/5">
+                    <div className={`flex items-center gap-3 ${isRTL ? 'flex-row' : 'flex-row'}`}>
+                        {/* Date Badge */}
+                        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500">
+                            <span className="text-lg font-bold text-white">{date.getDate()}</span>
                         </div>
+                        {/* Info */}
+                        <div className="flex-1">
+                            <h3 className="text-base font-bold text-white">
+                                {isRTL ? 'إضافة حدث' : 'Add Event'}
+                            </h3>
+                            <p className="text-xs text-surface-400">
+                                {dayNames[date.getDay()]} • {monthNames[date.getMonth()]} {date.getFullYear()}
+                            </p>
+                        </div>
+                        {/* Close */}
                         <button
                             onClick={onClose}
-                            className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-surface-400 hover:text-white transition-all"
+                            className="p-2 hover:bg-white/5 rounded-lg text-surface-400 hover:text-white transition-colors"
                         >
                             <X className="w-5 h-5" />
                         </button>
                     </div>
                 </div>
 
-                {/* Form Content */}
-                <div className="px-6 pb-8 space-y-5 max-h-[60vh] overflow-y-auto">
+                {/* Form - Scrollable */}
+                <div className="px-4 py-4 space-y-4 overflow-y-auto max-h-[60vh]">
 
-                    {/* Event Title */}
+                    {/* Title Input */}
                     <div>
-                        <label className="text-xs font-medium text-surface-400 block mb-2 uppercase tracking-wider">
+                        <label className="text-xs text-surface-400 block mb-1.5">
                             {isRTL ? 'عنوان الحدث' : 'Event Title'}
                         </label>
                         <input
                             type="text"
                             value={title}
                             onChange={e => setTitle(e.target.value)}
-                            placeholder={isRTL ? 'مثال: موعد عشاء رومانسي ❤️' : 'e.g., Romantic dinner date ❤️'}
-                            className="w-full bg-surface-800/80 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder-surface-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                            placeholder={isRTL ? 'مثال: عشاء رومانسي' : 'e.g., Romantic dinner'}
+                            className="w-full bg-surface-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm placeholder-surface-500 focus:border-primary-500 outline-none"
                         />
                     </div>
 
-                    {/* Event Type - Enhanced Grid */}
+                    {/* Type Selection - Compact Grid */}
                     <div>
-                        <label className="text-xs font-medium text-surface-400 block mb-3 uppercase tracking-wider">
+                        <label className="text-xs text-surface-400 block mb-1.5">
                             {isRTL ? 'نوع الحدث' : 'Event Type'}
                         </label>
-                        <div className="grid grid-cols-3 gap-2.5">
+                        <div className="grid grid-cols-3 gap-1.5">
                             {Object.entries(typeConfig).map(([key, cfg]) => {
                                 const Icon = cfg.icon;
                                 const isSelected = type === key;
                                 return (
-                                    <motion.button
+                                    <button
                                         key={key}
                                         onClick={() => setType(key)}
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        className={`relative flex flex-col items-center justify-center py-4 px-2 rounded-xl border-2 transition-all overflow-hidden
+                                        className={`flex flex-col items-center py-2.5 px-1 rounded-lg border transition-all
                                             ${isSelected
-                                                ? `border-current ${cfg.color} bg-gradient-to-br ${cfg.gradient}/20 shadow-lg`
-                                                : 'border-white/5 bg-white/5 text-surface-400 hover:bg-white/10 hover:border-white/10'
+                                                ? `${cfg.bgColor}/20 border-current ${cfg.color}`
+                                                : 'border-white/5 bg-white/5 text-surface-400 hover:bg-white/10'
                                             }
                                         `}
                                     >
-                                        {/* Glow Effect */}
-                                        {isSelected && (
-                                            <div className={`absolute inset-0 bg-gradient-to-br ${cfg.gradient} opacity-10`} />
-                                        )}
-                                        <Icon className={`w-6 h-6 mb-2 relative z-10 ${isSelected ? '' : ''}`} />
-                                        <span className={`text-xs font-medium relative z-10 ${isSelected ? 'text-white' : ''}`}>
+                                        <Icon className="w-4 h-4 mb-1" />
+                                        <span className="text-[10px] font-medium">
                                             {isRTL ? cfg.label : cfg.labelEn}
                                         </span>
-                                        {/* Selection Indicator */}
-                                        {isSelected && (
-                                            <motion.div
-                                                initial={{ scale: 0 }}
-                                                animate={{ scale: 1 }}
-                                                className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-lg"
-                                            >
-                                                <Check className={`w-3 h-3 ${cfg.color}`} />
-                                            </motion.div>
-                                        )}
-                                    </motion.button>
+                                    </button>
                                 );
                             })}
                         </div>
                     </div>
 
-                    {/* Time Input - Enhanced */}
+                    {/* Time Input */}
                     <div>
-                        <label className="text-xs font-medium text-surface-400 block mb-2 uppercase tracking-wider">
-                            {isRTL ? 'الوقت' : 'Time'}
-                            <span className="text-surface-500 normal-case font-normal mx-1">({isRTL ? 'اختياري' : 'optional'})</span>
+                        <label className="text-xs text-surface-400 block mb-1.5">
+                            {isRTL ? 'الوقت' : 'Time'} <span className="text-surface-500">({isRTL ? 'اختياري' : 'optional'})</span>
                         </label>
                         <div className="relative">
-                            <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500" />
+                            <Clock className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500 ${isRTL ? 'right-3' : 'left-3'}`} />
                             <input
                                 type="time"
                                 value={time}
                                 onChange={e => setTime(e.target.value)}
-                                className="w-full bg-surface-800/80 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                                className={`w-full bg-surface-800 border border-white/10 rounded-lg py-2.5 text-white text-sm focus:border-primary-500 outline-none ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
                             />
                         </div>
                     </div>
 
-                    {/* Recurring Toggle - Enhanced */}
-                    <motion.label
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
-                        className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all
-                            ${isRecurring
-                                ? 'bg-primary-500/10 border-primary-500/50'
-                                : 'bg-surface-800/50 border-white/5 hover:border-white/10'
-                            }`}
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-lg ${isRecurring ? 'bg-primary-500/20' : 'bg-white/5'}`}>
-                                <CalendarIcon className={`w-4 h-4 ${isRecurring ? 'text-primary-400' : 'text-surface-400'}`} />
+                    {/* Recurring Toggle - RTL Fixed */}
+                    <label className={`flex items-center justify-between p-3 bg-surface-800/50 rounded-lg border cursor-pointer transition-colors ${isRecurring ? 'border-primary-500/50 bg-primary-500/10' : 'border-white/5'}`}>
+                        <div className={`flex items-center gap-2.5 ${isRTL ? 'flex-row' : 'flex-row'}`}>
+                            <div className={`p-1.5 rounded-md ${isRecurring ? 'bg-primary-500/20' : 'bg-white/5'}`}>
+                                <CalendarIcon className={`w-3.5 h-3.5 ${isRecurring ? 'text-primary-400' : 'text-surface-400'}`} />
                             </div>
                             <div>
-                                <p className={`text-sm font-medium ${isRecurring ? 'text-white' : 'text-surface-300'}`}>
-                                    {isRTL ? 'يتكرر كل سنة' : 'Repeat Every Year'}
-                                </p>
-                                <p className="text-xs text-surface-500">
-                                    {isRTL ? 'مثالي للأعياد والذكريات' : 'Perfect for birthdays & anniversaries'}
-                                </p>
+                                <p className="text-sm text-white">{isRTL ? 'يتكرر سنوياً' : 'Yearly repeat'}</p>
                             </div>
                         </div>
-                        <div className={`relative w-12 h-6 rounded-full transition-colors ${isRecurring ? 'bg-primary-500' : 'bg-surface-700'}`}>
+                        {/* Toggle Switch - RTL Aware */}
+                        <div
+                            className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${isRecurring ? 'bg-primary-500' : 'bg-surface-700'}`}
+                            onClick={(e) => { e.preventDefault(); setIsRecurring(!isRecurring); }}
+                        >
                             <motion.div
-                                animate={{ x: isRecurring ? 24 : 2 }}
+                                animate={{
+                                    x: isRTL
+                                        ? (isRecurring ? 2 : 20)
+                                        : (isRecurring ? 20 : 2)
+                                }}
                                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                                className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-md"
-                            />
-                            <input
-                                type="checkbox"
-                                checked={isRecurring}
-                                onChange={e => setIsRecurring(e.target.checked)}
-                                className="sr-only"
+                                className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm"
                             />
                         </div>
-                    </motion.label>
+                        <input
+                            type="checkbox"
+                            checked={isRecurring}
+                            onChange={e => setIsRecurring(e.target.checked)}
+                            className="sr-only"
+                        />
+                    </label>
+                </div>
 
-                    {/* Save Button - Enhanced */}
-                    <motion.button
+                {/* Footer - Save Button */}
+                <div className="px-4 pb-4 pt-2">
+                    <button
                         onClick={handleSave}
                         disabled={!title.trim() || saving}
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
-                        className="w-full py-4 bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-500/25 relative overflow-hidden group"
+                        className="w-full py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        <span className="relative z-10 flex items-center justify-center gap-2">
-                            {saving ? (
-                                <>
-                                    <motion.div
-                                        animate={{ rotate: 360 }}
-                                        transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                                        className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                                    />
-                                    {isRTL ? 'جاري الحفظ...' : 'Saving...'}
-                                </>
-                            ) : (
-                                <>
-                                    <Plus className="w-5 h-5" />
-                                    {isRTL ? 'إضافة الحدث' : 'Add Event'}
-                                </>
-                            )}
-                        </span>
-                        {/* Shine Effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                    </motion.button>
+                        {saving ? (
+                            <>
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                                    className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                                />
+                                {isRTL ? 'جاري الحفظ...' : 'Saving...'}
+                            </>
+                        ) : (
+                            <>
+                                <Plus className="w-4 h-4" />
+                                {isRTL ? 'إضافة' : 'Add'}
+                            </>
+                        )}
+                    </button>
                 </div>
             </motion.div>
         </motion.div>
