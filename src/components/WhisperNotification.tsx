@@ -1,16 +1,20 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Phone, Clock, X, Check, MessageCircle, Sparkles } from 'lucide-react';
+import { Heart, Moon, Flame, Sparkles, Coffee, Clock, Check } from 'lucide-react';
 import { useWhisper, WhisperRequest } from '@/hooks/useWhisper';
 import { useSound } from '@/hooks/useSound';
 import { useEffect } from 'react';
 
-const whisperTypeConfig = {
-    call: { icon: Phone, color: 'from-rose-500 to-pink-500', label: 'يفكر فيك', labelEn: 'Thinking of you' },
-    thinking: { icon: Heart, color: 'from-purple-500 to-indigo-500', label: 'يشتاق لك', labelEn: 'Missing you' },
-    miss: { icon: Sparkles, color: 'from-amber-500 to-orange-500', label: 'يريدك', labelEn: 'Wants you' },
-    custom: { icon: MessageCircle, color: 'from-blue-500 to-cyan-500', label: 'رسالة', labelEn: 'Message' }
+const whisperTypeConfig: Record<string, { icon: typeof Heart; color: string; gradient: string }> = {
+    bed: { icon: Moon, color: 'text-purple-400', gradient: 'from-purple-500 to-indigo-500' },
+    miss: { icon: Heart, color: 'text-rose-400', gradient: 'from-rose-500 to-pink-500' },
+    want: { icon: Flame, color: 'text-orange-400', gradient: 'from-orange-500 to-red-500' },
+    cuddle: { icon: Sparkles, color: 'text-amber-400', gradient: 'from-amber-500 to-yellow-500' },
+    morning: { icon: Coffee, color: 'text-teal-400', gradient: 'from-teal-500 to-cyan-500' },
+    call: { icon: Heart, color: 'text-rose-400', gradient: 'from-rose-500 to-pink-500' },
+    thinking: { icon: Heart, color: 'text-purple-400', gradient: 'from-purple-500 to-indigo-500' },
+    custom: { icon: Sparkles, color: 'text-blue-400', gradient: 'from-blue-500 to-cyan-500' }
 };
 
 interface WhisperNotificationProps {
@@ -25,7 +29,7 @@ export default function WhisperNotification({ language = 'ar' }: WhisperNotifica
     // Play sound when receiving whisper
     useEffect(() => {
         if (hasIncoming) {
-            playSound('notification');
+            playSound('romantic');
         }
     }, [hasIncoming, playSound]);
 
@@ -39,7 +43,7 @@ export default function WhisperNotification({ language = 'ar' }: WhisperNotifica
         respondToWhisper(true);
     };
 
-    const handleDecline = () => {
+    const handleLater = () => {
         playSound('click');
         respondToWhisper(false);
     };
@@ -50,7 +54,7 @@ export default function WhisperNotification({ language = 'ar' }: WhisperNotifica
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4"
                 onClick={dismissWhisper}
             >
                 <motion.div
@@ -62,8 +66,33 @@ export default function WhisperNotification({ language = 'ar' }: WhisperNotifica
                     dir={isRTL ? 'rtl' : 'ltr'}
                     className="w-full max-w-sm bg-surface-900 rounded-3xl overflow-hidden border border-white/10 shadow-2xl"
                 >
-                    {/* Animated Gradient Background */}
-                    <div className={`relative h-48 bg-gradient-to-br ${config.color} overflow-hidden`}>
+                    {/* Animated Gradient Header */}
+                    <div className={`relative h-52 bg-gradient-to-br ${config.gradient} overflow-hidden`}>
+                        {/* Animated Hearts Background */}
+                        <div className="absolute inset-0">
+                            {[...Array(6)].map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    animate={{
+                                        y: [100, -50],
+                                        x: [Math.random() * 100, Math.random() * 100 - 50],
+                                        opacity: [0, 1, 0],
+                                        scale: [0.5, 1, 0.5]
+                                    }}
+                                    transition={{
+                                        duration: 3,
+                                        repeat: Infinity,
+                                        delay: i * 0.5,
+                                        ease: 'easeOut'
+                                    }}
+                                    className="absolute text-white/20 text-4xl"
+                                    style={{ left: `${(i + 1) * 15}%` }}
+                                >
+                                    💕
+                                </motion.div>
+                            ))}
+                        </div>
+
                         {/* Pulsing circles */}
                         <div className="absolute inset-0 flex items-center justify-center">
                             <motion.div
@@ -83,75 +112,63 @@ export default function WhisperNotification({ language = 'ar' }: WhisperNotifica
                             <motion.div
                                 animate={{ scale: [1, 1.1, 1] }}
                                 transition={{ repeat: Infinity, duration: 1.5 }}
-                                className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"
+                                className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"
                             >
-                                <Icon className="w-10 h-10 text-white" />
+                                <Icon className="w-12 h-12 text-white" />
                             </motion.div>
                         </div>
-
-                        {/* Dismiss button */}
-                        <button
-                            onClick={dismissWhisper}
-                            className="absolute top-4 right-4 p-2 rounded-full bg-black/20 hover:bg-black/30 transition-colors"
-                        >
-                            <X className="w-5 h-5 text-white/70" />
-                        </button>
                     </div>
 
                     {/* Content */}
                     <div className="p-6 text-center">
-                        {/* Partner Name */}
-                        <h2 className="text-2xl font-bold text-white mb-2">
-                            {incomingWhisper.senderName}
+                        {/* Sender */}
+                        <p className="text-surface-400 text-sm mb-1">
+                            {isRTL ? 'همسة من' : 'Whisper from'}
+                        </p>
+                        <h2 className="text-2xl font-bold text-white mb-4">
+                            {incomingWhisper.senderName} 💕
                         </h2>
 
-                        {/* Type Label */}
-                        <p className="text-surface-400 mb-4">
-                            {isRTL ? config.label : config.labelEn}
-                        </p>
-
                         {/* Message */}
-                        {incomingWhisper.message && (
-                            <div className="p-4 rounded-xl bg-white/5 border border-white/10 mb-6">
-                                <p className="text-white text-lg leading-relaxed">
-                                    "{incomingWhisper.message}"
-                                </p>
-                            </div>
-                        )}
+                        <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-white/10 mb-6">
+                            <p className="text-white text-lg leading-relaxed">
+                                "{incomingWhisper.message}"
+                            </p>
+                        </div>
 
                         {/* Action Buttons */}
                         <div className="flex gap-3">
-                            {/* Decline */}
+                            {/* Later */}
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={handleDecline}
+                                onClick={handleLater}
                                 className="flex-1 py-4 rounded-xl bg-surface-800 hover:bg-surface-700 border border-white/10 text-surface-300 font-medium flex items-center justify-center gap-2 transition-colors"
                             >
                                 <Clock className="w-5 h-5" />
                                 {isRTL ? 'لاحقاً' : 'Later'}
                             </motion.button>
 
-                            {/* Accept */}
+                            {/* Accept - Come */}
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleAccept}
-                                className={`flex-1 py-4 rounded-xl bg-gradient-to-r ${config.color} text-white font-bold flex items-center justify-center gap-2 shadow-lg`}
+                                className={`flex-1 py-4 rounded-xl bg-gradient-to-r ${config.gradient} text-white font-bold flex items-center justify-center gap-2 shadow-lg`}
                             >
                                 <Check className="w-5 h-5" />
-                                {isRTL ? 'تواصل' : 'Connect'}
+                                {isRTL ? 'قادم/ة! 💕' : 'Coming! 💕'}
                             </motion.button>
                         </div>
 
-                        {/* Timer indicator */}
+                        {/* Waiting indicator */}
                         <div className="mt-4 flex items-center justify-center gap-2 text-surface-500 text-sm">
                             <motion.div
-                                animate={{ opacity: [1, 0.5, 1] }}
-                                transition={{ repeat: Infinity, duration: 1 }}
-                                className="w-2 h-2 rounded-full bg-green-500"
+                                animate={{ opacity: [1, 0.3, 1] }}
+                                transition={{ repeat: Infinity, duration: 1.5 }}
+                                className="w-2 h-2 rounded-full bg-pink-500"
                             />
-                            {isRTL ? 'ينتظر ردك...' : 'Waiting for your response...'}
+                            {isRTL ? 'ينتظرك بشوق...' : 'Waiting for you...'}
                         </div>
                     </div>
                 </motion.div>
