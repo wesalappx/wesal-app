@@ -53,15 +53,19 @@ export function useProgress() {
             // Get streak
             let streak = 0;
             if (isPaired && coupleId) {
-                const { data: streakData } = await supabase
+                const { data: streakData, error: streakError } = await supabase
                     .from('streaks')
                     .select('current_streak')
                     .eq('couple_id', coupleId)
                     .maybeSingle();
 
+                console.log('[useProgress] Streak fetch:', { coupleId, streakData, streakError });
+
                 if (streakData) {
                     streak = streakData.current_streak;
                 }
+            } else {
+                console.log('[useProgress] Not paired or no coupleId:', { isPaired, coupleId });
             }
 
             // Get sessions this week

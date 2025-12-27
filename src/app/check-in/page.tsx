@@ -171,6 +171,7 @@ export default function CheckInPage() {
             playSound('success');
 
             // Save
+            console.log('[CheckIn] Saving scores:', newScores);
             const { error } = await createCheckIn({
                 mood: newScores.mood,
                 energy: newScores.energy,
@@ -180,7 +181,8 @@ export default function CheckInPage() {
                 shared_with_partner: shareWithPartner,
             });
 
-            if (error) console.error('Failed to save:', error);
+            if (error) console.error('[CheckIn] Failed to save:', error);
+            else console.log('[CheckIn] Save successful');
 
             // Trigger AI
             try {
@@ -216,6 +218,7 @@ export default function CheckInPage() {
 
             // Fetch weekly history for graphs
             const { data: history } = await getHistory(7);
+            console.log('[CheckIn] Weekly history fetched:', history);
             setWeeklyData(history || []);
 
             // Allow animation to play for a bit

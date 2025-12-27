@@ -67,6 +67,10 @@ export function useInsights() {
                 .gte('created_at', sevenDaysAgo.toISOString())
                 .order('created_at', { ascending: true });
 
+            // DEBUG: Log fetched data
+            console.log('[useInsights] Fetched check-ins:', checkIns);
+            console.log('[useInsights] User ID:', user.id);
+
             if (error) {
                 console.error('Error fetching check-ins:', error);
                 // Use mock data on error
@@ -76,6 +80,7 @@ export function useInsights() {
             }
 
             if (!checkIns || checkIns.length === 0) {
+                console.log('[useInsights] No check-ins found, using mock data');
                 // Use mock data when no check-ins exist
                 setInsights(mockInsights);
                 setIsLoading(false);
@@ -88,6 +93,16 @@ export function useInsights() {
             const avgStress = checkIns.reduce((sum, c) => sum + (c.stress || 3), 0) / checkIns.length;
             const avgSleep = checkIns.reduce((sum, c) => sum + (c.sleep || 3), 0) / checkIns.length;
             const avgConnection = checkIns.reduce((sum, c) => sum + (c.connection || 3), 0) / checkIns.length;
+
+            // DEBUG: Log calculated averages
+            console.log('[useInsights] Averages (1-5 scale):', { avgMood, avgEnergy, avgStress, avgSleep, avgConnection });
+            console.log('[useInsights] Percentages:', {
+                mood: Math.round(avgMood * 20),
+                energy: Math.round(avgEnergy * 20),
+                stress: Math.round(avgStress * 20),
+                sleep: Math.round(avgSleep * 20),
+                connection: Math.round(avgConnection * 20)
+            });
 
             // Calculate overall score (weighted average)
             const overallScore = Math.round(

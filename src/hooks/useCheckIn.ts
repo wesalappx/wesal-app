@@ -85,26 +85,32 @@ export function useCheckIn() {
 
                         // 2. Update Streak
                         try {
+                            console.log('[useCheckIn] Fetching streak for couple:', couple.id);
                             const { data: streakData, error: streakFetchError } = await supabase
                                 .from('streaks')
                                 .select('*')
                                 .eq('couple_id', couple.id)
                                 .maybeSingle(); // maybeSingle to allow null without error
 
+                            console.log('[useCheckIn] Streak fetch result:', { streakData, streakFetchError });
+
                             if (streakFetchError) {
-                                console.error('Streak fetch error:', streakFetchError);
+                                console.error('[useCheckIn] Streak fetch error:', streakFetchError);
                             }
 
                             if (!streakData) {
                                 // Streak row doesn't exist, create it
-                                await supabase
+                                console.log('[useCheckIn] No streak row found, creating new one...');
+                                const { data: insertResult, error: insertError } = await supabase
                                     .from('streaks')
                                     .insert({
                                         couple_id: couple.id,
                                         current_streak: 1,
                                         longest_streak: 1,
                                         updated_at: new Date().toISOString()
-                                    });
+                                    })
+                                    .select();
+                                console.log('[useCheckIn] Streak INSERT result:', { insertResult, insertError });
                             } else {
                                 // Streak row exists, apply update logic
                                 const lastUpdate = new Date(streakData.updated_at);
@@ -117,6 +123,8 @@ export function useCheckIn() {
                                 today.setHours(0, 0, 0, 0);
                                 yesterday.setHours(0, 0, 0, 0);
 
+                                console.log('[useCheckIn] Streak dates:', { lastUpdate, today, yesterday });
+
                                 if (lastUpdate.getTime() < today.getTime()) {
                                     // Not updated today
                                     let newStreak = 1;
@@ -126,18 +134,23 @@ export function useCheckIn() {
                                     }
                                     // Else: Broken streak, reset to 1
 
-                                    await supabase
+                                    console.log('[useCheckIn] Updating streak to:', newStreak);
+                                    const { data: updateResult, error: updateError } = await supabase
                                         .from('streaks')
                                         .update({
                                             current_streak: newStreak,
                                             longest_streak: Math.max(newStreak, streakData.longest_streak),
                                             updated_at: new Date().toISOString()
                                         })
-                                        .eq('id', streakData.id);
+                                        .eq('id', streakData.id)
+                                        .select();
+                                    console.log('[useCheckIn] Streak UPDATE result:', { updateResult, updateError });
+                                } else {
+                                    console.log('[useCheckIn] Already updated today, skipping streak update');
                                 }
                             }
                         } catch (streakUpdateError) {
-                            console.error('Streak update error:', streakUpdateError);
+                            console.error('[useCheckIn] Streak update error:', streakUpdateError);
                         }
                     }
                 } catch (notificationError) {

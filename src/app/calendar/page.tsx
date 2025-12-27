@@ -96,10 +96,14 @@ export default function CalendarPage() {
 
     // --- Loading Data ---
     const refreshData = async () => {
+        console.log('[CalendarPage] Refreshing data for month:', currentMonth);
+
         // 1. Fetch Shared Sessions
         const sRes = await getSessions(currentMonth);
+        console.log('[CalendarPage] Sessions fetched:', sRes);
+
         if (sRes.data) {
-            setSessions(sRes.data.map((s: DBSession) => ({
+            const mappedSessions = sRes.data.map((s: DBSession) => ({
                 id: s.id,
                 title: s.title,
                 date: new Date(s.scheduled_date),
@@ -107,11 +111,15 @@ export default function CalendarPage() {
                 type: mapDbTypeToLocal(s.type),
                 reminder: s.reminder_enabled,
                 isRecurring: s.is_recurring // Map DB field
-            })));
+            }));
+            console.log('[CalendarPage] Mapped sessions:', mappedSessions);
+            setSessions(mappedSessions);
         }
 
         // 2. Fetch Shared Health Data
         const hRes = await getHealthData();
+        console.log('[CalendarPage] Health data fetched:', hRes);
+
         if (hRes.data) {
             if (hRes.data.last_period_date) setLastPeriodDate(new Date(hRes.data.last_period_date));
             if (hRes.data.cycle_length) setCycleLength(hRes.data.cycle_length);

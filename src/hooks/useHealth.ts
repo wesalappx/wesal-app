@@ -34,6 +34,7 @@ export function useHealth() {
         setIsLoading(true);
         try {
             const coupleId = await getCoupleId();
+            console.log('[useHealth] Fetching health data for:', { userId: user.id, coupleId });
 
             // Try to fetch by couple_id first (shared), then user_id (personal fallback)
             let query = supabase.from('health_tracking').select('*');
@@ -45,11 +46,12 @@ export function useHealth() {
             }
 
             const { data, error } = await query.maybeSingle();
+            console.log('[useHealth] Health data result:', { data, error });
 
             if (error) throw error;
             return { data: data as HealthData | null, error: null };
         } catch (err: any) {
-            console.error('Health fetch error:', err);
+            console.error('[useHealth] Fetch error:', err);
             return { data: null, error: err.message };
         } finally {
             setIsLoading(false);
