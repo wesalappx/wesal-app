@@ -11,7 +11,9 @@ import { sessionData, getTruthsAndDares } from './data/gameContent';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useJourneys } from '@/hooks/useJourneys';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useSessionSync } from '@/hooks/useSessionSync';
+import { usePairing } from '@/hooks/usePairing';
 import SessionChat from '@/components/SessionChat';
 import SessionModeModal from '@/components/SessionModeModal';
 
@@ -40,7 +42,21 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 function GameSessionContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { t } = useTranslation();
     const mode = searchParams.get('mode') || 'values';
+
+    const getModeTitle = () => {
+        switch (mode) {
+            case 'values': return t('games.values', 'Shared Values');
+            case 'deep-questions': return t('games.deepQuestions', 'Deep Questions');
+            case 'truth-or-dare': return t('games.truthOrDare', 'Truth or Dare');
+            case 'would-you-rather': return t('games.wouldYouRather', 'Would You Rather');
+            case 'compliment-battle': return t('games.complimentBattle', 'Compliment Battle');
+            case 'love-roulette': return t('games.loveRoulette', 'Love Roulette');
+            case 'memory-lane': return t('games.memoryLane', 'Memory Lane');
+            default: return t('games.game', 'Game');
+        }
+    };
     const stepNumber = parseInt(searchParams.get('step') || '1');
     const journeyId = searchParams.get('journey'); // Get journey ID directly from URL
 

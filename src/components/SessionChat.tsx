@@ -42,7 +42,7 @@ export default function SessionChat({ sessionId, userId, partnerName, compact = 
                 .eq('id', sessionId)
                 .single();
 
-            if (data?.chat_history) {
+            if (data?.chat_history && Array.isArray(data.chat_history)) {
                 setMessages(data.chat_history as Message[]);
             }
         };
@@ -61,7 +61,7 @@ export default function SessionChat({ sessionId, userId, partnerName, compact = 
                 filter: `id=eq.${sessionId}`
             }, (payload) => {
                 const newData = payload.new;
-                if (newData.chat_history) {
+                if (newData.chat_history && Array.isArray(newData.chat_history)) {
                     const newMsgs = newData.chat_history as Message[];
                     setMessages(newMsgs);
 
