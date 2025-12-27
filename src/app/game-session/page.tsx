@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useJourneys } from '@/hooks/useJourneys';
 import { useSessionSync } from '@/hooks/useSessionSync';
+import SessionChat from '@/components/SessionChat';
 import SessionModeModal from '@/components/SessionModeModal';
 
 
@@ -801,6 +802,4 @@ export default function GameSessionPage() {
     );
 }
 
-// Update imports
-import { Users } from 'lucide-react';
-import SessionChat from '@/components/SessionChat';
+
