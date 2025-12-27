@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
+import WhisperNotification from '@/components/WhisperNotification';
 import { AuthProvider } from '@/hooks/useAuth';
 import { useSettingsStore, initializeSettings } from '@/stores/settings-store';
 
@@ -21,6 +22,12 @@ function SettingsInitializer() {
     }, [theme, language]);
 
     return null;
+}
+
+// Global whisper listener component
+function GlobalWhisperListener() {
+    const { language } = useSettingsStore();
+    return <WhisperNotification language={language as 'ar' | 'en'} />;
 }
 
 // Pages where navbar should be hidden
@@ -51,9 +58,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
                 <SettingsInitializer />
+                <GlobalWhisperListener />
                 {children}
                 <ConditionalBottomNav />
             </AuthProvider>
         </QueryClientProvider>
     );
 }
+

@@ -159,37 +159,73 @@ export default function Dashboard() {
 
     }, [language]); // Re-fetch when language changes
 
-    // Real-time Presence for partner online status
+    // Real-time Presence for partner online status with heartbeat
     useEffect(() => {
-        if (!coupleId || !user || !partnerId) return;
+        if (!coupleId || !user?.id || !partnerId) {
+            return;
+        }
 
-        const presenceChannel = supabase.channel(`presence-couple-${coupleId}`);
+        let heartbeatInterval: NodeJS.Timeout;
+        const channelName = `presence-couple-${coupleId}`;
+        const presenceChannel = supabase.channel(channelName);
 
         presenceChannel
             .on('presence', { event: 'sync' }, () => {
                 const state = presenceChannel.presenceState();
-                // Check if partner is present
-                const partnerPresent = Object.values(state).some((presences: any) =>
-                    presences.some((p: any) => p.user_id === partnerId)
-                );
-                setPartnerStatus(partnerPresent ? 'online' : 'offline');
+                // Check if partner is present in any presence entry
+                let partnerFound = false;
+                Object.values(state).forEach((presences: any) => {
+                    if (Array.isArray(presences)) {
+                        presences.forEach((p: any) => {
+                            if (p.user_id === partnerId) {
+                                partnerFound = true;
+                            }
+                        });
+                    }
+                });
+                setPartnerStatus(partnerFound ? 'online' : 'offline');
+            })
+            .on('presence', { event: 'join' }, ({ newPresences }) => {
+                // Partner joined
+                if (newPresences?.some((p: any) => p.user_id === partnerId)) {
+                    setPartnerStatus('online');
+                }
+            })
+            .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+                // Partner left
+                if (leftPresences?.some((p: any) => p.user_id === partnerId)) {
+                    setPartnerStatus('offline');
+                }
             })
             .subscribe(async (status) => {
-                if (status === 'SUBSCRIBED' && user) {
-                    // Broadcast our presence
+                if (status === 'SUBSCRIBED' && user?.id) {
+                    // Initial presence broadcast
                     await presenceChannel.track({
                         user_id: user.id,
                         online_at: new Date().toISOString()
                     });
+
+                    // Heartbeat: Re-track every 30 seconds to stay connected
+                    heartbeatInterval = setInterval(async () => {
+                        try {
+                            await presenceChannel.track({
+                                user_id: user.id,
+                                online_at: new Date().toISOString()
+                            });
+                        } catch (e) {
+                            // Ignore heartbeat errors
+                        }
+                    }, 30000);
                 }
             });
 
         // Cleanup on unmount
         return () => {
+            if (heartbeatInterval) clearInterval(heartbeatInterval);
             presenceChannel.untrack();
             supabase.removeChannel(presenceChannel);
         };
-    }, [coupleId, user, partnerId]);
+    }, [coupleId, user?.id, partnerId]);
 
     if (!mounted) return null;
 
