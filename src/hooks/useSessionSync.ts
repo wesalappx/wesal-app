@@ -35,7 +35,12 @@ export function useSessionSync(activityType: string, activityId: string) {
 
     // Initialize or Join Session
     const initSession = useCallback(async (selectedMode: 'remote' | 'local') => {
-        if (!user) return;
+        if (!user) {
+            setLoading(false);
+            setError('User not authenticated');
+            setMode('local'); // Fallback
+            return;
+        }
         setLoading(true);
         setError(null);
 

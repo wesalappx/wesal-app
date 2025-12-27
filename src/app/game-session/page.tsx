@@ -89,11 +89,9 @@ function GameSessionContent() {
     useEffect(() => {
         if (isRemote && session?.state) {
             // Sync questions order if provided
-            if (session.state.questions && session.state.questions.length > 0) {
-                // Ensure we don't overwrite if already set to avoid re-render loops? 
-                // Actually we want to force sync.
-                // But we need to check if it's different.
-                // For simplicity, we trust the session state as source of truth.
+            if (Array.isArray(session.state.questions) && session.state.questions.length > 0) {
+                // Ensure we don't overwrite if already set to avoid re-render loops
+                // But we trust the session state as source of truth.
                 setCurrentQuestions(session.state.questions);
             }
 
