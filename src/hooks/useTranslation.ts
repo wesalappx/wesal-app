@@ -14,7 +14,7 @@ const translations: Record<'en' | 'ar', Translations> = { en, ar };
 export function useTranslation() {
     const { language } = useSettingsStore();
 
-    const t = (key: string): string => {
+    const t = (key: string, defaultValue?: string): string => {
         const keys = key.split('.');
         let value: any = translations[language];
 
@@ -22,20 +22,21 @@ export function useTranslation() {
             if (value && typeof value === 'object' && k in value) {
                 value = value[k];
             } else {
-                // Fallback to English if key not found
+                // Fallback to English if key not found (but English might also miss it)
                 value = translations['en'];
                 for (const fallbackKey of keys) {
                     if (value && typeof value === 'object' && fallbackKey in value) {
                         value = value[fallbackKey];
                     } else {
-                        return key; // Return key if not found
+                        // Return default value if provided, else key
+                        return defaultValue || key;
                     }
                 }
                 break;
             }
         }
 
-        return typeof value === 'string' ? value : key;
+        return typeof value === 'string' ? value : (defaultValue || key);
     };
 
     return { t, language };

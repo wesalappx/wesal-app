@@ -253,17 +253,7 @@ function GameSessionContent() {
         }
     };
 
-    const getModeTitle = () => {
-        switch (mode) {
-            case 'truth-or-dare': return 'صراحة ولا تحدي';
-            case 'compliment-battle': return 'تحدي المدح';
-            case 'would-you-rather': return 'لو خيروك';
-            case 'memory-lane': return 'شريط الذكريات';
-            case 'love-roulette': return 'عجلة الحظ';
-            case 'deep-questions': return 'أسئلة عميقة';
-            default: return 'رحلة القيم';
-        }
-    };
+
 
     // --- FINISHED SCREEN ---
     if (isFinished) {
