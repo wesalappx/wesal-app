@@ -128,9 +128,17 @@ export function useSessionSync(activityType: string, activityId: string) {
         channelRef.current = channel;
     }, [user]);
 
-    // Update Session State
+    const sessionRef = useRef<ActiveSession | null>(null);
+
+    // Keep ref synced
+    useEffect(() => {
+        sessionRef.current = session;
+    }, [session]);
+
+    // Update Session State (Stable Identity)
     const updateState = useCallback(async (newState: Partial<SessionState>) => {
-        if (mode === 'local' || !session) return;
+        const currentSession = sessionRef.current;
+        if (mode === 'local' || !currentSession) return;
 
         // Optimistic update
         setSession(prev => prev ? { ...prev, state: { ...prev.state, ...newState } } : null);
@@ -138,13 +146,13 @@ export function useSessionSync(activityType: string, activityId: string) {
         const { error } = await supabase
             .from('active_sessions')
             .update({
-                state: { ...session.state, ...newState },
+                state: { ...currentSession.state, ...newState },
                 updated_at: new Date().toISOString()
             })
-            .eq('id', session.id);
+            .eq('id', currentSession.id);
 
         if (error) console.error('State update failed:', error);
-    }, [mode, session]);
+    }, [mode]);
 
     // Cleanup
     useEffect(() => {
