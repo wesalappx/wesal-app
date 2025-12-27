@@ -123,10 +123,28 @@ export function useCheckIn() {
                                 today.setHours(0, 0, 0, 0);
                                 yesterday.setHours(0, 0, 0, 0);
 
-                                console.log('[useCheckIn] Streak dates:', { lastUpdate, today, yesterday });
+                                console.log('[useCheckIn] Streak logic:', {
+                                    lastUpdate,
+                                    today,
+                                    currentStreak: streakData.current_streak
+                                });
 
-                                if (lastUpdate.getTime() < today.getTime()) {
-                                    // Not updated today
+                                // EDGE CASE FIX: If current_streak is 0, we always update to 1
+                                // This handles rows created by SQL migration with streak=0
+                                if (streakData.current_streak === 0) {
+                                    console.log('[useCheckIn] Streak is 0, setting to 1');
+                                    const { data: updateResult, error: updateError } = await supabase
+                                        .from('streaks')
+                                        .update({
+                                            current_streak: 1,
+                                            longest_streak: Math.max(1, streakData.longest_streak),
+                                            updated_at: new Date().toISOString()
+                                        })
+                                        .eq('id', streakData.id)
+                                        .select();
+                                    console.log('[useCheckIn] Streak UPDATE (from 0) result:', { updateResult, updateError });
+                                } else if (lastUpdate.getTime() < today.getTime()) {
+                                    // Not updated today, calculate new streak
                                     let newStreak = 1;
                                     if (lastUpdate.getTime() === yesterday.getTime()) {
                                         // Consecutive day
@@ -146,7 +164,7 @@ export function useCheckIn() {
                                         .select();
                                     console.log('[useCheckIn] Streak UPDATE result:', { updateResult, updateError });
                                 } else {
-                                    console.log('[useCheckIn] Already updated today, skipping streak update');
+                                    console.log('[useCheckIn] Already checked in today with active streak, skipping');
                                 }
                             }
                         } catch (streakUpdateError) {
