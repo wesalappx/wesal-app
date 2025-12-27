@@ -1,61 +1,62 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    ArrowRight,
-    ArrowLeft,
-    Calendar as CalendarIcon,
-    Plus,
-    Clock,
-    Heart,
-    Gamepad2,
-    Bell,
-    Check,
-    X,
-    ChevronRight,
-    ChevronLeft,
-    Star,
-    Gift,
-    Save,
-    Trash2,
-    Sparkles,
-    Droplets,
-    Activity
+    ArrowLeft, ArrowRight, Calendar as CalendarIcon, Plus, X,
+    Heart, Gamepad2, Check, Gift, Star, Sparkles, Moon, Droplets,
+    ChevronLeft, ChevronRight, Grid3X3, LayoutGrid, Settings2, Trash2, Clock
 } from 'lucide-react';
-import Link from 'next/link';
-import { useCalendar, ScheduledSession as DBSession } from '@/hooks/useCalendar';
-import { usePairing } from '@/hooks/usePairing';
+import { useCalendar, ScheduledSession } from '@/hooks/useCalendar';
 import { useHealth } from '@/hooks/useHealth';
+import { usePairing } from '@/hooks/usePairing';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // --- Types ---
-interface ScheduledSession {
+interface ScheduledEvent {
     id: string;
     title: string;
     date: Date;
-    time: string;
-    type: 'game' | 'date' | 'checkin' | 'birthday' | 'anniversary' | 'special';
+    time?: string;
+    type: string;
     reminder: boolean;
     isRecurring?: boolean;
 }
 
+interface DBSession {
+    id: string;
+    title: string;
+    type: string;
+    scheduled_date: string;
+    scheduled_time?: string;
+    reminder_enabled: boolean;
+    is_recurring?: boolean;
+    [key: string]: any;
+}
+
 // --- Config ---
-const typeConfig = {
-    game: { icon: Gamepad2, color: 'bg-indigo-500/20 text-indigo-400', gradient: 'from-indigo-500 to-violet-500', label: 'لعبة' },
-    date: { icon: Heart, color: 'bg-rose-500/20 text-rose-400', gradient: 'from-rose-500 to-pink-500', label: 'موعد' },
-    checkin: { icon: Check, color: 'bg-emerald-500/20 text-emerald-400', gradient: 'from-emerald-500 to-teal-500', label: 'تقييم' },
-    birthday: { icon: Gift, color: 'bg-pink-500/20 text-pink-400', gradient: 'from-pink-500 to-rose-500', label: 'عيد ميلاد' },
-    anniversary: { icon: Star, color: 'bg-amber-500/20 text-amber-400', gradient: 'from-amber-500 to-orange-500', label: 'ذكرى' },
-    special: { icon: Sparkles, color: 'bg-purple-500/20 text-purple-400', gradient: 'from-purple-500 to-fuchsia-500', label: 'مناسبة' },
+const typeConfig: Record<string, { icon: any; color: string; bgColor: string; gradient: string; label: string; labelEn: string }> = {
+    game: { icon: Gamepad2, color: 'text-indigo-400', bgColor: 'bg-indigo-500', gradient: 'from-indigo-500 to-violet-500', label: 'لعبة', labelEn: 'Game' },
+    date: { icon: Heart, color: 'text-rose-400', bgColor: 'bg-rose-500', gradient: 'from-rose-500 to-pink-500', label: 'موعد', labelEn: 'Date' },
+    checkin: { icon: Check, color: 'text-emerald-400', bgColor: 'bg-emerald-500', gradient: 'from-emerald-500 to-teal-500', label: 'تقييم', labelEn: 'Check-in' },
+    birthday: { icon: Gift, color: 'text-pink-400', bgColor: 'bg-pink-500', gradient: 'from-pink-500 to-rose-500', label: 'عيد ميلاد', labelEn: 'Birthday' },
+    anniversary: { icon: Star, color: 'text-amber-400', bgColor: 'bg-amber-500', gradient: 'from-amber-500 to-orange-500', label: 'ذكرى', labelEn: 'Anniversary' },
+    special: { icon: Sparkles, color: 'text-purple-400', bgColor: 'bg-purple-500', gradient: 'from-purple-500 to-fuchsia-500', label: 'مناسبة', labelEn: 'Special' },
 };
+
+// Special Days (Auto-detected)
+const specialDays = [
+    { month: 1, day: 14, nameAr: 'عيد الحب', nameEn: "Valentine's Day", icon: Heart, color: 'text-rose-500' },
+    { month: 11, day: 31, nameAr: 'رأس السنة', nameEn: "New Year's Eve", icon: Sparkles, color: 'text-amber-500' },
+];
 
 const arabicDays = ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
 const englishDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const arabicMonths = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-const englishMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const englishMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-const mapDbTypeToLocal = (dbType: string): any => {
+const mapDbTypeToLocal = (dbType: string): string => {
     switch (dbType) {
         case 'JOURNEY': return 'game';
         case 'ACTIVITY': return 'date';
@@ -64,7 +65,7 @@ const mapDbTypeToLocal = (dbType: string): any => {
     }
 };
 
-const mapLocalTypeToDb = (localType: string): any => {
+const mapLocalTypeToDb = (localType: string): string => {
     switch (localType) {
         case 'game': return 'JOURNEY';
         case 'date': return 'ACTIVITY';
@@ -73,53 +74,44 @@ const mapLocalTypeToDb = (localType: string): any => {
     }
 };
 
+// --- Main Component ---
 export default function CalendarPage() {
     const { t, language } = useTranslation();
     const isRTL = language === 'ar';
 
     // State
+    const [viewMode, setViewMode] = useState<'month' | 'year'>('month');
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showCycleSettings, setShowCycleSettings] = useState(false);
 
     // Data Hooks
     const { getSessions, createSession, deleteSession } = useCalendar();
-    const { getHealthData, updateHealthData } = useHealth();
-    const { getStatus } = usePairing();
+    const { getHealthData, updateHealthData, isLoading: healthLoading } = useHealth();
 
     // Data State
-    const [sessions, setSessions] = useState<ScheduledSession[]>([]);
+    const [sessions, setSessions] = useState<ScheduledEvent[]>([]);
     const [lastPeriodDate, setLastPeriodDate] = useState<Date | null>(null);
     const [cycleLength, setCycleLength] = useState(28);
-    const [showCycleSettings, setShowCycleSettings] = useState(false);
     const [savingHealth, setSavingHealth] = useState(false);
 
-    // --- Loading Data ---
+    // --- Data Loading ---
     const refreshData = async () => {
-        console.log('[CalendarPage] Refreshing data for month:', currentMonth);
-
-        // 1. Fetch Shared Sessions
         const sRes = await getSessions(currentMonth);
-        console.log('[CalendarPage] Sessions fetched:', sRes);
-
         if (sRes.data) {
-            const mappedSessions = sRes.data.map((s: DBSession) => ({
+            setSessions(sRes.data.map((s: DBSession) => ({
                 id: s.id,
                 title: s.title,
                 date: new Date(s.scheduled_date),
-                time: s.scheduled_time?.slice(0, 5) || '00:00',
+                time: s.scheduled_time?.slice(0, 5) || '',
                 type: mapDbTypeToLocal(s.type),
                 reminder: s.reminder_enabled,
-                isRecurring: s.is_recurring // Map DB field
-            }));
-            console.log('[CalendarPage] Mapped sessions:', mappedSessions);
-            setSessions(mappedSessions);
+                isRecurring: s.is_recurring
+            })));
         }
 
-        // 2. Fetch Shared Health Data
         const hRes = await getHealthData();
-        console.log('[CalendarPage] Health data fetched:', hRes);
-
         if (hRes.data) {
             if (hRes.data.last_period_date) setLastPeriodDate(new Date(hRes.data.last_period_date));
             if (hRes.data.cycle_length) setCycleLength(hRes.data.cycle_length);
@@ -130,50 +122,106 @@ export default function CalendarPage() {
         refreshData();
     }, [currentMonth]);
 
-    // --- Logic: Cycle Phases ---
-    const getCyclePhase = (date: Date) => {
+    // --- Cycle Phase Calculation ---
+    const getCyclePhase = (date: Date): { phase: string; color: string; bgColor: string; borderColor: string } | null => {
         if (!lastPeriodDate) return null;
 
-        // Calculate difference in days
         const diffTime = date.getTime() - lastPeriodDate.getTime();
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-        // Determine day within current cycle
-        // If negative (date is before last period), we ignore or handle previous cycle logic roughly
-        // Ideally we project phases based on cycle length modulo.
+        if (diffDays < 0) return null;
 
-        // Simple projection for current/future
-        const currentCycleDay = (diffDays % cycleLength + cycleLength) % cycleLength + 1;
+        const dayInCycle = (diffDays % cycleLength) + 1;
 
-        // Standard phases (approximate)
-        // Menstruation: 1-5
-        // Follicular: 6-11
-        // Ovulation: 12-16 (Peak 14)
-        // Luteal: 17-28
-
-        if (currentCycleDay >= 1 && currentCycleDay <= 5) return { name: 'Menstruation', bg: 'bg-rose-500/20', border: 'border-rose-500/30', dot: 'bg-rose-500', label: isRTL ? 'دورة' : 'Period' };
-        if (currentCycleDay >= 12 && currentCycleDay <= 16) return { name: 'Ovulation', bg: 'bg-purple-500/20', border: 'border-purple-500/30', dot: 'bg-purple-500', label: isRTL ? 'خصوبة' : 'Fertile' };
-        if (currentCycleDay >= 17) return { name: 'Luteal', bg: 'bg-amber-500/5', border: '', dot: 'bg-amber-500', label: isRTL ? 'تجهيز' : 'Luteal' };
-
-        return { name: 'Follicular', bg: 'bg-blue-500/5', border: '', dot: 'bg-blue-400', label: isRTL ? 'راحة' : 'Follicular' };
-    };
-
-    // --- Actions ---
-    const handleSaveSession = async (data: any) => {
-        const res = await createSession({
-            title: data.title,
-            type: mapLocalTypeToDb(data.type),
-            scheduled_date: data.date.toISOString().split('T')[0],
-            scheduled_time: data.time,
-            reminder_enabled: data.reminder,
-            is_recurring: data.is_recurring // Ensure this is passed
-        });
-        if (res.data) {
-            refreshData();
-            setShowAddModal(false);
+        // Menstruation: Days 1-5
+        if (dayInCycle <= 5) {
+            return {
+                phase: isRTL ? 'الدورة' : 'Period',
+                color: 'text-rose-400',
+                bgColor: 'bg-rose-500/20',
+                borderColor: 'border-rose-500/40'
+            };
         }
+
+        // Ovulation: Days 12-16 (fertile window)
+        if (dayInCycle >= 12 && dayInCycle <= 16) {
+            return {
+                phase: isRTL ? 'فترة الخصوبة' : 'Fertile',
+                color: 'text-emerald-400',
+                bgColor: 'bg-emerald-500/20',
+                borderColor: 'border-emerald-500/40'
+            };
+        }
+
+        return null;
     };
 
+    // --- Calendar Grid Generation ---
+    const generateMonthDays = (month: Date) => {
+        const year = month.getFullYear();
+        const monthNum = month.getMonth();
+        const firstDay = new Date(year, monthNum, 1);
+        const lastDay = new Date(year, monthNum + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDayIndex = firstDay.getDay();
+
+        const days: (Date | null)[] = [];
+
+        // Add empty slots for days before the first of the month
+        for (let i = 0; i < startingDayIndex; i++) {
+            days.push(null);
+        }
+
+        // Add all days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            days.push(new Date(year, monthNum, day));
+        }
+
+        return days;
+    };
+
+    const monthDays = useMemo(() => generateMonthDays(currentMonth), [currentMonth]);
+
+    // --- Navigation ---
+    const prevMonth = () => {
+        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+    };
+
+    const nextMonth = () => {
+        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+    };
+
+    const prevYear = () => {
+        setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth(), 1));
+    };
+
+    const nextYear = () => {
+        setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth(), 1));
+    };
+
+    // --- Get Events for a Day ---
+    const getEventsForDay = (date: Date) => {
+        return sessions.filter(s =>
+            s.date.getDate() === date.getDate() &&
+            s.date.getMonth() === date.getMonth() &&
+            s.date.getFullYear() === date.getFullYear()
+        );
+    };
+
+    // --- Check for Special Days ---
+    const getSpecialDay = (date: Date) => {
+        return specialDays.find(sd => sd.month === date.getMonth() && sd.day === date.getDate());
+    };
+
+    // --- Is Today ---
+    const isToday = (date: Date) => {
+        const today = new Date();
+        return date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
+    };
+
+    // --- Save Health Data ---
     const handleSaveHealth = async () => {
         setSavingHealth(true);
         await updateHealthData({
@@ -182,371 +230,546 @@ export default function CalendarPage() {
         });
         setSavingHealth(false);
         setShowCycleSettings(false);
-        refreshData(); // Re-calc phases
     };
 
-    // --- Render Helpers ---
-    const { daysInMonth, startingDay } = (() => {
-        const year = currentMonth.getFullYear();
-        const month = currentMonth.getMonth();
-        return {
-            daysInMonth: new Date(year, month + 1, 0).getDate(),
-            startingDay: new Date(year, month, 1).getDay()
-        };
-    })();
+    // --- Add Event ---
+    const handleAddEvent = async (data: { title: string; type: string; time: string; isRecurring: boolean }) => {
+        if (!selectedDate) return;
 
-    const monthName = isRTL ? arabicMonths[currentMonth.getMonth()] : englishMonths[currentMonth.getMonth()];
+        await createSession({
+            title: data.title,
+            type: mapLocalTypeToDb(data.type) as any,
+            scheduled_date: selectedDate.toISOString().split('T')[0],
+            scheduled_time: data.time || undefined,
+            reminder_enabled: true,
+            is_recurring: data.isRecurring
+        });
+
+        await refreshData();
+        setShowAddModal(false);
+    };
+
+    // --- Delete Event ---
+    const handleDeleteEvent = async (eventId: string) => {
+        await deleteSession(eventId);
+        await refreshData();
+    };
+
+    // --- Day Names ---
     const dayNames = isRTL ? arabicDays : englishDays;
+    const monthNames = isRTL ? arabicMonths : englishMonths;
 
     return (
-        <div className="min-h-screen bg-surface-950 font-sans pb-32">
-            {/* Header */}
-            <header className="sticky top-0 z-40 bg-surface-950/80 backdrop-blur-md border-b border-white/5 px-4 py-4 flex items-center justify-between">
-                <Link href="/dashboard" className="p-2 -ml-2 rounded-full hover:bg-white/10">
-                    {isRTL ? <ArrowRight className="w-6 h-6 text-white" /> : <ArrowLeft className="w-6 h-6 text-white" />}
-                </Link>
-                <h1 className="text-lg font-bold text-white">{isRTL ? 'التقويم المشترك' : 'Shared Calendar'}</h1>
-                <div onClick={() => setCurrentMonth(new Date())} className="p-2 rounded-full hover:bg-white/10 cursor-pointer">
-                    <CalendarIcon className="w-5 h-5 text-primary-400" />
-                </div>
-            </header>
+        <div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900 font-sans">
+            <div className="max-w-md mx-auto p-4 pb-32">
 
-            <main className="px-4 py-4 space-y-6">
+                {/* Header */}
+                <header className="flex items-center justify-between mb-6 pt-4">
+                    <Link href="/dashboard" className="p-2 -ml-2 text-surface-400 hover:text-white transition-colors">
+                        <ArrowRight className={`w-6 h-6 ${isRTL ? '' : 'rotate-180'}`} />
+                    </Link>
+                    <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                        <CalendarIcon className="w-5 h-5 text-primary-400" />
+                        {isRTL ? 'التقويم' : 'Calendar'}
+                    </h1>
+                    <button
+                        onClick={() => setShowCycleSettings(true)}
+                        className="p-2 text-surface-400 hover:text-white transition-colors"
+                    >
+                        <Settings2 className="w-5 h-5" />
+                    </button>
+                </header>
 
-                {/* Month Navigation */}
-                <div className="flex items-center justify-between bg-surface-900 rounded-2xl p-2 border border-white/5">
-                    <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))} className="p-2 hover:bg-white/5 rounded-xl"><ChevronRight className={`w-5 h-5 text-white ${!isRTL && 'rotate-180'}`} /></button>
-                    <div className="text-center">
-                        <span className="text-lg font-bold text-white block">{monthName}</span>
-                        <span className="text-xs text-surface-400">{currentMonth.getFullYear()}</span>
-                    </div>
-                    <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))} className="p-2 hover:bg-white/5 rounded-xl"><ChevronLeft className={`w-5 h-5 text-white ${!isRTL && 'rotate-180'}`} /></button>
-                </div>
-
-                {/* Calendar Grid */}
-                <div className="bg-surface-900 rounded-3xl border border-white/5 p-4 shadow-xl">
-                    <div className="grid grid-cols-7 mb-4">
-                        {dayNames.map((d, i) => (
-                            <div key={i} className="text-center text-[10px] text-surface-400 font-medium tracking-wider uppercase">{d}</div>
-                        ))}
-                    </div>
-
-                    <div className="grid grid-cols-7 gap-y-2 gap-x-1">
-                        {Array.from({ length: startingDay }).map((_, i) => <div key={`empty-${i}`} />)}
-
-                        {Array.from({ length: daysInMonth }).map((_, i) => {
-                            const day = i + 1;
-                            const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-                            const isToday = new Date().toDateString() === date.toDateString();
-                            const isSelected = selectedDate?.toDateString() === date.toDateString();
-
-                            // Data for this day
-                            const daySessions = sessions.filter(s =>
-                                s.date.toDateString() === date.toDateString() ||
-                                (s.isRecurring && s.date.getDate() === date.getDate() && s.date.getMonth() === date.getMonth())
-                            );
-                            const phase = getCyclePhase(date);
-
-                            return (
-                                <div
-                                    key={day}
-                                    onClick={() => setSelectedDate(date)}
-                                    className={`relative flex flex-col items-center justify-start pt-1 gap-1 cursor-pointer group h-14 rounded-xl transition-all border 
-                                        ${phase?.bg || 'hover:bg-white/5'} 
-                                        ${phase?.border || 'border-transparent'}
-                                        ${isSelected ? 'ring-2 ring-primary-500 z-10' : ''}
-                                    `}
-                                >
-                                    {/* Day Number */}
-                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all
-                                        ${isSelected ? 'bg-primary-500 text-white' :
-                                            isToday ? 'bg-surface-700 text-primary-400' :
-                                                'text-surface-300'}
-                                    `}>
-                                        {day}
-                                    </div>
-
-                                    {/* Indicators */}
-                                    <div className="flex gap-0.5 h-1 items-end mt-auto mb-1">
-                                        {daySessions.slice(0, 3).map((s, idx) => (
-                                            <div key={idx} className={`w-1 h-1 rounded-full ${typeConfig[s.type]?.color.split(' ')[0].replace('/20', '')}`} />
-                                        ))}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Legend */}
-                    <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-center gap-4 text-[10px] text-surface-400">
-                        <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 rounded-full bg-rose-500/50 border border-rose-500/50" />
-                            <span>{isRTL ? 'دورة' : 'Period'}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 rounded-full bg-purple-500/50 border border-purple-500/50" />
-                            <span>{isRTL ? 'خصوبة' : 'Fertile'}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 rounded-full bg-primary-500" />
-                            <span>{isRTL ? 'اليوم' : 'Today'}</span>
-                        </div>
-                    </div>
+                {/* View Toggle */}
+                <div className="flex gap-2 mb-6">
+                    <button
+                        onClick={() => setViewMode('month')}
+                        className={`flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${viewMode === 'month'
+                                ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
+                                : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700'
+                            }`}
+                    >
+                        <LayoutGrid className="w-4 h-4" />
+                        {isRTL ? 'شهري' : 'Month'}
+                    </button>
+                    <button
+                        onClick={() => setViewMode('year')}
+                        className={`flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${viewMode === 'year'
+                                ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
+                                : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700'
+                            }`}
+                    >
+                        <Grid3X3 className="w-4 h-4" />
+                        {isRTL ? 'سنوي' : 'Year'}
+                    </button>
                 </div>
 
-                {/* Selected Day Info */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-white font-bold text-lg">
-                            {selectedDate ?
-                                selectedDate.toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' }) :
-                                (isRTL ? 'تفاصيل اليوم' : 'Today Details')}
-                        </h3>
-                        {selectedDate && (
-                            <button onClick={() => setShowAddModal(true)} className="flex items-center gap-1 text-xs bg-primary-500/10 text-primary-400 px-3 py-1.5 rounded-full border border-primary-500/20">
-                                <Plus className="w-3.5 h-3.5" />
-                                {isRTL ? 'إضافة' : 'Add'}
-                            </button>
-                        )}
-                    </div>
-
-                    {selectedDate && getCyclePhase(selectedDate) && (
-                        <div className={`p-4 rounded-2xl flex items-center justify-between border ${getCyclePhase(selectedDate)?.bg} ${getCyclePhase(selectedDate)?.border}`}>
-                            <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCyclePhase(selectedDate)?.dot} bg-opacity-20`}>
-                                    <Activity className={`w-5 h-5 ${getCyclePhase(selectedDate)?.dot.replace('bg-', 'text-')}`} />
-                                </div>
-                                <div>
-                                    <span className="text-xs text-surface-400 block">{isRTL ? 'الحالة الصحية' : 'Cycle Phase'}</span>
-                                    <span className="text-white font-bold">{getCyclePhase(selectedDate)?.label}</span>
+                {/* Month View */}
+                <AnimatePresence mode="wait">
+                    {viewMode === 'month' && (
+                        <motion.div
+                            key="month-view"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                        >
+                            {/* Month Navigation */}
+                            <div className="glass-card p-4 mb-4">
+                                <div className="flex items-center justify-between">
+                                    <button onClick={prevMonth} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                                        <ChevronRight className={`w-5 h-5 text-surface-400 ${isRTL ? '' : 'rotate-180'}`} />
+                                    </button>
+                                    <h2 className="text-lg font-bold text-white">
+                                        {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                                    </h2>
+                                    <button onClick={nextMonth} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                                        <ChevronLeft className={`w-5 h-5 text-surface-400 ${isRTL ? '' : 'rotate-180'}`} />
+                                    </button>
                                 </div>
                             </div>
-                            <button onClick={() => setShowCycleSettings(true)} className="text-xs text-surface-500 underline">{isRTL ? 'تعديل' : 'Edit'}</button>
-                        </div>
-                    )}
 
-                    {/* Sessions List */}
-                    <div className="space-y-2">
-                        {selectedDate ? (
-                            (() => {
-                                const selectedSessions = sessions.filter(s =>
-                                    s.date.toDateString() === selectedDate.toDateString() ||
-                                    (s.isRecurring && s.date.getDate() === selectedDate.getDate() && s.date.getMonth() === selectedDate.getMonth())
-                                );
+                            {/* Calendar Grid */}
+                            <div className="glass-card p-4 mb-4">
+                                {/* Day Headers */}
+                                <div className="grid grid-cols-7 gap-1 mb-2">
+                                    {dayNames.map(day => (
+                                        <div key={day} className="text-center text-xs text-surface-500 font-medium py-2">
+                                            {day}
+                                        </div>
+                                    ))}
+                                </div>
 
-                                return selectedSessions.length > 0 ? (
-                                    selectedSessions.map(session => {
-                                        const Cfg = typeConfig[session.type] || typeConfig.special;
-                                        const Icon = Cfg.icon;
+                                {/* Day Grid */}
+                                <div className="grid grid-cols-7 gap-1">
+                                    {monthDays.map((date, idx) => {
+                                        if (!date) {
+                                            return <div key={`empty-${idx}`} className="aspect-square" />;
+                                        }
+
+                                        const cyclePhase = getCyclePhase(date);
+                                        const events = getEventsForDay(date);
+                                        const special = getSpecialDay(date);
+                                        const today = isToday(date);
+                                        const isSelected = selectedDate?.getDate() === date.getDate() &&
+                                            selectedDate?.getMonth() === date.getMonth();
+
                                         return (
-                                            <div key={session.id} className="p-3 rounded-2xl bg-surface-900 border border-white/5 flex items-center gap-4">
-                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${Cfg.color}`}>
-                                                    <Icon className="w-5 h-5" />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <h4 className="text-white font-bold text-sm">{session.title}</h4>
-                                                        {session.isRecurring && (
-                                                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-surface-800 text-surface-400 border border-surface-700">
-                                                                {isRTL ? 'سنوي' : 'Yearly'}
-                                                            </span>
+                                            <motion.button
+                                                key={date.toISOString()}
+                                                onClick={() => setSelectedDate(date)}
+                                                whileTap={{ scale: 0.95 }}
+                                                className={`aspect-square rounded-xl relative flex flex-col items-center justify-center transition-all border
+                                                    ${cyclePhase ? `${cyclePhase.bgColor} ${cyclePhase.borderColor}` : 'border-transparent hover:bg-white/5'}
+                                                    ${isSelected ? 'ring-2 ring-primary-500 bg-primary-500/20' : ''}
+                                                    ${today ? 'ring-2 ring-amber-500' : ''}
+                                                `}
+                                            >
+                                                <span className={`text-sm font-medium ${today ? 'text-amber-400' : cyclePhase ? cyclePhase.color : 'text-white'}`}>
+                                                    {date.getDate()}
+                                                </span>
+
+                                                {/* Event Dots */}
+                                                {events.length > 0 && (
+                                                    <div className="flex gap-0.5 mt-1">
+                                                        {events.slice(0, 3).map((e, i) => (
+                                                            <div key={i} className={`w-1 h-1 rounded-full ${typeConfig[e.type]?.bgColor || 'bg-primary-500'}`} />
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* Special Day Indicator */}
+                                                {special && (
+                                                    <div className="absolute -top-1 -right-1">
+                                                        <special.icon className={`w-3 h-3 ${special.color}`} />
+                                                    </div>
+                                                )}
+
+                                                {/* Cycle Phase Indicator */}
+                                                {cyclePhase && (
+                                                    <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2">
+                                                        {cyclePhase.phase === (isRTL ? 'الدورة' : 'Period') ? (
+                                                            <Droplets className="w-2.5 h-2.5 text-rose-400" />
+                                                        ) : (
+                                                            <Moon className="w-2.5 h-2.5 text-emerald-400" />
                                                         )}
                                                     </div>
-                                                    <span className="text-xs text-surface-400">{session.time}</span>
-                                                </div>
-                                                <button onClick={() => deleteSession(session.id).then(refreshData)} className="p-2 hover:bg-red-500/10 rounded-lg group">
-                                                    <Trash2 className="w-4 h-4 text-surface-600 group-hover:text-red-400 transition-colors" />
-                                                </button>
-                                            </div>
+                                                )}
+                                            </motion.button>
                                         );
-                                    })
-                                ) : (
-                                    <div className="text-center py-8 text-surface-500 text-sm border border-dashed border-white/5 rounded-2xl">
-                                        {isRTL ? 'لا يوجد أحداث في هذا اليوم' : 'No events for this day'}
-                                    </div>
-                                );
-                            })()
-                        ) : (
-                            <div className="text-center py-8 text-surface-500 text-sm">
-                                {isRTL ? 'اختر يوماً لعرض التفاصيل' : 'Select a day to view details'}
+                                    })}
+                                </div>
                             </div>
-                        )}
-                    </div>
-                </div>
 
-            </main>
+                            {/* Legend */}
+                            <div className="glass-card p-3 mb-4">
+                                <div className="flex flex-wrap gap-3 justify-center text-xs">
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-3 h-3 rounded bg-rose-500/30 border border-rose-500/50" />
+                                        <span className="text-surface-400">{isRTL ? 'الدورة' : 'Period'}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500/50" />
+                                        <span className="text-surface-400">{isRTL ? 'خصوبة' : 'Fertile'}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-3 h-3 rounded ring-2 ring-amber-500" />
+                                        <span className="text-surface-400">{isRTL ? 'اليوم' : 'Today'}</span>
+                                    </div>
+                                </div>
+                            </div>
 
-            {/* Floating Add Button */}
-            <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => { setSelectedDate(new Date()); setShowAddModal(true); }}
-                className="fixed bottom-24 left-6 w-14 h-14 bg-gradient-to-r from-primary-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/30 z-30"
-            >
-                <Plus className="w-6 h-6 text-white" />
-            </motion.button>
+                            {/* Selected Day Details */}
+                            {selectedDate && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="glass-card p-4"
+                                >
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-white">
+                                                {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]}
+                                            </h3>
+                                            <p className="text-sm text-surface-400">
+                                                {dayNames[selectedDate.getDay()]}
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowAddModal(true)}
+                                            className="p-2 bg-primary-500 rounded-xl text-white hover:bg-primary-600 transition-colors"
+                                        >
+                                            <Plus className="w-5 h-5" />
+                                        </button>
+                                    </div>
 
-            {/* --- Modals --- */}
+                                    {/* Events List */}
+                                    {getEventsForDay(selectedDate).length > 0 ? (
+                                        <div className="space-y-2">
+                                            {getEventsForDay(selectedDate).map(event => {
+                                                const cfg = typeConfig[event.type] || typeConfig.special;
+                                                const Icon = cfg.icon;
+                                                return (
+                                                    <div key={event.id} className="flex items-center justify-between p-3 bg-surface-800/50 rounded-xl">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`p-2 rounded-lg ${cfg.bgColor}/20`}>
+                                                                <Icon className={`w-4 h-4 ${cfg.color}`} />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-medium text-white">{event.title}</p>
+                                                                {event.time && (
+                                                                    <p className="text-xs text-surface-400 flex items-center gap-1">
+                                                                        <Clock className="w-3 h-3" />
+                                                                        {event.time}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => handleDeleteEvent(event.id)}
+                                                            className="p-2 text-surface-500 hover:text-rose-400 transition-colors"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <p className="text-center text-surface-500 py-4">
+                                            {isRTL ? 'لا توجد أحداث' : 'No events'}
+                                        </p>
+                                    )}
 
-            {/* Add Session Modal */}
-            <AnimatePresence>
-                {showAddModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                        <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="bg-surface-900 w-full max-w-sm rounded-3xl p-6 border border-white/10 shadow-2xl">
-                            <h3 className="text-xl font-bold text-white mb-4 text-center">{isRTL ? 'حدث جديد' : 'New Event'}</h3>
-                            <AddSessionForm
-                                date={selectedDate || new Date()}
-                                onClose={() => setShowAddModal(false)}
-                                onSave={handleSaveSession}
-                                isRTL={isRTL}
-                            />
+                                    {/* Cycle Info */}
+                                    {getCyclePhase(selectedDate) && (
+                                        <div className={`mt-4 p-3 rounded-xl ${getCyclePhase(selectedDate)!.bgColor} border ${getCyclePhase(selectedDate)!.borderColor}`}>
+                                            <p className={`text-sm font-medium ${getCyclePhase(selectedDate)!.color}`}>
+                                                {getCyclePhase(selectedDate)!.phase}
+                                            </p>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            )}
                         </motion.div>
-                    </div>
+                    )}
+
+                    {/* Year View */}
+                    {viewMode === 'year' && (
+                        <motion.div
+                            key="year-view"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                        >
+                            {/* Year Navigation */}
+                            <div className="glass-card p-4 mb-4">
+                                <div className="flex items-center justify-between">
+                                    <button onClick={prevYear} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                                        <ChevronRight className={`w-5 h-5 text-surface-400 ${isRTL ? '' : 'rotate-180'}`} />
+                                    </button>
+                                    <h2 className="text-2xl font-bold text-white">
+                                        {currentMonth.getFullYear()}
+                                    </h2>
+                                    <button onClick={nextYear} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                                        <ChevronLeft className={`w-5 h-5 text-surface-400 ${isRTL ? '' : 'rotate-180'}`} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Mini Months Grid */}
+                            <div className="grid grid-cols-3 gap-3">
+                                {Array.from({ length: 12 }, (_, i) => {
+                                    const monthDate = new Date(currentMonth.getFullYear(), i, 1);
+                                    const isCurrentMonth = i === new Date().getMonth() && currentMonth.getFullYear() === new Date().getFullYear();
+
+                                    return (
+                                        <motion.button
+                                            key={i}
+                                            onClick={() => {
+                                                setCurrentMonth(monthDate);
+                                                setViewMode('month');
+                                            }}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            className={`glass-card p-3 text-center transition-all ${isCurrentMonth ? 'ring-2 ring-primary-500 bg-primary-500/10' : ''
+                                                }`}
+                                        >
+                                            <p className={`text-sm font-bold ${isCurrentMonth ? 'text-primary-400' : 'text-white'}`}>
+                                                {monthNames[i]}
+                                            </p>
+                                        </motion.button>
+                                    );
+                                })}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* Add Event Modal */}
+            <AnimatePresence>
+                {showAddModal && selectedDate && (
+                    <AddEventModal
+                        date={selectedDate}
+                        isRTL={isRTL}
+                        onClose={() => setShowAddModal(false)}
+                        onSave={handleAddEvent}
+                    />
                 )}
             </AnimatePresence>
 
             {/* Cycle Settings Modal */}
             <AnimatePresence>
                 {showCycleSettings && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-surface-900 w-full max-w-xs rounded-3xl p-6 border border-white/10 shadow-2xl space-y-4">
-                            <div className="text-center">
-                                <div className="w-12 h-12 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                                    <Droplets className="w-6 h-6 text-rose-400" />
-                                </div>
-                                <h3 className="text-white font-bold">{isRTL ? 'إعدادات الدورة' : 'Cycle Settings'}</h3>
-                            </div>
-
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="text-xs text-surface-400 block mb-1">{isRTL ? 'تاريخ آخر دورة' : 'Last Period Date'}</label>
-                                    <input
-                                        type="date"
-                                        value={lastPeriodDate ? lastPeriodDate.toISOString().split('T')[0] : ''}
-                                        onChange={(e) => setLastPeriodDate(new Date(e.target.value))}
-                                        className="w-full bg-surface-950 border border-white/10 rounded-xl px-3 py-2 text-white text-sm"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-xs text-surface-400 block mb-1">{isRTL ? 'متوسط الطول (أيام)' : 'Cycle Length (days)'}</label>
-                                    <input
-                                        type="number"
-                                        value={cycleLength}
-                                        onChange={(e) => setCycleLength(Number(e.target.value))}
-                                        className="w-full bg-surface-950 border border-white/10 rounded-xl px-3 py-2 text-white text-sm"
-                                    />
-                                </div>
-                            </div>
-
-                            <button onClick={handleSaveHealth} disabled={savingHealth} className="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold transition-colors">
-                                {savingHealth ? '...' : (isRTL ? 'حفظ التغييرات' : 'Save Changes')}
-                            </button>
-                            <button onClick={() => setShowCycleSettings(false)} className="w-full py-2 text-surface-400 text-sm hover:text-white">
-                                {isRTL ? 'إلغاء' : 'Cancel'}
-                            </button>
-                        </motion.div>
-                    </div>
+                    <CycleSettingsModal
+                        isRTL={isRTL}
+                        lastPeriodDate={lastPeriodDate}
+                        cycleLength={cycleLength}
+                        saving={savingHealth}
+                        onClose={() => setShowCycleSettings(false)}
+                        onSave={handleSaveHealth}
+                        onDateChange={setLastPeriodDate}
+                        onCycleLengthChange={setCycleLength}
+                    />
                 )}
             </AnimatePresence>
-
         </div>
     );
 }
 
-function AddSessionForm({ date, onClose, onSave, isRTL }: any) {
+// --- Add Event Modal Component ---
+function AddEventModal({ date, isRTL, onClose, onSave }: {
+    date: Date;
+    isRTL: boolean;
+    onClose: () => void;
+    onSave: (data: { title: string; type: string; time: string; isRecurring: boolean }) => void;
+}) {
     const [title, setTitle] = useState('');
-    const [time, setTime] = useState('20:00');
     const [type, setType] = useState('date');
-    const [reminder, setReminder] = useState(true);
+    const [time, setTime] = useState('');
     const [isRecurring, setIsRecurring] = useState(false);
 
-    // Auto-check recurring for birthday/anniversary
-    useEffect(() => {
-        if (type === 'birthday' || type === 'anniversary') {
-            setIsRecurring(true);
-        } else {
-            setIsRecurring(false);
-        }
-    }, [type]);
-
     return (
-        <div className="space-y-4">
-            <div>
-                <label className="text-xs text-surface-400 block mb-1">{isRTL ? 'العنوان' : 'Title'}</label>
-                <input
-                    type="text"
-                    value={title}
-                    onChange={e => setTitle(e.target.value)}
-                    placeholder={isRTL ? 'مثال: عشاء رومانسي' : 'e.g. Dinner Date'}
-                    className="w-full bg-surface-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary-500 outline-none transition-colors"
-                />
-            </div>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                onClick={e => e.stopPropagation()}
+                className="w-full max-w-md bg-surface-900 border-t border-white/10 rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto"
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-bold text-white">
+                        {isRTL ? 'إضافة حدث' : 'Add Event'}
+                    </h3>
+                    <button onClick={onClose} className="p-2 text-surface-400 hover:text-white">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
 
-            <div className="grid grid-cols-2 gap-3">
-                <div>
-                    <label className="text-xs text-surface-400 block mb-1">{isRTL ? 'التاريخ' : 'Date'}</label>
-                    <div className="w-full bg-surface-950 border border-white/10 rounded-xl px-3 py-3 text-white text-sm opacity-60 cursor-not-allowed">
-                        {date.toLocaleDateString()}
+                {/* Form */}
+                <div className="space-y-4">
+                    {/* Title */}
+                    <div>
+                        <label className="text-xs text-surface-400 block mb-2">{isRTL ? 'العنوان' : 'Title'}</label>
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={e => setTitle(e.target.value)}
+                            placeholder={isRTL ? 'عنوان الحدث...' : 'Event title...'}
+                            className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary-500 outline-none"
+                        />
+                    </div>
+
+                    {/* Type Grid */}
+                    <div>
+                        <label className="text-xs text-surface-400 block mb-2">{isRTL ? 'النوع' : 'Type'}</label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {Object.entries(typeConfig).map(([key, cfg]) => {
+                                const Icon = cfg.icon;
+                                const isSelected = type === key;
+                                return (
+                                    <button
+                                        key={key}
+                                        onClick={() => setType(key)}
+                                        className={`flex flex-col items-center justify-center py-3 rounded-xl border transition-all
+                                            ${isSelected ? `${cfg.bgColor}/20 border-current ${cfg.color}` : 'border-white/5 bg-white/5 text-surface-400'}
+                                        `}
+                                    >
+                                        <Icon className="w-5 h-5 mb-1" />
+                                        <span className="text-[10px]">{isRTL ? cfg.label : cfg.labelEn}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Time */}
+                    <div>
+                        <label className="text-xs text-surface-400 block mb-2">{isRTL ? 'الوقت (اختياري)' : 'Time (optional)'}</label>
+                        <input
+                            type="time"
+                            value={time}
+                            onChange={e => setTime(e.target.value)}
+                            className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary-500 outline-none"
+                        />
+                    </div>
+
+                    {/* Recurring */}
+                    <label className="flex items-center gap-3 p-3 bg-surface-800/50 rounded-xl border border-white/5 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={isRecurring}
+                            onChange={e => setIsRecurring(e.target.checked)}
+                            className="w-5 h-5 rounded border-white/20 bg-surface-900 text-primary-500 focus:ring-primary-500"
+                        />
+                        <span className="text-sm text-white">{isRTL ? 'يتكرر سنوياً' : 'Repeats yearly'}</span>
+                    </label>
+
+                    {/* Save Button */}
+                    <button
+                        onClick={() => onSave({ title, type, time, isRecurring })}
+                        disabled={!title.trim()}
+                        className="w-full py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isRTL ? 'حفظ' : 'Save'}
+                    </button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+
+// --- Cycle Settings Modal Component ---
+function CycleSettingsModal({ isRTL, lastPeriodDate, cycleLength, saving, onClose, onSave, onDateChange, onCycleLengthChange }: {
+    isRTL: boolean;
+    lastPeriodDate: Date | null;
+    cycleLength: number;
+    saving: boolean;
+    onClose: () => void;
+    onSave: () => void;
+    onDateChange: (date: Date | null) => void;
+    onCycleLengthChange: (length: number) => void;
+}) {
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+                className="w-full max-w-sm bg-surface-900 border border-white/10 rounded-2xl p-6"
+            >
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-rose-500/20 rounded-xl">
+                        <Droplets className="w-5 h-5 text-rose-400" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white">
+                        {isRTL ? 'إعدادات الدورة' : 'Cycle Settings'}
+                    </h3>
+                </div>
+
+                <div className="space-y-4">
+                    {/* Last Period Date */}
+                    <div>
+                        <label className="text-xs text-surface-400 block mb-2">
+                            {isRTL ? 'تاريخ آخر دورة' : 'Last Period Date'}
+                        </label>
+                        <input
+                            type="date"
+                            value={lastPeriodDate?.toISOString().split('T')[0] || ''}
+                            onChange={e => onDateChange(e.target.value ? new Date(e.target.value) : null)}
+                            className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary-500 outline-none"
+                        />
+                    </div>
+
+                    {/* Cycle Length */}
+                    <div>
+                        <label className="text-xs text-surface-400 block mb-2">
+                            {isRTL ? 'طول الدورة (أيام)' : 'Cycle Length (days)'}
+                        </label>
+                        <input
+                            type="number"
+                            min={21}
+                            max={35}
+                            value={cycleLength}
+                            onChange={e => onCycleLengthChange(parseInt(e.target.value) || 28)}
+                            className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary-500 outline-none"
+                        />
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="flex gap-3 pt-2">
+                        <button
+                            onClick={onClose}
+                            className="flex-1 py-3 bg-surface-800 text-surface-400 font-medium rounded-xl hover:bg-surface-700 transition-colors"
+                        >
+                            {isRTL ? 'إلغاء' : 'Cancel'}
+                        </button>
+                        <button
+                            onClick={onSave}
+                            disabled={saving}
+                            className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-bold rounded-xl disabled:opacity-50"
+                        >
+                            {saving ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ' : 'Save')}
+                        </button>
                     </div>
                 </div>
-                <div>
-                    <label className="text-xs text-surface-400 block mb-1">{isRTL ? 'الوقت' : 'Time'}</label>
-                    <input
-                        type="time"
-                        value={time}
-                        onChange={e => setTime(e.target.value)}
-                        className="w-full bg-surface-950 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:border-primary-500 outline-none"
-                    />
-                </div>
-            </div>
-
-            <div>
-                <label className="text-xs text-surface-400 block mb-2">{isRTL ? 'النوع' : 'Type'}</label>
-                <div className="grid grid-cols-3 gap-2">
-                    {Object.entries(typeConfig).map(([key, cfg]) => {
-                        const Icon = cfg.icon;
-                        const isSelected = type === key;
-                        return (
-                            <button
-                                key={key}
-                                onClick={() => setType(key)}
-                                className={`flex flex-col items-center justify-center py-3 rounded-xl border transition-all
-                                    ${isSelected ? `${cfg.color} border-current` : 'border-white/5 bg-white/5 text-surface-400'}
-                                `}
-                            >
-                                <Icon className="w-5 h-5 mb-1" />
-                                <span className="text-[10px]">{cfg.label}</span>
-                            </button>
-                        )
-                    })}
-                </div>
-            </div>
-
-            {/* Recurring Option */}
-            <div className="flex items-center gap-3 p-3 bg-surface-950/50 rounded-xl border border-white/5">
-                <input
-                    type="checkbox"
-                    id="isRecurring"
-                    checked={isRecurring}
-                    onChange={(e) => setIsRecurring(e.target.checked)}
-                    className="w-5 h-5 rounded border-surface-700 bg-surface-800 text-primary-500 focus:ring-primary-500/50"
-                />
-                <label htmlFor="isRecurring" className="text-sm text-surface-300 select-none cursor-pointer flex-1">
-                    {isRTL ? 'تكرار سنوياً (أعياد، ذكرى...)' : 'Repeat Yearly (Birthday, Anniversary...)'}
-                </label>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-                <button onClick={onClose} className="flex-1 py-3 bg-surface-800 text-surface-300 rounded-xl font-bold hover:bg-surface-700 transition-colors">
-                    {isRTL ? 'إلغاء' : 'Cancel'}
-                </button>
-                <button
-                    onClick={() => onSave({ title, date, time, type, reminder, is_recurring: isRecurring })}
-                    disabled={!title}
-                    className="flex-1 py-3 bg-primary-500 text-white rounded-xl font-bold hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {isRTL ? 'حفظ' : 'Save'}
-                </button>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 }
