@@ -60,7 +60,7 @@ const whisperOptions = [
 ];
 
 export default function WhisperPage() {
-    const { user } = useAuth();
+    const { user, isLoading: authLoading } = useAuth();
     const { getStatus } = usePairing();
     const { language } = useSettingsStore();
     const { playSound } = useSound();
@@ -78,6 +78,7 @@ export default function WhisperPage() {
     } = useWhisper();
 
     const [isPaired, setIsPaired] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [customMessage, setCustomMessage] = useState('');
     const [showCustomInput, setShowCustomInput] = useState(false);
@@ -86,15 +87,36 @@ export default function WhisperPage() {
     // Load pairing
     useEffect(() => {
         async function loadData() {
-            if (!user) return;
-            const pairingStatus = await getStatus();
-            if (pairingStatus.isPaired && pairingStatus.partner) {
-                setIsPaired(true);
-                setPartnerDisplayName(pairingStatus.partner.display_name || pairingStatus.partner.username || 'Partner');
+            // Wait for auth to finish loading
+            if (authLoading) return;
+
+            if (!user) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                const pairingStatus = await getStatus();
+
+                // Check if paired - coupleId is the most reliable indicator
+                if (pairingStatus.isPaired && pairingStatus.coupleId) {
+                    setIsPaired(true);
+                    if (pairingStatus.partner) {
+                        setPartnerDisplayName(
+                            pairingStatus.partner.display_name ||
+                            pairingStatus.partner.username ||
+                            (isRTL ? 'الشريك' : 'Partner')
+                        );
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading pairing status:', error);
+            } finally {
+                setIsLoading(false);
             }
         }
         loadData();
-    }, [user]);
+    }, [user, authLoading, isRTL]);
 
     const handleOptionSelect = (optionId: string) => {
         playSound('click');
@@ -157,7 +179,13 @@ export default function WhisperPage() {
             </header>
 
             <main className="max-w-lg mx-auto px-4 py-8 pb-32">
-                {!isPaired ? (
+                {isLoading ? (
+                    // Loading State
+                    <div className="text-center py-16">
+                        <div className="w-12 h-12 mx-auto mb-4 border-3 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                        <p className="text-surface-400">{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
+                    </div>
+                ) : !isPaired ? (
                     // Not Paired State
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -306,8 +334,8 @@ export default function WhisperPage() {
                                         transition={{ delay: index * 0.1 }}
                                         onClick={() => handleOptionSelect(option.id)}
                                         className={`w-full p-4 rounded-2xl border-2 transition-all flex items-center gap-4 ${isSelected
-                                                ? `${option.bgColor} border-current bg-gradient-to-r ${option.color} bg-clip-text text-transparent`
-                                                : 'bg-surface-800/50 border-white/5 hover:border-white/10'
+                                            ? `${option.bgColor} border-current bg-gradient-to-r ${option.color} bg-clip-text text-transparent`
+                                            : 'bg-surface-800/50 border-white/5 hover:border-white/10'
                                             }`}
                                     >
                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${option.bgColor}`}>
