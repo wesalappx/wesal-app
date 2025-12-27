@@ -324,7 +324,7 @@ export default function ConflictPage() {
         }
     };
 
-    const handleCreateJointSession = async () => {
+    const handleStartRemoteSession = async () => {
         if (!user) {
             alert(language === 'ar' ? 'عفواً، يجب عليك تسجيل الدخول أولاً' : 'Please login first');
             return;
@@ -335,47 +335,8 @@ export default function ConflictPage() {
         }
 
         playSound('click');
-        try {
-            // Create session
-            const { data, error } = await supabase
-                .from('conflict_sessions')
-                .insert({
-                    couple_id: coupleId,
-                    initiator_id: user.id,
-                    status: 'created',
-                    topic: '' // Topic set later? Or we should ask for it? Current flow asks topic set later.
-                })
-                .select()
-                .single();
-
-            if (error) throw error;
-            if (data) {
-                setSessionId(data.id);
-                setIsInitiator(true);
-                setMode('joint');
-                setStep('waiting_partner'); // Flow: Intro -> Waiting -> Partner Joins -> Rules -> Topic
-
-                // Notify partner? 
-                if (partnerId) {
-                    await supabase.from('notifications').insert({
-                        user_id: partnerId, // Partner needs to receive this
-                        type: 'conflict_invite',
-                        title_ar: 'شريكك دعاك لجلسة "المستشار"',
-                        title_en: 'Partner invited you to "The Consultant"',
-                        body_ar: 'هناك موضوع يحتاج نقاش هادئ، انقر للدخول.',
-                        body_en: 'There is a topic to discuss calmly. Click to join.',
-                        data: { session_id: data.id, url: '/conflict' }
-                    });
-                }
-            }
-        } catch (err: any) {
-            console.error('Failed to create joint session', err);
-            // Show visible error to user
-            alert(language === 'ar'
-                ? `حدث خطأ: ${err.message || 'تأكد من إعداد قاعدة البيانات'}`
-                : `Error: ${err.message || 'Check database setup'}`
-            );
-        }
+        setMode('joint');
+        setStep('rules');
     };
 
     const handleStart = () => {
@@ -385,33 +346,68 @@ export default function ConflictPage() {
 
     const handleRulesAgreed = () => {
         playSound('success');
-        setStep('topic');
+        // If partner is joining existing session, skip topic input
+        if (mode === 'joint' && !isInitiator && sessionId) {
+            setStep('joint_input');
+        } else {
+            setStep('topic');
+        }
     };
 
-    const handleTopicSubmit = (e: React.FormEvent) => {
+    const handleTopicSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (topic.trim()) {
-            if (mode === 'joint' && sessionId) {
-                // Update topic in DB for joint mode
-                supabase.from('conflict_sessions').update({ topic: topic }).eq('id', sessionId);
-                // We don't advance step here locally for valid joint flow, we wait for partner? 
-                // Actually design says: Rules -> Topic -> Waiting.
-                // So Initiator sets topic THEN waits.
-                // Actually the logic is: Intro -> Create Session -> Waiting Partner -> Partner Joins -> Rules -> Topic?
-                // No, currently: Call Partner -> Create Session -> Waiting -> Partner Joins -> Joint Input.
-                // Wait, topic is needed!
-                // Let's assume Topic is set by Initiator BEFORE calling partner? Or during joint input?
-                // Current flow in UI: Intro -> Call Partner.
-                // We are skipping Rules and Topic in Joint Mode currently! That's a gap!
-                // Correction: Let's assume for now we jump to input. But ideally we want Topic.
-                // Let's stick to the simple flow implemented: Jump to Joint Input where users enter their "Perspective". 
-                // There is a 'topic' input in joint_input? No it displays topic.
-                // The 'topic' logic is currently missing in the joint flow I built.
-                // Let's allow Topic input inside the "Joint Input" screen if it's empty? Or simpler: Initiator inputs topic before calling?
-                // Let's just fix the handlers first.
+        if (!topic.trim()) return;
+
+        if (mode === 'joint') {
+            if (!sessionId) {
+                // CREATE NEW SESSION
+                try {
+                    const { data, error } = await supabase
+                        .from('conflict_sessions')
+                        .insert({
+                            couple_id: coupleId,
+                            initiator_id: user?.id,
+                            status: 'created',
+                            topic: topic
+                        })
+                        .select()
+                        .single();
+
+                    if (error) throw error;
+                    if (data) {
+                        setSessionId(data.id);
+                        setIsInitiator(true);
+                        setStep('waiting_partner');
+
+                        // Notify partner
+                        if (partnerId) {
+                            await supabase.from('notifications').insert({
+                                user_id: partnerId,
+                                type: 'conflict_invite',
+                                title_ar: 'شريكك دعاك لجلسة "المستشار"',
+                                title_en: 'Partner invited you to "The Consultant"',
+                                body_ar: `الموضوع: ${topic}`,
+                                body_en: `Topic: ${topic}`,
+                                data: { session_id: data.id, url: '/conflict' }
+                            });
+                        }
+                        playSound('pop');
+                    }
+                } catch (err: any) {
+                    console.error('Failed to create joint session', err);
+                    alert(language === 'ar'
+                        ? `حدث خطأ: ${err.message}`
+                        : `Error: ${err.message}`
+                    );
+                }
             } else {
-                setStep('perspective-1');
+                // Update existing topic
+                await supabase.from('conflict_sessions').update({ topic: topic }).eq('id', sessionId);
+                playSound('pop');
             }
+        } else {
+            // Solo Mode
+            setStep('perspective-1');
             playSound('pop');
         }
     };
@@ -731,7 +727,7 @@ export default function ConflictPage() {
                                 </div>
 
                                 <button
-                                    onClick={() => handleCreateJointSession()}
+                                    onClick={() => handleStartRemoteSession()}
                                     className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl font-bold text-lg hover:from-purple-500 hover:to-indigo-500 transition-all shadow-lg shadow-purple-500/25 flex items-center justify-center gap-3"
                                 >
                                     <MessageCircle className="w-5 h-5" />
