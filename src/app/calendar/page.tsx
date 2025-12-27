@@ -85,6 +85,7 @@ export default function CalendarPage() {
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
     const [showCycleSettings, setShowCycleSettings] = useState(false);
+    const [showPeriodTracking, setShowPeriodTracking] = useState(true); // Toggle for period visibility
 
     // Data Hooks
     const { getSessions, createSession, deleteSession } = useCalendar();
@@ -124,6 +125,8 @@ export default function CalendarPage() {
 
     // --- Cycle Phase Calculation ---
     const getCyclePhase = (date: Date): { phase: string; color: string; bgColor: string; borderColor: string } | null => {
+        // Return null if period tracking is hidden
+        if (!showPeriodTracking) return null;
         if (!lastPeriodDate) return null;
 
         const diffTime = date.getTime() - lastPeriodDate.getTime();
@@ -301,6 +304,29 @@ export default function CalendarPage() {
                     >
                         <Grid3X3 className="w-4 h-4" />
                         {isRTL ? 'سنوي' : 'Year'}
+                    </button>
+                </div>
+
+                {/* Period Tracking Toggle */}
+                <div className="mb-4">
+                    <button
+                        onClick={() => setShowPeriodTracking(!showPeriodTracking)}
+                        className={`w-full py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${showPeriodTracking
+                            ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                            : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700 border border-white/5'
+                            }`}
+                    >
+                        {showPeriodTracking ? (
+                            <>
+                                <span className="w-2 h-2 rounded-full bg-rose-400"></span>
+                                {isRTL ? 'إخفاء متابعة الدورة' : 'Hide Period Tracking'}
+                            </>
+                        ) : (
+                            <>
+                                <span className="w-2 h-2 rounded-full bg-surface-500"></span>
+                                {isRTL ? 'إظهار متابعة الدورة' : 'Show Period Tracking'}
+                            </>
+                        )}
                     </button>
                 </div>
 
@@ -573,6 +599,21 @@ export default function CalendarPage() {
                     />
                 )}
             </AnimatePresence>
+
+            {/* Floating Add Button */}
+            <motion.button
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => {
+                    if (!selectedDate) setSelectedDate(new Date());
+                    setShowAddModal(true);
+                }}
+                className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 p-4 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full shadow-xl shadow-primary-500/30 text-white"
+            >
+                <Plus className="w-6 h-6" />
+            </motion.button>
         </div>
     );
 }
@@ -716,9 +757,12 @@ function AddEventModal({ date, isRTL, onClose, onSave }: {
                         </div>
                     </div>
 
-                    {/* Recurring Toggle - RTL Fixed */}
-                    <label className={`flex items-center justify-between p-3 bg-surface-800/50 rounded-lg border cursor-pointer transition-colors ${isRecurring ? 'border-primary-500/50 bg-primary-500/10' : 'border-white/5'}`}>
-                        <div className={`flex items-center gap-2.5 ${isRTL ? 'flex-row' : 'flex-row'}`}>
+                    {/* Recurring Toggle */}
+                    <div
+                        onClick={() => setIsRecurring(!isRecurring)}
+                        className={`flex items-center justify-between p-3 bg-surface-800/50 rounded-lg border cursor-pointer transition-all ${isRecurring ? 'border-primary-500/50 bg-primary-500/10' : 'border-white/5 hover:border-white/10'}`}
+                    >
+                        <div className="flex items-center gap-2.5">
                             <div className={`p-1.5 rounded-md ${isRecurring ? 'bg-primary-500/20' : 'bg-white/5'}`}>
                                 <CalendarIcon className={`w-3.5 h-3.5 ${isRecurring ? 'text-primary-400' : 'text-surface-400'}`} />
                             </div>
@@ -726,28 +770,19 @@ function AddEventModal({ date, isRTL, onClose, onSave }: {
                                 <p className="text-sm text-white">{isRTL ? 'يتكرر سنوياً' : 'Yearly repeat'}</p>
                             </div>
                         </div>
-                        {/* Toggle Switch - RTL Aware */}
-                        <div
-                            className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${isRecurring ? 'bg-primary-500' : 'bg-surface-700'}`}
-                            onClick={(e) => { e.preventDefault(); setIsRecurring(!isRecurring); }}
-                        >
+
+                        {/* Toggle Switch */}
+                        <div className={`relative w-11 h-6 rounded-full transition-colors ${isRecurring ? 'bg-primary-500' : 'bg-surface-600'}`}>
                             <motion.div
+                                initial={false}
                                 animate={{
-                                    x: isRTL
-                                        ? (isRecurring ? 2 : 20)
-                                        : (isRecurring ? 20 : 2)
+                                    x: isRecurring ? (isRTL ? -20 : 20) : 0
                                 }}
                                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                                className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm"
+                                className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-md ${isRTL ? 'right-1' : 'left-1'}`}
                             />
                         </div>
-                        <input
-                            type="checkbox"
-                            checked={isRecurring}
-                            onChange={e => setIsRecurring(e.target.checked)}
-                            className="sr-only"
-                        />
-                    </label>
+                    </div>
                 </div>
 
                 {/* Footer - Save Button */}
