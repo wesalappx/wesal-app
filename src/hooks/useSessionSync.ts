@@ -156,6 +156,8 @@ export function useSessionSync(activityType: string, activityId: string) {
         };
     }, []);
 
+    const isConnected = presence.length > 1;
+
     return {
         session,
         mode,
@@ -164,6 +166,7 @@ export function useSessionSync(activityType: string, activityId: string) {
         presence,
         initSession,
         updateState,
-        isRemote: mode === 'remote'
+        isRemote: mode === 'remote',
+        isConnected
     };
 }

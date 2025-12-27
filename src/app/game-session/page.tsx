@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, MessageCircle, ChevronRight, Check, Trophy, Zap, Camera, Flame, Heart, RefreshCw, Star, ThumbsUp, SkipForward, X } from 'lucide-react';
+import { ArrowLeft, MessageCircle, ChevronRight, Check, Trophy, Zap, Camera, Flame, Heart, RefreshCw, Star, ThumbsUp, SkipForward, X, Users } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 
@@ -76,7 +76,8 @@ function GameSessionContent() {
         initSession: initGameSession,
         updateState,
         isRemote,
-        loading: sessionLoading
+        loading: sessionLoading,
+        isConnected
     } = useSessionSync('game', mode);
 
     const { updateProgress, progressMap } = useJourneys();
@@ -107,11 +108,42 @@ function GameSessionContent() {
         }
     }, [isRemote, session?.state]);
 
+    const [hasNotified, setHasNotified] = useState(false);
+    const { getStatus } = usePairing(); // Need partner ID
+
     // Handle Mode Selection
     const handleModeSelect = (selectedMode: 'local' | 'remote') => {
         initGameSession(selectedMode);
         setShowModeModal(false);
     };
+
+    // Send Notification on Session Create
+    useEffect(() => {
+        const sendInvite = async () => {
+            if (isRemote && session && session.id && !hasNotified) {
+                // Check if I am creator
+                if (session.created_by === user?.id) {
+                    const status = await getStatus();
+                    if (status.partner) {
+                        await createClient().from('notifications').insert({
+                            user_id: status.partner.id,
+                            type: 'game_invite',
+                            title_ar: 'دعوة للعب 🎮',
+                            title_en: 'Game Invitation 🎮',
+                            body_ar: `شريكك دعاك للعب "${getModeTitle()}"`,
+                            body_en: `Partner invited you to play "${getModeTitle()}"`,
+                            data: { url: `/game-session?mode=${mode}&journey=${journeyId || ''}` } // session_id isn't needed if we assume ONE active session, but standard practice is nice.
+                            // Actually, standard link should probably include session_id in query if we want direct join, 
+                            // but useSessionSync usually finds active session by Type.
+                            // Let's stick to simple URL.
+                        });
+                        setHasNotified(true);
+                    }
+                }
+            }
+        };
+        sendInvite();
+    }, [isRemote, session, hasNotified, user]);
 
     // Initialize Questions (Only if local or if Creator in remote)
     useEffect(() => {
@@ -711,19 +743,38 @@ function GameSessionContent() {
 
             {/* Main Content */}
             {/* Main Content */}
-            <div className="flex-1 flex flex-col justify-center px-6 pb-32 z-10">
+            <div className={`flex-1 flex flex-col justify-center px-6 ${isRemote ? 'pb-48' : 'pb-32'} z-10`}>
                 <AnimatePresence mode="wait">
-                    <motion.div
-                        key={question?.id || currentIndex}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="w-full max-w-md mx-auto"
-                    >
-                        {renderGameContent()}
-                    </motion.div>
+                    {(!isRemote || (isRemote && isConnected) || (isRemote && sessionMode === 'local')) ? (
+                        <motion.div
+                            key={question?.id || currentIndex}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="w-full max-w-md mx-auto"
+                        >
+                            {renderGameContent()}
+                        </motion.div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <div className="w-20 h-20 bg-primary-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                                <Users className="w-10 h-10 text-primary-400" />
+                            </div>
+                            <h2 className="text-xl font-bold text-white mb-2">في انتظار الشريك...</h2>
+                            <p className="text-surface-400">تم إرسال دعوة لشريكك للانضمام للجلسة</p>
+                        </div>
+                    )}
                 </AnimatePresence>
             </div>
+
+            {/* Chat Overlay */}
+            {isRemote && session && user && (
+                <SessionChat
+                    sessionId={session.id}
+                    userId={user.id}
+                    partnerName={isConnected ? 'Partner' : undefined}
+                />
+            )}
 
             {/* Session Mode Modal */}
             <SessionModeModal
@@ -749,3 +800,7 @@ export default function GameSessionPage() {
         </Suspense>
     );
 }
+
+// Update imports
+import { Users } from 'lucide-react';
+import SessionChat from '@/components/SessionChat';

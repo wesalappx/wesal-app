@@ -11,10 +11,15 @@ import {
     Star,
     X,
     Heart,
-    MessageCircle
+    MessageCircle,
+    Users
 } from 'lucide-react';
 import { useJourneys } from '@/hooks/useJourneys';
 import { useSessionSync } from '@/hooks/useSessionSync';
+import { useAuth } from '@/hooks/useAuth';
+import { usePairing } from '@/hooks/usePairing';
+import { createClient } from '@/lib/supabase/client';
+import SessionChat from '@/components/SessionChat';
 import SessionModeModal from '@/components/SessionModeModal';
 import { journeysData, getJourneySteps } from '@/data/journeys';
 import { sessionData } from '@/app/game-session/data/gameContent';
@@ -23,6 +28,8 @@ function JourneyExerciseContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { progressMap, updateProgress } = useJourneys();
+    const { user } = useAuth();
+    const { getStatus } = usePairing();
 
     const journeyId = searchParams.get('journey') || 'basics';
     const stepParam = searchParams.get('step');
@@ -37,12 +44,14 @@ function JourneyExerciseContent() {
         initSession,
         updateState,
         isRemote,
-        loading: sessionLoading
+        loading: sessionLoading,
+        isConnected
     } = useSessionSync('journey', journeyId);
 
     const [showModeModal, setShowModeModal] = useState(!modeParam);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
+    const [hasNotified, setHasNotified] = useState(false);
 
     // Initial Mode Effect
     useEffect(() => {
@@ -50,6 +59,37 @@ function JourneyExerciseContent() {
             initSession(modeParam);
         }
     }, [modeParam, initSession, mode]);
+
+    // Data Loading
+    const journey = journeysData.find(j => j.id === journeyId);
+    const steps = getJourneySteps(journeyId);
+    const currentStep = steps?.[stepIndex];
+
+    // Send Notification on Session Create
+    useEffect(() => {
+        const sendInvite = async () => {
+            if (isRemote && session && session.id && !hasNotified) {
+                // Check if I am creator
+                if (session.created_by === user?.id) {
+                    const status = await getStatus();
+                    if (status.partner) {
+                        const supabase = createClient();
+                        await supabase.from('notifications').insert({
+                            user_id: status.partner.id,
+                            type: 'journey_invite',
+                            title_ar: 'دعوة لرحلة 🚀',
+                            title_en: 'Journey Invitation 🚀',
+                            body_ar: `شريكك دعاك لإكمال "${currentStep?.title || 'رحلة'}"`,
+                            body_en: `Partner invited you to "${currentStep?.title || 'Journey'}"`,
+                            data: { url: `/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=remote` }
+                        });
+                        setHasNotified(true);
+                    }
+                }
+            }
+        };
+        sendInvite();
+    }, [isRemote, session, hasNotified, user, journeyId, stepIndex, currentStep, getStatus]);
 
     // Sync State Effect
     useEffect(() => {
@@ -63,17 +103,13 @@ function JourneyExerciseContent() {
         setShowModeModal(false);
     };
 
-    const journey = journeysData.find(j => j.id === journeyId);
-    const steps = getJourneySteps(journeyId);
-    const currentStep = steps?.[stepIndex];
-
-    // Get step-specific content that matches the journey theme
+    // Get step-specific content
     const getStepContent = () => {
         const values = sessionData['values'] || [];
         const deepQuestions = sessionData['deep-questions'] || [];
         const compliments = sessionData['compliment-battle'] || [];
-        const memories = sessionData['memory-lane'] || [];
-        const roulette = sessionData['love-roulette'] || [];
+        // const memories = sessionData['memory-lane'] || []; // Unused
+        // const roulette = sessionData['love-roulette'] || []; // Unused
 
         // New specific content
         const loveLanguages = sessionData['love-languages'] || [];
@@ -92,37 +128,35 @@ function JourneyExerciseContent() {
         const legacy = sessionData['legacy'] || [];
 
         // Map each step to appropriate content based on theme
+        // (Logic identical to previous file)
         if (journeyId === 'basics') {
-            // 5 steps: لغات الحب, جلسة مصارحة, قيمنا المشتركة, تحدي الامتنان, رسالة للمستقبل
             const stepContent: Record<number, any[]> = {
-                0: loveLanguages,            // Step 1: Love Languages
-                1: deepQuestions.slice(30, 38), // Step 2: Session (Openness)
-                2: values.slice(5, 13),      // Step 3: Shared Values
-                3: compliments.slice(0, 8),  // Step 4: Gratitude Challenge
-                4: futureLetter,             // Step 5: Message to Future
+                0: loveLanguages,
+                1: deepQuestions.slice(30, 38),
+                2: values.slice(5, 13),
+                3: compliments.slice(0, 8),
+                4: futureLetter,
             };
             return stepContent[stepIndex] || values.slice(0, 8);
         } else if (journeyId === 'communication') {
-            // 7 steps: المستمع الجيد, تمرين الصدى, لغة الجسد, درس في التقدير, طرق الزعل, أنا أشعر, حديث الوسادة
             const stepContent: Record<number, any[]> = {
-                0: listeningSkills,          // Step 1: Good Listener
-                1: echoExercise,             // Step 2: Echo Exercise
-                2: bodyLanguage,             // Step 3: Body Language
-                3: compliments.slice(30, 38), // Step 4: Appreciation Lesson
-                4: conflictStyles,           // Step 5: Conflict Styles
-                5: deepQuestions.slice(0, 8),   // Step 6: I feel...
-                6: pillowTalk,               // Step 7: Pillow Talk (Fixed)
+                0: listeningSkills,
+                1: echoExercise,
+                2: bodyLanguage,
+                3: compliments.slice(30, 38),
+                4: conflictStyles,
+                5: deepQuestions.slice(0, 8),
+                6: pillowTalk,
             };
             return stepContent[stepIndex] || deepQuestions.slice(0, 8);
         } else if (journeyId === 'future') {
-            // 6 steps: لوحة الأحلام, الأهداف المالية, العائلة والتربية, قائمة الأمنيات, التقاعد السعيد, الإرث
             const stepContent: Record<number, any[]> = {
-                0: deepQuestions.slice(20, 28), // Step 1: Dream Board
-                1: financialGoals,           // Step 2: Financial Goals
-                2: familyValues,             // Step 3: Family & Parenting
-                3: bucketList,               // Step 4: Bucket List (Fixed)
-                4: retirementPlans,          // Step 5: Happy Retirement
-                5: legacy,                   // Step 6: Legacy (Fixed)
+                0: deepQuestions.slice(20, 28),
+                1: financialGoals,
+                2: familyValues,
+                3: bucketList,
+                4: retirementPlans,
+                5: legacy,
             };
             return stepContent[stepIndex] || deepQuestions.slice(0, 8);
         }
@@ -197,7 +231,6 @@ function JourneyExerciseContent() {
                 <div className="absolute inset-0 pointer-events-none">
                     <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]" />
                     <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/15 rounded-full blur-[120px]" />
-
                     {/* Floating Celebrations */}
                     {[...Array(6)].map((_, i) => (
                         <motion.div
@@ -282,40 +315,15 @@ function JourneyExerciseContent() {
         );
     }
 
+    const isWaiting = isRemote && !isConnected;
+
     return (
         <main className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950 flex flex-col relative overflow-hidden">
             {/* Premium Background Effects */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {/* Main gradient orbs */}
                 <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-radial from-primary-500/20 via-primary-500/5 to-transparent rounded-full blur-3xl" />
                 <div className="absolute -bottom-20 -right-20 w-[500px] h-[500px] bg-gradient-radial from-accent-500/15 via-transparent to-transparent rounded-full blur-3xl" />
                 <div className="absolute top-1/2 -left-20 w-[300px] h-[300px] bg-gradient-radial from-rose-500/10 via-transparent to-transparent rounded-full blur-3xl" />
-
-                {/* Floating hearts and sparkles */}
-                <motion.div
-                    className="absolute top-20 right-6 text-3xl"
-                    animate={{ y: [0, -20, 0], rotate: [0, 15, 0], scale: [1, 1.1, 1] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                >
-                    💕
-                </motion.div>
-                <motion.div
-                    className="absolute top-1/3 left-4 text-2xl"
-                    animate={{ y: [0, -15, 0], opacity: [0.3, 0.6, 0.3] }}
-                    transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-                >
-                    ✨
-                </motion.div>
-                <motion.div
-                    className="absolute bottom-1/3 right-8 text-xl"
-                    animate={{ y: [0, -10, 0], rotate: [0, -10, 0] }}
-                    transition={{ duration: 6, repeat: Infinity, delay: 2 }}
-                >
-                    💫
-                </motion.div>
-
-                {/* Subtle grid pattern */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
             </div>
 
             {/* Header */}
@@ -342,7 +350,7 @@ function JourneyExerciseContent() {
                 <div className="w-11" />
             </header>
 
-            {/* Step Info with Premium Styling */}
+            {/* Step Info */}
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -355,7 +363,7 @@ function JourneyExerciseContent() {
                 <h2 className="text-xl font-bold text-white">{currentStep.title}</h2>
             </motion.div>
 
-            {/* Progress Bar - Enhanced */}
+            {/* Progress Bar */}
             <div className="px-6 pb-6 z-10">
                 <div className="flex items-center justify-between text-xs mb-3">
                     <span className="text-surface-400 font-medium">السؤال {currentQuestionIndex + 1} من {questions.length}</span>
@@ -374,106 +382,107 @@ function JourneyExerciseContent() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col justify-center px-4 pb-40 z-10">
+            <div className={`flex-1 flex flex-col justify-center px-4 ${isRemote ? 'pb-48' : 'pb-40'} z-10`}>
                 <AnimatePresence mode="wait">
-                    <motion.div
-                        key={currentQuestionIndex}
-                        initial={{ opacity: 0, x: 60, scale: 0.95 }}
-                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                        exit={{ opacity: 0, x: -60, scale: 0.95 }}
-                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="w-full max-w-lg mx-auto"
-                    >
-                        {/* Question Card - Premium Design */}
-                        <div className="relative">
-                            {/* Card glow effect */}
-                            <div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 via-accent-500/20 to-rose-500/20 rounded-[2rem] blur-xl opacity-50" />
-
-                            <div className="relative bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-2xl rounded-3xl border border-white/20 p-7 shadow-2xl">
-                                {/* Decorative top accent */}
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full" />
-
-                                {/* Phase badge if exists */}
-                                {question.phase && (
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        className="text-center mb-5"
-                                    >
-                                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-300 text-sm font-bold shadow-lg">
-                                            <MessageCircle className="w-4 h-4" />
-                                            {question.phase}
-                                        </span>
-                                    </motion.div>
-                                )}
-
-                                {/* Question Text */}
-                                <h3 className="text-xl md:text-2xl font-bold text-white text-center leading-relaxed mb-5" dir="rtl">
-                                    {question.text}
-                                </h3>
-
-                                {/* Hint */}
-                                <p className="text-surface-300 text-sm text-center px-4 py-3 bg-surface-800/30 rounded-2xl border border-surface-700/50">
-                                    💡 {question.hint}
-                                </p>
+                    {!isWaiting ? (
+                        <motion.div
+                            key={currentQuestionIndex}
+                            initial={{ opacity: 0, x: 60, scale: 0.95 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: -60, scale: 0.95 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            className="w-full max-w-lg mx-auto"
+                        >
+                            {/* Question Card */}
+                            <div className="relative">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 via-accent-500/20 to-rose-500/20 rounded-[2rem] blur-xl opacity-50" />
+                                <div className="relative bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-2xl rounded-3xl border border-white/20 p-7 shadow-2xl">
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full" />
+                                    {question.phase && (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            className="text-center mb-5"
+                                        >
+                                            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-300 text-sm font-bold shadow-lg">
+                                                <MessageCircle className="w-4 h-4" />
+                                                {question.phase}
+                                            </span>
+                                        </motion.div>
+                                    )}
+                                    <h3 className="text-xl md:text-2xl font-bold text-white text-center leading-relaxed mb-5" dir="rtl">
+                                        {question.text}
+                                    </h3>
+                                    <p className="text-surface-300 text-sm text-center px-4 py-3 bg-surface-800/30 rounded-2xl border border-surface-700/50">
+                                        💡 {question.hint}
+                                    </p>
+                                </div>
                             </div>
+                        </motion.div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <div className="w-20 h-20 bg-primary-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                                <Users className="w-10 h-10 text-primary-400" />
+                            </div>
+                            <h2 className="text-xl font-bold text-white mb-2">في انتظار الشريك...</h2>
+                            <p className="text-surface-400">تم إرسال دعوة لإكمال الرحلة معاً</p>
                         </div>
-                    </motion.div>
+                    )}
                 </AnimatePresence>
             </div>
 
-            {/* Bottom Navigation - Premium */}
-            <div className="fixed bottom-0 left-0 right-0 z-20">
-                {/* Gradient fade */}
-                <div className="h-24 bg-gradient-to-t from-surface-950 via-surface-950/95 to-transparent pointer-events-none" />
+            {/* Chat Overlay */}
+            {isRemote && session && user && (
+                <SessionChat
+                    sessionId={session.id}
+                    userId={user.id}
+                    partnerName={session.partner_id ? 'Partner' : undefined}
+                />
+            )}
 
-                <div className="absolute bottom-0 left-0 right-0 p-6 pb-8">
-                    <div className="max-w-lg mx-auto flex items-center gap-4">
-                        {/* Back Button */}
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={handlePrev}
-                            disabled={currentQuestionIndex === 0}
-                            className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-lg
+            {/* Bottom Navigation */}
+            {!isWaiting && (
+                <div className={`fixed bottom-0 left-0 right-0 z-20 ${isRemote ? 'mb-[70px]' : ''}`}>
+                    <div className="h-24 bg-gradient-to-t from-surface-950 via-surface-950/95 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 p-6 pb-8">
+                        <div className="max-w-lg mx-auto flex items-center gap-4">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={handlePrev}
+                                disabled={currentQuestionIndex === 0}
+                                className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-lg
                                 ${currentQuestionIndex === 0
-                                    ? 'bg-surface-800/30 text-surface-600 cursor-not-allowed'
-                                    : 'bg-white/10 backdrop-blur-xl text-white hover:bg-white/20 border border-white/10'}`}
-                        >
-                            <ChevronRight className="w-6 h-6" />
-                        </motion.button>
-
-                        {/* Next/Complete Button */}
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={handleNext}
-                            className="flex-1 h-14 rounded-2xl bg-gradient-to-r from-primary-500 via-accent-500 to-rose-500 flex items-center justify-center gap-3 text-white font-bold text-lg shadow-xl shadow-primary-500/25 relative overflow-hidden"
-                        >
-                            {/* Shimmer effect */}
-                            <motion.div
-                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                                animate={{ x: ['-100%', '100%'] }}
-                                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                            />
-                            <span className="relative z-10 flex items-center gap-2">
-                                {currentQuestionIndex === questions.length - 1 ? (
-                                    <>
-                                        <CheckCircle className="w-5 h-5" />
-                                        إنهاء الخطوة
-                                    </>
-                                ) : (
-                                    <>
-                                        التالي
-                                        <ChevronLeft className="w-5 h-5" />
-                                    </>
-                                )}
-                            </span>
-                        </motion.button>
+                                        ? 'bg-surface-800/30 text-surface-600 cursor-not-allowed'
+                                        : 'bg-white/10 backdrop-blur-xl text-white hover:bg-white/20 border border-white/10'}`}
+                            >
+                                <ChevronRight className="w-6 h-6" />
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={handleNext}
+                                className="flex-1 h-14 rounded-2xl bg-gradient-to-r from-primary-500 via-accent-500 to-rose-500 flex items-center justify-center gap-3 text-white font-bold text-lg shadow-xl shadow-primary-500/25 relative overflow-hidden"
+                            >
+                                <span className="relative z-10 flex items-center gap-2">
+                                    {currentQuestionIndex === questions.length - 1 ? (
+                                        <>
+                                            <CheckCircle className="w-5 h-5" />
+                                            إنهاء الخطوة
+                                        </>
+                                    ) : (
+                                        <>
+                                            التالي
+                                            <ChevronLeft className="w-5 h-5" />
+                                        </>
+                                    )}
+                                </span>
+                            </motion.button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {/* Session Mode Modal */}
+            )}
+
             <SessionModeModal
                 isOpen={showModeModal}
                 onSelectMode={handleModeSelect}
@@ -487,11 +496,7 @@ export default function JourneyExercisePage() {
     return (
         <Suspense fallback={
             <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-surface-950 to-surface-900">
-                <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full"
-                />
+                <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
             </main>
         }>
             <JourneyExerciseContent />
