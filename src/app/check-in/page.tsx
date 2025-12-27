@@ -272,7 +272,7 @@ export default function CheckInPage() {
                             exit={{ x: -50, opacity: 0 }}
                             className="text-center"
                         >
-                            <div className={`inline-flex p-4 rounded-2xl ${currentQ.color.replace('text', 'bg')}/20 mb-6`}>
+                            <div className={`inline-flex p-4 rounded-2xl ${currentQ.bgColor}/20 mb-6`}>
                                 <currentQ.icon className={`w-12 h-12 ${currentQ.color}`} />
                             </div>
                             <h2 className="text-3xl font-bold text-white mb-8">{currentQ.label}</h2>
@@ -430,7 +430,7 @@ export default function CheckInPage() {
                                         <div key={metric} className="flex items-center gap-4">
                                             {/* Label Section */}
                                             <div className="flex items-center gap-2 w-28 shrink-0">
-                                                <div className={`p-1.5 rounded-lg ${question.color.replace('text', 'bg')}/10`}>
+                                                <div className={`p-1.5 rounded-lg ${question.bgColor}/10`}>
                                                     <question.icon className={`w-3.5 h-3.5 ${question.color}`} />
                                                 </div>
                                                 <span className="text-xs font-medium text-surface-200">{question.label.split(' ').slice(1).join(' ')}</span>
