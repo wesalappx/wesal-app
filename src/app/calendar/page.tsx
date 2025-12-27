@@ -493,7 +493,7 @@ function AddSessionForm({ date, onClose, onSave, isRTL }: any) {
 
             <div>
                 <label className="text-xs text-surface-400 block mb-2">{isRTL ? 'النوع' : 'Type'}</label>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                <div className="grid grid-cols-3 gap-2">
                     {Object.entries(typeConfig).map(([key, cfg]) => {
                         const Icon = cfg.icon;
                         const isSelected = type === key;
@@ -501,7 +501,7 @@ function AddSessionForm({ date, onClose, onSave, isRTL }: any) {
                             <button
                                 key={key}
                                 onClick={() => setType(key)}
-                                className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl border transition-all shrink-0
+                                className={`flex flex-col items-center justify-center py-3 rounded-xl border transition-all
                                     ${isSelected ? `${cfg.color} border-current` : 'border-white/5 bg-white/5 text-surface-400'}
                                 `}
                             >

@@ -84,47 +84,60 @@ export function useCheckIn() {
                             });
 
                         // 2. Update Streak
-                        const { data: streakData } = await supabase
-                            .from('streaks')
-                            .select('*')
-                            .eq('couple_id', couple.id)
-                            .single();
+                        try {
+                            const { data: streakData, error: streakFetchError } = await supabase
+                                .from('streaks')
+                                .select('*')
+                                .eq('couple_id', couple.id)
+                                .maybeSingle(); // maybeSingle to allow null without error
 
-                        if (streakData) {
-                            const lastUpdate = new Date(streakData.updated_at);
-                            const today = new Date();
-                            const yesterday = new Date();
-                            yesterday.setDate(yesterday.getDate() - 1);
+                            if (streakFetchError) {
+                                console.error('Streak fetch error:', streakFetchError);
+                            }
 
-                            // Reset times to compare dates only
-                            lastUpdate.setHours(0, 0, 0, 0);
-                            today.setHours(0, 0, 0, 0);
-                            yesterday.setHours(0, 0, 0, 0);
-
-                            if (lastUpdate.getTime() < today.getTime()) {
-                                // Not updated today
-                                let newStreak = 1;
-                                if (lastUpdate.getTime() === yesterday.getTime()) {
-                                    // Consecutive day
-                                    newStreak = streakData.current_streak + 1;
-                                } else if (lastUpdate.getTime() < yesterday.getTime() && streakData.current_streak > 0) {
-                                    // Broken streak
-                                    newStreak = 1;
-                                } else {
-                                    // First time or continuing from 0
-                                    newStreak = streakData.current_streak + 1; // Assuming if 0, current is 1.
-                                }
-
-                                // Update
+                            if (!streakData) {
+                                // Streak row doesn't exist, create it
                                 await supabase
                                     .from('streaks')
-                                    .update({
-                                        current_streak: newStreak,
-                                        longest_streak: Math.max(newStreak, streakData.longest_streak),
+                                    .insert({
+                                        couple_id: couple.id,
+                                        current_streak: 1,
+                                        longest_streak: 1,
                                         updated_at: new Date().toISOString()
-                                    })
-                                    .eq('id', streakData.id);
+                                    });
+                            } else {
+                                // Streak row exists, apply update logic
+                                const lastUpdate = new Date(streakData.updated_at);
+                                const today = new Date();
+                                const yesterday = new Date();
+                                yesterday.setDate(yesterday.getDate() - 1);
+
+                                // Reset times to compare dates only
+                                lastUpdate.setHours(0, 0, 0, 0);
+                                today.setHours(0, 0, 0, 0);
+                                yesterday.setHours(0, 0, 0, 0);
+
+                                if (lastUpdate.getTime() < today.getTime()) {
+                                    // Not updated today
+                                    let newStreak = 1;
+                                    if (lastUpdate.getTime() === yesterday.getTime()) {
+                                        // Consecutive day
+                                        newStreak = streakData.current_streak + 1;
+                                    }
+                                    // Else: Broken streak, reset to 1
+
+                                    await supabase
+                                        .from('streaks')
+                                        .update({
+                                            current_streak: newStreak,
+                                            longest_streak: Math.max(newStreak, streakData.longest_streak),
+                                            updated_at: new Date().toISOString()
+                                        })
+                                        .eq('id', streakData.id);
+                                }
                             }
+                        } catch (streakUpdateError) {
+                            console.error('Streak update error:', streakUpdateError);
                         }
                     }
                 } catch (notificationError) {
