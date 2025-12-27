@@ -89,17 +89,15 @@ export function useInsights() {
             const avgSleep = checkIns.reduce((sum, c) => sum + (c.sleep || 3), 0) / checkIns.length;
             const avgConnection = checkIns.reduce((sum, c) => sum + (c.connection || 3), 0) / checkIns.length;
 
-            // Calculate overall score (weighted average, stress inverted)
-            const stressInverted = 6 - avgStress; // Convert stress to positive metric
+            // Calculate overall score (weighted average)
             const overallScore = Math.round(
-                ((avgMood * 0.25) + (avgEnergy * 0.2) + (stressInverted * 0.2) + (avgSleep * 0.15) + (avgConnection * 0.2)) * 20
+                ((avgMood * 0.25) + (avgEnergy * 0.2) + (avgStress * 0.2) + (avgSleep * 0.15) + (avgConnection * 0.2)) * 20
             );
 
             // Create daily trend
             const dailyScores = checkIns.map(c => {
-                const stressInv = 6 - (c.stress || 3);
                 return Math.round(
-                    (((c.mood || 3) + (c.energy || 3) + stressInv + (c.sleep || 3) + (c.connection || 3)) / 5) * 20
+                    (((c.mood || 3) + (c.energy || 3) + (c.stress || 3) + (c.sleep || 3) + (c.connection || 3)) / 5) * 20
                 );
             });
 
@@ -158,7 +156,7 @@ export function useInsights() {
                 emotionTrend: dailyScores,
                 avgMood: Math.round(avgMood * 20),
                 avgEnergy: Math.round(avgEnergy * 20),
-                avgStress: Math.round((6 - avgStress) * 20), // Show as positive (low stress = high score)
+                avgStress: Math.round(avgStress * 20), // High score = Relaxed (Good)
                 avgSleep: Math.round(avgSleep * 20),
                 avgConnection: Math.round(avgConnection * 20),
                 checkInCount: checkIns.length,

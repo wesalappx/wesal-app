@@ -47,38 +47,63 @@ export function useCalendar() {
         try {
             const coupleId = await getCoupleId();
 
-            // Build query - get sessions by user_id OR couple_id
-            let query = supabase
+            // 1. Fetch Standard Events (in range)
+            let rangeQuery = supabase
                 .from('user_calendar_events')
                 .select('*')
                 .order('scheduled_date', { ascending: true });
 
             if (coupleId) {
-                query = query.or(`user_id.eq.${user.id},couple_id.eq.${coupleId}`);
+                rangeQuery = rangeQuery.or(`user_id.eq.${user.id},couple_id.eq.${coupleId}`);
             } else {
-                query = query.eq('user_id', user.id);
+                rangeQuery = rangeQuery.eq('user_id', user.id);
             }
 
             if (month) {
                 const startOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);
                 const endOfMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0);
-                query = query
+                rangeQuery = rangeQuery
                     .gte('scheduled_date', startOfMonth.toISOString().split('T')[0])
                     .lte('scheduled_date', endOfMonth.toISOString().split('T')[0]);
             }
 
-            const { data, error: fetchError } = await query;
+            // 2. Fetch All Recurring Events (forever)
+            let recurringQuery = supabase
+                .from('user_calendar_events')
+                .select('*')
+                .eq('is_recurring', true);
 
-            if (fetchError) {
-                console.error('Error fetching events:', fetchError);
-                // If table doesn't exist, return empty
-                if (fetchError.code === '42P01') {
-                    return { data: [], error: null };
-                }
-                throw fetchError;
+            if (coupleId) {
+                // Note: .or() with filters can be tricky, make sure to group logically if needed
+                // But generally: (user_id = X OR couple_id = Y) AND is_recurring = true
+                recurringQuery = recurringQuery.or(`user_id.eq.${user.id},couple_id.eq.${coupleId}`);
+            } else {
+                recurringQuery = recurringQuery.eq('user_id', user.id);
             }
 
-            return { data: data || [], error: null };
+            // Execute in parallel
+            const [rangeRes, recurringRes] = await Promise.all([
+                rangeQuery,
+                recurringQuery
+            ]);
+
+            if (rangeRes.error) throw rangeRes.error;
+            if (recurringRes.error) throw recurringRes.error;
+
+            // Merge & Deduplicate
+            const rangeEvents = rangeRes.data || [];
+            const recurringEvents = recurringRes.data || [];
+
+            const allEvents = [...rangeEvents];
+
+            // Add recurring events if not already present
+            recurringEvents.forEach(rec => {
+                if (!allEvents.find(e => e.id === rec.id)) {
+                    allEvents.push(rec);
+                }
+            });
+
+            return { data: allEvents, error: null };
         } catch (err: any) {
             console.error('Calendar fetch error:', err);
             return { data: [], error: err.message };

@@ -58,10 +58,10 @@ export function useCheckIn() {
             // If shared with partner, send notification
             if (data.shared_with_partner) {
                 try {
-                    // Get partner ID from couples table
+                    // Get couple info
                     const { data: couple } = await supabase
                         .from('couples')
-                        .select('partner1_id, partner2_id')
+                        .select('id, partner1_id, partner2_id')
                         .or(`partner1_id.eq.${user.id},partner2_id.eq.${user.id}`)
                         .eq('status', 'ACTIVE')
                         .single();
@@ -70,7 +70,7 @@ export function useCheckIn() {
                         const partnerId = couple.partner1_id === user.id ? couple.partner2_id : couple.partner1_id;
                         const userName = user?.user_metadata?.display_name || 'شريكك';
 
-                        // Create notification for partner
+                        // 1. Send Notification
                         await supabase
                             .from('notifications')
                             .insert({
@@ -82,10 +82,54 @@ export function useCheckIn() {
                                 body_en: `${userName} shared their mood with you`,
                                 is_read: false,
                             });
+
+                        // 2. Update Streak
+                        const { data: streakData } = await supabase
+                            .from('streaks')
+                            .select('*')
+                            .eq('couple_id', couple.id)
+                            .single();
+
+                        if (streakData) {
+                            const lastUpdate = new Date(streakData.updated_at);
+                            const today = new Date();
+                            const yesterday = new Date();
+                            yesterday.setDate(yesterday.getDate() - 1);
+
+                            // Reset times to compare dates only
+                            lastUpdate.setHours(0, 0, 0, 0);
+                            today.setHours(0, 0, 0, 0);
+                            yesterday.setHours(0, 0, 0, 0);
+
+                            if (lastUpdate.getTime() < today.getTime()) {
+                                // Not updated today
+                                let newStreak = 1;
+                                if (lastUpdate.getTime() === yesterday.getTime()) {
+                                    // Consecutive day
+                                    newStreak = streakData.current_streak + 1;
+                                } else if (lastUpdate.getTime() < yesterday.getTime() && streakData.current_streak > 0) {
+                                    // Broken streak
+                                    newStreak = 1;
+                                } else {
+                                    // First time or continuing from 0
+                                    newStreak = streakData.current_streak + 1; // Assuming if 0, current is 1.
+                                }
+
+                                // Update
+                                await supabase
+                                    .from('streaks')
+                                    .update({
+                                        current_streak: newStreak,
+                                        longest_streak: Math.max(newStreak, streakData.longest_streak),
+                                        updated_at: new Date().toISOString()
+                                    })
+                                    .eq('id', streakData.id);
+                            }
+                        }
                     }
                 } catch (notificationError) {
-                    // Don't fail the check-in if notification fails
-                    console.error('Failed to send notification:', notificationError);
+                    // Don't fail the check-in if notification/streak fails
+                    console.error('Failed to send notification or update streak:', notificationError);
                 }
             }
 

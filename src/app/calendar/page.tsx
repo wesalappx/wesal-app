@@ -105,7 +105,8 @@ export default function CalendarPage() {
                 date: new Date(s.scheduled_date),
                 time: s.scheduled_time?.slice(0, 5) || '00:00',
                 type: mapDbTypeToLocal(s.type),
-                reminder: s.reminder_enabled
+                reminder: s.reminder_enabled,
+                isRecurring: s.is_recurring // Map DB field
             })));
         }
 
@@ -231,7 +232,10 @@ export default function CalendarPage() {
                             const isSelected = selectedDate?.toDateString() === date.toDateString();
 
                             // Data for this day
-                            const daySessions = sessions.filter(s => s.date.toDateString() === date.toDateString());
+                            const daySessions = sessions.filter(s =>
+                                s.date.toDateString() === date.toDateString() ||
+                                (s.isRecurring && s.date.getDate() === date.getDate() && s.date.getMonth() === date.getMonth())
+                            );
                             const phase = getCyclePhase(date);
 
                             return (
@@ -296,30 +300,44 @@ export default function CalendarPage() {
                     {/* Sessions List */}
                     <div className="space-y-2">
                         {selectedDate ? (
-                            sessions.filter(s => s.date.toDateString() === selectedDate.toDateString()).length > 0 ? (
-                                sessions.filter(s => s.date.toDateString() === selectedDate.toDateString()).map(session => {
-                                    const Cfg = typeConfig[session.type] || typeConfig.special;
-                                    const Icon = Cfg.icon;
-                                    return (
-                                        <div key={session.id} className="p-3 rounded-2xl bg-surface-900 border border-white/5 flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${Cfg.color}`}>
-                                                <Icon className="w-5 h-5" />
+                            (() => {
+                                const selectedSessions = sessions.filter(s =>
+                                    s.date.toDateString() === selectedDate.toDateString() ||
+                                    (s.isRecurring && s.date.getDate() === selectedDate.getDate() && s.date.getMonth() === selectedDate.getMonth())
+                                );
+
+                                return selectedSessions.length > 0 ? (
+                                    selectedSessions.map(session => {
+                                        const Cfg = typeConfig[session.type] || typeConfig.special;
+                                        const Icon = Cfg.icon;
+                                        return (
+                                            <div key={session.id} className="p-3 rounded-2xl bg-surface-900 border border-white/5 flex items-center gap-4">
+                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${Cfg.color}`}>
+                                                    <Icon className="w-5 h-5" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <h4 className="text-white font-bold text-sm">{session.title}</h4>
+                                                        {session.isRecurring && (
+                                                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-surface-800 text-surface-400 border border-surface-700">
+                                                                {isRTL ? 'سنوي' : 'Yearly'}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <span className="text-xs text-surface-400">{session.time}</span>
+                                                </div>
+                                                <button onClick={() => deleteSession(session.id).then(refreshData)} className="p-2 hover:bg-red-500/10 rounded-lg group">
+                                                    <Trash2 className="w-4 h-4 text-surface-600 group-hover:text-red-400 transition-colors" />
+                                                </button>
                                             </div>
-                                            <div className="flex-1">
-                                                <h4 className="text-white font-bold text-sm">{session.title}</h4>
-                                                <span className="text-xs text-surface-400">{session.time}</span>
-                                            </div>
-                                            <button onClick={() => deleteSession(session.id).then(refreshData)} className="p-2 hover:bg-red-500/10 rounded-lg group">
-                                                <Trash2 className="w-4 h-4 text-surface-600 group-hover:text-red-400 transition-colors" />
-                                            </button>
-                                        </div>
-                                    );
-                                })
-                            ) : (
-                                <div className="text-center py-8 text-surface-500 text-sm border border-dashed border-white/5 rounded-2xl">
-                                    {isRTL ? 'لا يوجد أحداث في هذا اليوم' : 'No events for this day'}
-                                </div>
-                            )
+                                        );
+                                    })
+                                ) : (
+                                    <div className="text-center py-8 text-surface-500 text-sm border border-dashed border-white/5 rounded-2xl">
+                                        {isRTL ? 'لا يوجد أحداث في هذا اليوم' : 'No events for this day'}
+                                    </div>
+                                );
+                            })()
                         ) : (
                             <div className="text-center py-8 text-surface-500 text-sm">
                                 {isRTL ? 'اختر يوماً لعرض التفاصيل' : 'Select a day to view details'}
@@ -411,6 +429,16 @@ function AddSessionForm({ date, onClose, onSave, isRTL }: any) {
     const [time, setTime] = useState('20:00');
     const [type, setType] = useState('date');
     const [reminder, setReminder] = useState(true);
+    const [isRecurring, setIsRecurring] = useState(false);
+
+    // Auto-check recurring for birthday/anniversary
+    useEffect(() => {
+        if (type === 'birthday' || type === 'anniversary') {
+            setIsRecurring(true);
+        } else {
+            setIsRecurring(false);
+        }
+    }, [type]);
 
     return (
         <div className="space-y-4">
@@ -465,12 +493,26 @@ function AddSessionForm({ date, onClose, onSave, isRTL }: any) {
                 </div>
             </div>
 
+            {/* Recurring Option */}
+            <div className="flex items-center gap-3 p-3 bg-surface-950/50 rounded-xl border border-white/5">
+                <input
+                    type="checkbox"
+                    id="isRecurring"
+                    checked={isRecurring}
+                    onChange={(e) => setIsRecurring(e.target.checked)}
+                    className="w-5 h-5 rounded border-surface-700 bg-surface-800 text-primary-500 focus:ring-primary-500/50"
+                />
+                <label htmlFor="isRecurring" className="text-sm text-surface-300 select-none cursor-pointer flex-1">
+                    {isRTL ? 'تكرار سنوياً (أعياد، ذكرى...)' : 'Repeat Yearly (Birthday, Anniversary...)'}
+                </label>
+            </div>
+
             <div className="flex gap-3 pt-2">
                 <button onClick={onClose} className="flex-1 py-3 bg-surface-800 text-surface-300 rounded-xl font-bold hover:bg-surface-700 transition-colors">
                     {isRTL ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
-                    onClick={() => onSave({ title, date, time, type, reminder })}
+                    onClick={() => onSave({ title, date, time, type, reminder, is_recurring: isRecurring })}
                     disabled={!title}
                     className="flex-1 py-3 bg-primary-500 text-white rounded-xl font-bold hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >

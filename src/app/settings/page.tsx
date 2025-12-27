@@ -153,44 +153,6 @@ export default function SettingsPage() {
                     </div>
                 </motion.section>
 
-                {/* Unpair Button (Outside Card) */}
-                {partnerInfo?.isPaired && !showUnpairConfirm && (
-                    <button
-                        onClick={() => setShowUnpairConfirm(true)}
-                        className="w-full p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-colors font-medium flex items-center justify-center gap-2"
-                    >
-                        <UserMinus className="w-4 h-4" />
-                        {isRTL ? 'إلغاء الربط' : 'Unpair'}
-                    </button>
-                )}
-
-                {/* Unpair Confirmation Dialog */}
-                {showUnpairConfirm && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-4 rounded-2xl glass-card border border-red-500/30 bg-red-500/5 space-y-3"
-                    >
-                        <p className="text-sm text-center text-red-200">
-                            {isRTL ? 'هل أنت متأكد؟ سيتم فصل الحسابين عن بعضهما.' : 'Are you sure? This will disconnect your accounts.'}
-                        </p>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setShowUnpairConfirm(false)}
-                                className="flex-1 p-2 rounded-lg bg-surface-800 text-surface-300 hover:bg-surface-700 transition-colors text-sm font-bold"
-                            >
-                                {isRTL ? 'إلغاء' : 'Cancel'}
-                            </button>
-                            <button
-                                onClick={handleUnpair}
-                                disabled={unpairLoading}
-                                className="flex-1 p-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition-colors text-sm font-bold"
-                            >
-                                {unpairLoading ? '...' : (isRTL ? 'نعم، ألغِ الربط' : 'Yes, Unpair')}
-                            </button>
-                        </div>
-                    </motion.div>
-                )}
 
                 {/* Preferences Section */}
                 <motion.section variants={itemVariants} className="space-y-3">
