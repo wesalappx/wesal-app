@@ -26,6 +26,16 @@ const MODE_TO_JOURNEY: Record<string, string> = {
     'truth-or-dare': 'adventure'
 };
 
+// Shuffle array helper (Fisher-Yates algorithm)
+const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
+
 function GameSessionContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -47,16 +57,6 @@ function GameSessionContent() {
     const [todTruths, setTodTruths] = useState<any[]>([]);
     const [todDares, setTodDares] = useState<any[]>([]);
     const [todCurrentChallenge, setTodCurrentChallenge] = useState<any>(null);
-
-    // Shuffle array helper (Fisher-Yates algorithm)
-    const shuffleArray = <T,>(array: T[]): T[] => {
-        const shuffled = [...array];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        return shuffled;
-    };
 
     // Prepare questions - RANDOMIZED ORDER
     const questions = sessionData[mode] || sessionData['values'] || [];
@@ -160,7 +160,7 @@ function GameSessionContent() {
                 updateState({ questions: shuffled });
             }
         }
-    }, [mode, sessionMode, isRemote, session?.created_by, user?.id]);
+    }, [mode, sessionMode, isRemote, session?.created_by, user?.id, questions, currentQuestions.length, updateState]);
     // Removed legacy sync logic (replaced by useSessionSync hook)
 
     const handleNext = async () => {
