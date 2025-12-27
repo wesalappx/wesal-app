@@ -31,6 +31,7 @@ const QUESTIONS = [
         label: 'كيف المود اليوم؟',
         icon: Sun,
         color: 'text-amber-400',
+        bgColor: 'bg-amber-400', // Explicit for Tailwind
         options: [
             { val: 1, emoji: '😢', label: 'متضايق' },
             { val: 2, emoji: '😞', label: 'طفشان' },
@@ -44,6 +45,7 @@ const QUESTIONS = [
         label: 'كيف طاقتك؟',
         icon: Zap,
         color: 'text-blue-400',
+        bgColor: 'bg-blue-400', // Explicit for Tailwind
         options: [
             { val: 1, emoji: '🪫', label: 'منتهي' },
             { val: 2, emoji: '🥱', label: 'خمول' },
@@ -57,6 +59,7 @@ const QUESTIONS = [
         label: 'مستوى الضغط؟',
         icon: Brain,
         color: 'text-rose-400',
+        bgColor: 'bg-rose-400', // Explicit for Tailwind
         options: [
             { val: 1, emoji: '🤯', label: 'جداً مضغوط' }, // Low score = Bad
             { val: 2, emoji: '😰', label: 'مشغول بالي' },
@@ -70,6 +73,7 @@ const QUESTIONS = [
         label: 'كيف نومك؟',
         icon: Sun, // Fallback icon
         color: 'text-indigo-400',
+        bgColor: 'bg-indigo-400', // Explicit for Tailwind
         options: [
             { val: 1, emoji: '😫', label: 'سيء' },
             { val: 2, emoji: '😴', label: 'ما شبعت' },
@@ -83,6 +87,7 @@ const QUESTIONS = [
         label: 'شعورك تجاه الشريك؟',
         icon: Heart,
         color: 'text-rose-500',
+        bgColor: 'bg-rose-500', // Explicit for Tailwind
         options: [
             { val: 1, emoji: '💔', label: 'بعيدين' },
             { val: 2, emoji: '🥀', label: 'جاف' },
@@ -400,7 +405,7 @@ export default function CheckInPage() {
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${pct}%` }}
                                                 transition={{ duration: 1, delay: 0.2 }}
-                                                className={`h-full rounded-full ${q.color.replace('text', 'bg')}`}
+                                                className={`h-full rounded-full ${q.bgColor}`}
                                             />
                                         </div>
                                     </div>
@@ -442,7 +447,7 @@ export default function CheckInPage() {
                                                                 initial={{ height: 0 }}
                                                                 animate={{ height: `${height}%` }}
                                                                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                                                                className={`w-full ${question.color.replace('text', 'bg')} opacity-60 group-hover:opacity-100 transition-opacity`}
+                                                                className={`w-full ${question.bgColor} opacity-60 group-hover:opacity-100 transition-opacity`}
                                                             />
                                                             {/* Tooltip on Hover */}
                                                             <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap">
