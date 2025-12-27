@@ -2,98 +2,22 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-    ArrowLeft,
-    ArrowRight,
-    Heart,
-    Send,
-    Moon,
-    Sparkles,
-    Flame,
-    Coffee,
-    Check,
-    Loader2,
-    WifiOff,
-    Star
-} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowRight, Send, Loader2, LinkIcon } from 'lucide-react';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useAuth } from '@/hooks/useAuth';
 import { usePairing } from '@/hooks/usePairing';
 import { createClient } from '@/lib/supabase/client';
 import { useSound } from '@/hooks/useSound';
 
-// Romantic whisper options
-const whisperOptions = [
-    {
-        id: 'hint',
-        icon: '😏',
-        color: 'from-rose-500 to-pink-600',
-        labelAr: 'احم احم...',
-        labelEn: 'Ahem ahem...',
-    },
-    {
-        id: 'sweet',
-        icon: '💝',
-        color: 'from-pink-500 to-purple-600',
-        labelAr: 'عندي لك شي حلو',
-        labelEn: 'I have something sweet for you',
-    },
-    {
-        id: 'cold',
-        icon: '❄️',
-        color: 'from-blue-400 to-indigo-600',
-        labelAr: 'الجو بارد بدونك',
-        labelEn: 'It\'s cold without you',
-    },
-    {
-        id: 'night',
-        icon: '🌟',
-        color: 'from-purple-500 to-indigo-600',
-        labelAr: 'تعال نسهر سوا',
-        labelEn: 'Let\'s stay up together',
-    },
-    {
-        id: 'hug',
-        icon: '🤗',
-        color: 'from-amber-500 to-rose-500',
-        labelAr: 'تعال ضمني',
-        labelEn: 'Come hold me',
-    }
+// Whisper messages
+const whisperMessages = [
+    { id: 'hint', emoji: '😏', ar: 'احم احم...', en: 'Ahem ahem...' },
+    { id: 'sweet', emoji: '💝', ar: 'عندي لك شي حلو', en: 'I have something sweet for you' },
+    { id: 'cold', emoji: '❄️', ar: 'الجو بارد بدونك', en: 'It\'s cold without you' },
+    { id: 'night', emoji: '🌟', ar: 'تعال نسهر سوا', en: 'Let\'s stay up together' },
+    { id: 'hug', emoji: '🤗', ar: 'تعال ضمني', en: 'Come hold me' }
 ];
-
-// Floating Hearts Component
-function FloatingHearts() {
-    return (
-        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-            {[...Array(15)].map((_, i) => (
-                <motion.div
-                    key={i}
-                    initial={{
-                        x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 400),
-                        y: (typeof window !== 'undefined' ? window.innerHeight : 800) + 50,
-                        opacity: 0,
-                        scale: 0.5 + Math.random() * 0.5
-                    }}
-                    animate={{
-                        y: -100,
-                        opacity: [0, 0.6, 0.6, 0],
-                        rotate: Math.random() * 360
-                    }}
-                    transition={{
-                        duration: 8 + Math.random() * 4,
-                        repeat: Infinity,
-                        delay: i * 0.8,
-                        ease: 'linear'
-                    }}
-                    className="absolute text-2xl md:text-3xl"
-                >
-                    {['💕', '💗', '💖', '✨', '💫'][i % 5]}
-                </motion.div>
-            ))}
-        </div>
-    );
-}
 
 export default function WhisperPage() {
     const supabase = createClient();
@@ -103,333 +27,196 @@ export default function WhisperPage() {
     const { playSound } = useSound();
     const isRTL = language === 'ar';
 
-    // States
     const [isPaired, setIsPaired] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [coupleId, setCoupleId] = useState<string | null>(null);
     const [partnerId, setPartnerId] = useState<string | null>(null);
     const [partnerName, setPartnerName] = useState('');
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [sending, setSending] = useState(false);
+    const [sent, setSent] = useState(false);
 
-    const [selectedOption, setSelectedOption] = useState<string | null>(null);
-    const [sendingStatus, setSendingStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
-
-    // Load pairing data
     useEffect(() => {
-        async function loadData() {
+        async function load() {
             if (authLoading) return;
-
-            if (!user) {
-                setIsLoading(false);
-                return;
-            }
+            if (!user) { setIsLoading(false); return; }
 
             try {
                 const status = await getStatus();
-
                 if (status.isPaired && status.coupleId) {
                     setIsPaired(true);
                     setCoupleId(status.coupleId);
                     if (status.partner) {
                         setPartnerId(status.partner.id);
-                        setPartnerName(status.partner.display_name || (isRTL ? 'حبيبي' : 'My Love'));
+                        setPartnerName(status.partner.display_name || 'حبيبي');
                     }
                 }
-            } catch (error) {
-                console.error('Error loading pairing:', error);
-            } finally {
-                setIsLoading(false);
-            }
+            } catch (e) { console.error(e); }
+            setIsLoading(false);
         }
-        loadData();
-    }, [user, authLoading, isRTL]);
+        load();
+    }, [user, authLoading]);
 
-    const handleSendWhisper = async () => {
-        if (!selectedOption || !coupleId || !user?.id) return;
-
-        setSendingStatus('sending');
+    const handleSend = async () => {
+        if (!selectedId || !coupleId || !user?.id) return;
+        setSending(true);
         playSound('whoosh');
 
         try {
-            const option = whisperOptions.find(o => o.id === selectedOption);
-            const message = isRTL ? option?.labelAr : option?.labelEn;
+            const msg = whisperMessages.find(m => m.id === selectedId);
+            const text = isRTL ? msg?.ar : msg?.en;
 
             const channel = supabase.channel(`whisper-${coupleId}`);
             await channel.subscribe();
-
             await channel.send({
                 type: 'broadcast',
                 event: 'whisper',
                 payload: {
                     type: 'whisper_request',
                     senderId: user.id,
-                    senderName: user.user_metadata?.display_name || (isRTL ? 'حبيبك' : 'Your Love'),
-                    message: message,
-                    whisperType: selectedOption,
+                    senderName: user.user_metadata?.display_name || 'حبيبك',
+                    message: text,
+                    whisperType: selectedId,
                     timestamp: new Date().toISOString()
                 }
             });
 
-            // Save to notifications
             if (partnerId) {
                 await supabase.from('notifications').insert({
                     user_id: partnerId,
                     type: 'WHISPER',
-                    title: isRTL ? '💕 همسة' : '💕 Whisper',
-                    message: message,
-                    data: { whisperId: selectedOption, senderId: user.id },
+                    title: '💕',
+                    message: text,
                     is_read: false
                 });
             }
 
-            setSendingStatus('sent');
+            setSent(true);
             playSound('romantic');
-
-            setTimeout(() => {
-                setSendingStatus('idle');
-                setSelectedOption(null);
-            }, 3000);
-
-        } catch (error) {
-            console.error('Error sending whisper:', error);
-            setSendingStatus('idle');
-        }
+            setTimeout(() => { setSent(false); setSelectedId(null); }, 2500);
+        } catch (e) { console.error(e); }
+        setSending(false);
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-rose-950 via-purple-950 to-indigo-950 relative overflow-hidden">
-            {/* Floating Hearts Background */}
-            <FloatingHearts />
-
-            {/* Ambient Glow Effects */}
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-pink-500/5 rounded-full blur-3xl" />
-            </div>
+        <div className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0a0a1a] flex flex-col">
 
             {/* Header */}
-            <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/20 border-b border-white/5">
-                <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
-                    <Link href="/dashboard" className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        {isRTL ? <ArrowRight className="w-6 h-6 text-white" /> : <ArrowLeft className="w-6 h-6 text-white" />}
-                    </Link>
-                    <div className="flex-1 text-center">
-                        <h1 className="text-xl font-bold text-white flex items-center justify-center gap-2">
-                            <motion.span
-                                animate={{ scale: [1, 1.2, 1] }}
-                                transition={{ repeat: Infinity, duration: 1.5 }}
-                            >
-                                💕
-                            </motion.span>
-                            {isRTL ? 'همسة' : 'Whisper'}
-                        </h1>
-                    </div>
-                    <div className="w-10" /> {/* Spacer */}
-                </div>
+            <header className="px-4 py-4 flex items-center">
+                <Link href="/dashboard" className="p-2 -ml-2 text-white/60 hover:text-white">
+                    {isRTL ? <ArrowRight className="w-6 h-6" /> : <ArrowLeft className="w-6 h-6" />}
+                </Link>
+                <h1 className="flex-1 text-center text-lg font-semibold text-white">
+                    {isRTL ? 'همسة' : 'Whisper'}
+                </h1>
+                <div className="w-10" />
             </header>
 
-            <main className="relative z-10 max-w-lg mx-auto px-4 py-8 pb-32">
+            {/* Main Content */}
+            <main className="flex-1 flex flex-col items-center justify-center px-6 pb-20">
+
                 {isLoading ? (
-                    <div className="text-center py-20">
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
-                            className="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-pink-500/30 border-t-pink-500"
-                        />
-                        <p className="text-pink-300/60">{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
+                    <div className="text-center">
+                        <Loader2 className="w-8 h-8 text-purple-400 animate-spin mx-auto mb-3" />
+                        <p className="text-white/50 text-sm">{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
                     </div>
                 ) : !isPaired ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-center py-16"
-                    >
-                        <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center">
-                            <WifiOff className="w-12 h-12 text-pink-300/50" />
-                        </div>
-                        <h2 className="text-2xl font-bold text-white mb-3">
-                            {isRTL ? 'اربط مع شريكك أولاً' : 'Pair with your partner first'}
+                    <div className="text-center max-w-xs">
+                        <div className="text-5xl mb-6">💔</div>
+                        <h2 className="text-xl font-bold text-white mb-2">
+                            {isRTL ? 'اربط مع شريكك' : 'Pair with your partner'}
                         </h2>
-                        <p className="text-pink-200/60 mb-8">
-                            {isRTL ? 'الهمسة تحتاج شريك 💕' : 'Whisper needs a partner 💕'}
+                        <p className="text-white/50 text-sm mb-6">
+                            {isRTL ? 'لازم تربط حسابك عشان تقدر تهمس' : 'You need to pair your account first'}
                         </p>
                         <Link
                             href="/pairing"
-                            className="inline-block px-8 py-4 bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl text-white font-bold shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40 transition-shadow"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-xl text-white font-medium transition-colors"
                         >
+                            <LinkIcon className="w-4 h-4" />
                             {isRTL ? 'ربط الشريك' : 'Pair Now'}
                         </Link>
-                    </motion.div>
-                ) : sendingStatus === 'sent' ? (
-                    // Success State - Beautiful Animation
+                    </div>
+                ) : sent ? (
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="text-center py-12"
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="text-center"
                     >
-                        {/* Flying Heart Animation */}
-                        <div className="relative h-48 mb-8">
-                            <motion.div
-                                initial={{ scale: 0, y: 0 }}
-                                animate={{
-                                    scale: [0, 1.5, 1],
-                                    y: [0, -20, 0]
-                                }}
-                                transition={{ duration: 0.8, ease: 'backOut' }}
-                                className="absolute inset-0 flex items-center justify-center"
-                            >
-                                <span className="text-8xl">💕</span>
-                            </motion.div>
-
-                            {/* Sparkles */}
-                            {[...Array(8)].map((_, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ scale: 0, opacity: 0 }}
-                                    animate={{
-                                        scale: [0, 1.5, 0],
-                                        opacity: [0, 1, 0],
-                                        x: Math.cos(i * 45 * Math.PI / 180) * 80,
-                                        y: Math.sin(i * 45 * Math.PI / 180) * 80
-                                    }}
-                                    transition={{ duration: 1, delay: 0.3 }}
-                                    className="absolute top-1/2 left-1/2 text-2xl"
-                                >
-                                    ✨
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        <motion.h2
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5 }}
-                            className="text-3xl font-bold text-white mb-3"
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: [0, 1.3, 1] }}
+                            transition={{ duration: 0.5 }}
+                            className="text-7xl mb-6"
                         >
-                            {isRTL ? 'وصلت همستك!' : 'Whisper Sent!'}
-                        </motion.h2>
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.7 }}
-                            className="text-pink-200/70 text-lg"
-                        >
-                            {isRTL ? `${partnerName} راح يشوفها الحين` : `${partnerName} will see it now`}
-                        </motion.p>
+                            💕
+                        </motion.div>
+                        <h2 className="text-2xl font-bold text-white mb-2">
+                            {isRTL ? 'وصلت!' : 'Sent!'}
+                        </h2>
+                        <p className="text-purple-300/70">
+                            {isRTL ? `${partnerName} راح يشوفها` : `${partnerName} will see it`}
+                        </p>
                     </motion.div>
                 ) : (
-                    // Main Selection UI
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="space-y-8"
-                    >
-                        {/* Romantic Header */}
-                        <div className="text-center pt-4 pb-2">
-                            <motion.div
-                                animate={{
-                                    y: [0, -8, 0],
-                                    rotate: [0, 5, -5, 0]
-                                }}
-                                transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-                                className="text-6xl mb-4"
-                            >
-                                💌
-                            </motion.div>
-                            <h2 className="text-2xl font-bold text-white mb-2">
-                                {isRTL ? `أرسل همسة لـ ${partnerName}` : `Send a whisper to ${partnerName}`}
+                    <div className="w-full max-w-sm space-y-6">
+                        {/* Title */}
+                        <div className="text-center mb-8">
+                            <div className="text-4xl mb-3">💌</div>
+                            <h2 className="text-xl font-bold text-white">
+                                {isRTL ? 'اختر همستك' : 'Choose your whisper'}
                             </h2>
-                            <p className="text-pink-200/60">
-                                {isRTL ? 'اختر رسالتك الرومانسية' : 'Choose your romantic message'}
+                            <p className="text-white/40 text-sm mt-1">
+                                {isRTL ? `إلى ${partnerName}` : `To ${partnerName}`}
                             </p>
                         </div>
 
-                        {/* Whisper Options - Card Style */}
-                        <div className="space-y-3">
-                            {whisperOptions.map((option, index) => {
-                                const isSelected = selectedOption === option.id;
-
-                                return (
-                                    <motion.button
-                                        key={option.id}
-                                        initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: index * 0.1 }}
-                                        onClick={() => {
-                                            playSound('pop');
-                                            setSelectedOption(option.id);
-                                        }}
-                                        className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 ${isSelected
-                                                ? 'border-pink-500 bg-pink-500/20 scale-[1.02]'
-                                                : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
-                                            }`}
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            {/* Emoji Icon */}
-                                            <motion.span
-                                                animate={isSelected ? {
-                                                    scale: [1, 1.3, 1],
-                                                    rotate: [0, 10, -10, 0]
-                                                } : {}}
-                                                transition={{ repeat: isSelected ? Infinity : 0, duration: 1 }}
-                                                className="text-4xl"
-                                            >
-                                                {option.icon}
-                                            </motion.span>
-
-                                            {/* Label */}
-                                            <span className={`flex-1 text-lg font-medium ${isRTL ? 'text-right' : 'text-left'} ${isSelected ? 'text-white' : 'text-white/80'
-                                                }`}>
-                                                {isRTL ? option.labelAr : option.labelEn}
-                                            </span>
-
-                                            {/* Selection Indicator */}
-                                            {isSelected && (
-                                                <motion.div
-                                                    initial={{ scale: 0 }}
-                                                    animate={{ scale: 1 }}
-                                                    className="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center"
-                                                >
-                                                    <Check className="w-5 h-5 text-white" />
-                                                </motion.div>
-                                            )}
-                                        </div>
-                                    </motion.button>
-                                );
-                            })}
+                        {/* Message Options */}
+                        <div className="space-y-2">
+                            {whisperMessages.map((msg) => (
+                                <button
+                                    key={msg.id}
+                                    onClick={() => { playSound('click'); setSelectedId(msg.id); }}
+                                    className={`w-full px-4 py-4 rounded-xl text-right flex items-center gap-3 transition-all ${selectedId === msg.id
+                                            ? 'bg-purple-600/30 border-2 border-purple-500'
+                                            : 'bg-white/5 border-2 border-transparent hover:bg-white/10'
+                                        }`}
+                                >
+                                    <span className="text-2xl">{msg.emoji}</span>
+                                    <span className={`flex-1 ${isRTL ? 'text-right' : 'text-left'} ${selectedId === msg.id ? 'text-white' : 'text-white/70'
+                                        }`}>
+                                        {isRTL ? msg.ar : msg.en}
+                                    </span>
+                                </button>
+                            ))}
                         </div>
 
                         {/* Send Button */}
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={handleSendWhisper}
-                            disabled={!selectedOption || sendingStatus === 'sending'}
-                            className={`w-full py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all duration-300 ${selectedOption
-                                    ? 'bg-gradient-to-r from-pink-500 via-rose-500 to-red-500 text-white shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50'
-                                    : 'bg-white/10 text-white/40 cursor-not-allowed'
+                        <button
+                            onClick={handleSend}
+                            disabled={!selectedId || sending}
+                            className={`w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all ${selectedId
+                                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700'
+                                    : 'bg-white/10 text-white/30 cursor-not-allowed'
                                 }`}
                         >
-                            {sendingStatus === 'sending' ? (
-                                <>
-                                    <Loader2 className="w-6 h-6 animate-spin" />
-                                    {isRTL ? 'جاري الإرسال...' : 'Sending...'}
-                                </>
+                            {sending ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 <>
-                                    <Send className={`w-6 h-6 ${isRTL ? 'rotate-180' : ''}`} />
-                                    {isRTL ? 'أرسل الهمسة 💕' : 'Send Whisper 💕'}
+                                    <Send className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
+                                    {isRTL ? 'أرسل' : 'Send'}
                                 </>
                             )}
-                        </motion.button>
-
-                        {/* Subtle Footer */}
-                        <p className="text-center text-pink-200/40 text-sm">
-                            {isRTL ? '✨ خاصة وسرية بينكم ✨' : '✨ Private and secret between you two ✨'}
-                        </p>
-                    </motion.div>
+                        </button>
+                    </div>
                 )}
             </main>
+
+            {/* Footer */}
+            <footer className="py-4 text-center text-white/20 text-xs">
+                {isRTL ? 'خاص بينكم 💕' : 'Private between you 💕'}
+            </footer>
         </div>
     );
 }
