@@ -302,7 +302,7 @@ export default function Dashboard() {
             </div>
 
             {/* Main Content */}
-            <div className="px-5 mt-4 space-y-4">
+            <div className="px-5 mt-4 space-y-6">
                 {/* Partner Mood */}
                 {partnerMood && (
                     <div className={`rounded-2xl p-5 backdrop-blur-md border ${theme === 'light' ? 'bg-white/70 border-indigo-100' : 'bg-surface-800/50 border-surface-700/30'}`}>
@@ -377,7 +377,7 @@ export default function Dashboard() {
                 <h2 className={`text-lg font-bold px-1 ${theme === 'light' ? 'text-slate-700' : 'text-surface-200'}`}>
                     {language === 'ar' ? 'نشاطات' : 'Activities'}
                 </h2>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-6">
                     {actions.map((action, idx) => {
                         const CardContent = (
                             <motion.div
@@ -415,7 +415,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Breathe & Whisper Cards */}
-                <div className="grid grid-cols-2 gap-3 mt-4">
+                <div className="grid grid-cols-2 gap-6 mt-4">
                     <motion.div
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
