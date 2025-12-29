@@ -78,7 +78,7 @@ export default function AICoachPage() {
     const { getPartnerCheckIn } = useCheckIn();
     const { notes, specialDates, budgetGoals, createNote, createSpecialDate, createBudgetGoal } = useNotes();
     const { getSessions, createSession } = useCalendar();
-    const healthData = useHealth();
+    const { getHealthData, getCycleInfo } = useHealth();
     const supabase = createClient();
 
     const [messages, setMessages] = useState<Message[]>([]);
@@ -88,6 +88,7 @@ export default function AICoachPage() {
     const [showQuickActions, setShowQuickActions] = useState(true);
     const [partnerInfo, setPartnerInfo] = useState<{ name: string; mood?: number } | null>(null);
     const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+    const [healthCycleInfo, setHealthCycleInfo] = useState<any | null>(null);
     const [showPrivacyDisclaimer, setShowPrivacyDisclaimer] = useState(false);
 
     // Separate storage for intimate mode messages (privacy: hidden when exiting)
@@ -146,6 +147,23 @@ export default function AICoachPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Fetch health data - only on mount
+    useEffect(() => {
+        const fetchHealthData = async () => {
+            try {
+                const result = await getHealthData();
+                if (result.data) {
+                    const cycleInfo = getCycleInfo(result.data);
+                    setHealthCycleInfo(cycleInfo);
+                }
+            } catch (error) {
+                console.error('Error fetching health data:', error);
+            }
+        };
+        fetchHealthData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // Build context for AI - COMPREHENSIVE
     const buildContext = () => {
         const context: string[] = [];
@@ -198,23 +216,24 @@ export default function AICoachPage() {
         }
 
         // Health & Fertility Data
-        if (healthData) {
+        // Health & Fertility Data
+        if (healthCycleInfo) {
             context.push('');
             context.push('=== HEALTH & FERTILITY INFO ===');
-            context.push(`Cycle phase: ${healthData.phase} (${healthData.phaseLabel})`);
-            context.push(`Day of cycle: ${healthData.dayOfCycle} of ${healthData.cycleLength}`);
-            context.push(`Fertility level: ${healthData.fertilityLevel}`);
-            if (healthData.isInFertileWindow) {
+            context.push(`Cycle phase: ${healthCycleInfo.currentPhase} (${healthCycleInfo.phaseName.en} / ${healthCycleInfo.phaseName.ar})`);
+            context.push(`Day of cycle: ${healthCycleInfo.dayOfCycle}`);
+            context.push(`Fertility level: ${healthCycleInfo.fertilityLevel}`);
+            if (healthCycleInfo.isFertileToday) {
                 context.push(`🔴 Currently in FERTILE WINDOW!`);
             }
-            if (healthData.isOvulationDay) {
+            if (healthCycleInfo.isOvulationDay) {
                 context.push(`✨ TODAY is OVULATION DAY!`);
             }
-            if (healthData.daysUntilOvulation > 0 && healthData.daysUntilOvulation <= 5) {
-                context.push(`Ovulation in ${healthData.daysUntilOvulation} days`);
+            if (healthCycleInfo.daysUntilOvulation > 0 && healthCycleInfo.daysUntilOvulation <= 5) {
+                context.push(`Ovulation in ${healthCycleInfo.daysUntilOvulation} days`);
             }
-            if (healthData.daysUntilNextPeriod <= 5) {
-                context.push(`Next period in ${healthData.daysUntilNextPeriod} days`);
+            if (healthCycleInfo.daysUntilPeriod <= 5) {
+                context.push(`Next period in ${healthCycleInfo.daysUntilPeriod} days`);
             }
         }
 
