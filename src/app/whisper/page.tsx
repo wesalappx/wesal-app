@@ -1,0 +1,221 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ArrowRight, Send, Loader2, Link2, Check } from 'lucide-react';
+import { useSettingsStore } from '@/stores/settings-store';
+import { useAuth } from '@/hooks/useAuth';
+import { usePairing } from '@/hooks/usePairing';
+import { createClient } from '@/lib/supabase/client';
+import { useSound } from '@/hooks/useSound';
+
+const whisperMessages = [
+    { id: 'hint', emoji: '😏', ar: 'احم احم...', en: 'Ahem ahem...' },
+    { id: 'sweet', emoji: '💝', ar: 'عندي لك شي حلو', en: 'Something sweet for you' },
+    { id: 'cold', emoji: '❄️', ar: 'الجو بارد بدونك', en: 'Cold without you' },
+    { id: 'night', emoji: '🌟', ar: 'تعال نسهر سوا', en: 'Stay up together' },
+    { id: 'hug', emoji: '🤗', ar: 'تعال ضمني', en: 'Hold me' }
+];
+
+export default function WhisperPage() {
+    const supabase = createClient();
+    const { user, isLoading: authLoading } = useAuth();
+    const { getStatus } = usePairing();
+    const { language } = useSettingsStore();
+    const { playSound } = useSound();
+    const isRTL = language === 'ar';
+
+    const [isPaired, setIsPaired] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [coupleId, setCoupleId] = useState<string | null>(null);
+    const [partnerId, setPartnerId] = useState<string | null>(null);
+    const [partnerName, setPartnerName] = useState('');
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [sending, setSending] = useState(false);
+    const [sent, setSent] = useState(false);
+
+    useEffect(() => {
+        async function load() {
+            if (authLoading) return;
+            if (!user) { setIsLoading(false); return; }
+            try {
+                const status = await getStatus();
+                if (status.isPaired && status.coupleId) {
+                    setIsPaired(true);
+                    setCoupleId(status.coupleId);
+                    if (status.partner) {
+                        setPartnerId(status.partner.id);
+                        setPartnerName(status.partner.display_name || 'حبيبي');
+                    }
+                }
+            } catch (e) { console.error(e); }
+            setIsLoading(false);
+        }
+        load();
+    }, [user, authLoading]);
+
+    const handleSend = async () => {
+        if (!selectedId || !coupleId || !user?.id) return;
+        setSending(true);
+        playSound('whoosh');
+
+        try {
+            const msg = whisperMessages.find(m => m.id === selectedId);
+            const text = isRTL ? msg?.ar : msg?.en;
+
+            const channel = supabase.channel(`whisper-${coupleId}`);
+            await channel.subscribe();
+            await channel.send({
+                type: 'broadcast',
+                event: 'whisper',
+                payload: {
+                    type: 'whisper_request',
+                    senderId: user.id,
+                    senderName: user.user_metadata?.display_name || 'حبيبك',
+                    message: text,
+                    whisperType: selectedId,
+                    timestamp: new Date().toISOString()
+                }
+            });
+
+            if (partnerId) {
+                await supabase.from('notifications').insert({
+                    user_id: partnerId, type: 'WHISPER', title: '💕', message: text, is_read: false
+                });
+            }
+
+            setSent(true);
+            playSound('romantic');
+            setTimeout(() => { setSent(false); setSelectedId(null); }, 2500);
+        } catch (e) { console.error(e); }
+        setSending(false);
+    };
+
+    return (
+        <div className="min-h-screen bg-gradient-to-b from-[#12121a] to-[#1a1025]">
+            {/* Background Decoration */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-20 left-10 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-40 right-10 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl" />
+            </div>
+
+            {/* Header */}
+            <header className="relative z-10 flex items-center px-4 py-4">
+                <Link href="/dashboard" className="p-2 text-white/50 hover:text-white">
+                    {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
+                </Link>
+                <h1 className="flex-1 text-center text-lg font-semibold text-white">{isRTL ? 'همسة' : 'Whisper'}</h1>
+                <div className="w-9" />
+            </header>
+
+            {/* Content */}
+            <main className="relative z-10 px-5 py-4 max-w-md mx-auto">
+                {isLoading ? (
+                    <div className="flex items-center justify-center h-60">
+                        <Loader2 className="w-8 h-8 text-pink-400 animate-spin" />
+                    </div>
+                ) : !isPaired ? (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
+                        <div className="text-5xl mb-4">💔</div>
+                        <h2 className="text-xl font-bold text-white mb-2">{isRTL ? 'اربط مع شريكك' : 'Pair first'}</h2>
+                        <p className="text-white/40 text-sm mb-6">{isRTL ? 'لازم تربط حسابك' : 'Connect your accounts'}</p>
+                        <Link href="/pairing" className="inline-flex items-center gap-2 px-6 py-3 bg-pink-600 rounded-xl text-white font-medium">
+                            <Link2 className="w-4 h-4" />{isRTL ? 'اربط' : 'Pair'}
+                        </Link>
+                    </motion.div>
+                ) : sent ? (
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-16">
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: [0, 1.3, 1] }}
+                            transition={{ duration: 0.5 }}
+                            className="text-7xl mb-4"
+                        >💕</motion.div>
+                        <h2 className="text-2xl font-bold text-white">{isRTL ? 'وصلت!' : 'Sent!'}</h2>
+                        <p className="text-white/40 mt-1">{isRTL ? `${partnerName} راح يشوفها` : `${partnerName} will see it`}</p>
+                    </motion.div>
+                ) : (
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+                        {/* Title */}
+                        <div className="text-center py-4">
+                            <motion.div
+                                animate={{ y: [0, -5, 0] }}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                                className="text-4xl mb-2"
+                            >💌</motion.div>
+                            <h2 className="text-lg font-bold text-white">{isRTL ? 'اختر همستك' : 'Pick your whisper'}</h2>
+                            <p className="text-white/30 text-sm">{isRTL ? `إلى ${partnerName}` : `To ${partnerName}`}</p>
+                        </div>
+
+                        {/* Message Cards */}
+                        <div className="grid grid-cols-1 gap-2.5">
+                            {whisperMessages.map((msg, i) => {
+                                const isSelected = selectedId === msg.id;
+                                return (
+                                    <motion.button
+                                        key={msg.id}
+                                        initial={{ opacity: 0, y: 15 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.06 }}
+                                        onClick={() => { playSound('click'); setSelectedId(msg.id); }}
+                                        className={`relative flex items-center gap-3 p-4 rounded-2xl border transition-all duration-200 ${isSelected
+                                            ? 'bg-gradient-to-r from-pink-600/20 to-purple-600/20 border-pink-500/50'
+                                            : 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]'
+                                            }`}
+                                    >
+                                        <span className={`text-2xl transition-transform duration-200 ${isSelected ? 'scale-110' : ''}`}>
+                                            {msg.emoji}
+                                        </span>
+                                        <span className={`flex-1 text-base ${isRTL ? 'text-right' : 'text-left'} ${isSelected ? 'text-white' : 'text-white/60'}`}>
+                                            {isRTL ? msg.ar : msg.en}
+                                        </span>
+                                        <AnimatePresence>
+                                            {isSelected && (
+                                                <motion.div
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    exit={{ scale: 0 }}
+                                                    className="w-6 h-6 rounded-full bg-pink-500 flex items-center justify-center"
+                                                >
+                                                    <Check className="w-3.5 h-3.5 text-white" />
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </motion.button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Send Button */}
+                        <motion.button
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.35 }}
+                            onClick={handleSend}
+                            disabled={!selectedId || sending}
+                            className={`w-full py-4 rounded-2xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-200 ${selectedId
+                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/20'
+                                : 'bg-white/5 text-white/25'
+                                }`}
+                        >
+                            {sending ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                <>
+                                    💕
+                                    {isRTL ? 'أرسل الهمسة' : 'Send Whisper'}
+                                </>
+                            )}
+                        </motion.button>
+
+                        {/* Footer */}
+                        <p className="text-center text-white/15 text-xs pt-2">
+                            {isRTL ? '🔒 خاص بينكم' : '🔒 Private'}
+                        </p>
+                    </motion.div>
+                )}
+            </main>
+        </div>
+    );
+}
