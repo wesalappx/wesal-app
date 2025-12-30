@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Almarai } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
@@ -8,6 +8,13 @@ const almarai = Almarai({
     weight: ['300', '400', '700', '800'],
     variable: '--font-almarai',
 });
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+};
 
 export const metadata: Metadata = {
     title: 'وصال | Wesal',

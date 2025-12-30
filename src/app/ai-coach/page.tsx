@@ -744,7 +744,7 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
                             placeholder={isRTL ? 'اكتب رسالتك...' : 'Type your message...'}
                             disabled={isLoading}
                             dir={isRTL ? 'rtl' : 'ltr'}
-                            className="flex-1 bg-transparent px-3 py-2 text-white placeholder-surface-500 focus:outline-none text-sm"
+                            className="flex-1 bg-transparent px-3 py-2 text-white placeholder-surface-500 focus:outline-none text-base"
                         />
                         <button
                             type="submit"

@@ -274,7 +274,7 @@ export default function SessionChat({ sessionId, userId, partnerName, compact = 
                                                 onChange={(e) => setInput(e.target.value)}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                                                 placeholder={isRTL ? 'اكتب رسالتك...' : 'Type your message...'}
-                                                className="flex-1 bg-transparent px-4 py-3 text-white placeholder-surface-500 focus:outline-none text-sm"
+                                                className="flex-1 bg-transparent px-4 py-3 text-white placeholder-surface-500 focus:outline-none text-base"
                                                 dir={isRTL ? 'rtl' : 'ltr'}
                                             />
                                             <button
