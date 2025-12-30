@@ -15,6 +15,11 @@ import { useCheckIn } from '@/hooks/useCheckIn';
 import { useNotes } from '@/hooks/useNotes';
 import { useCalendar } from '@/hooks/useCalendar';
 import { useHealth } from '@/hooks/useHealth';
+import { useProgress } from '@/hooks/useProgress';
+import { useAchievements } from '@/hooks/useAchievements';
+import { useJourneys } from '@/hooks/useJourneys';
+import { useWhisper } from '@/hooks/useWhisper';
+import { useInsights } from '@/hooks/useInsights';
 import { createClient } from '@/lib/supabase/client';
 
 interface Message {
@@ -79,6 +84,11 @@ export default function AICoachPage() {
     const { notes, specialDates, budgetGoals, createNote, createSpecialDate, createBudgetGoal } = useNotes();
     const { getSessions, createSession } = useCalendar();
     const { getHealthData, getCycleInfo } = useHealth();
+    const { progress: progressStats } = useProgress();
+    const { achievements } = useAchievements();
+    const { progressMap: journeysData } = useJourneys();
+    const { incomingWhisper, outgoingWhisper } = useWhisper();
+    const { insights: insightsData } = useInsights();
     const supabase = createClient();
 
     const [messages, setMessages] = useState<Message[]>([]);
@@ -89,6 +99,8 @@ export default function AICoachPage() {
     const [partnerInfo, setPartnerInfo] = useState<{ name: string; mood?: number } | null>(null);
     const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
     const [healthCycleInfo, setHealthCycleInfo] = useState<any | null>(null);
+    const [gamesData, setGamesData] = useState<any[]>([]);
+    const [checkInTrends, setCheckInTrends] = useState<any | null>(null);
     const [showPrivacyDisclaimer, setShowPrivacyDisclaimer] = useState(false);
 
     // Separate storage for intimate mode messages (privacy: hidden when exiting)
@@ -163,6 +175,77 @@ export default function AICoachPage() {
         fetchHealthData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Fetch games data - only on mount
+    useEffect(() => {
+        const fetchGamesData = async () => {
+            if (!user) return;
+            try {
+                const { data, error } = await supabase
+                    .from('game_sessions')
+                    .select('id, game_type, created_at, scores')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (!error && data) {
+                    setGamesData(data);
+                }
+            } catch (error) {
+                console.error('Error fetching games data:', error);
+            }
+        };
+        fetchGamesData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
+
+    // Fetch check-in trends (last 30 days) - only on mount
+    useEffect(() => {
+        const fetchCheckInTrends = async () => {
+            if (!user) return;
+            try {
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+                const { data, error } = await supabase
+                    .from('check_ins')
+                    .select('mood, energy, stress, created_at')
+                    .eq('user_id', user.id)
+                    .gte('created_at', thirtyDaysAgo.toISOString())
+                    .order('created_at', { ascending: true });
+
+                if (!error && data && data.length > 0) {
+                    // Calculate trends
+                    const total = data.length;
+                    const avgMood = data.reduce((sum, c) => sum + c.mood, 0) / total;
+                    const avgEnergy = data.reduce((sum, c) => sum + c.energy, 0) / total;
+                    const avgStress = data.reduce((sum, c) => sum + c.stress, 0) / total;
+
+                    // Detect mood trend
+                    const firstHalf = data.slice(0, Math.floor(total / 2));
+                    const secondHalf = data.slice(Math.floor(total / 2));
+                    const firstMood = firstHalf.reduce((s, c) => s + c.mood, 0) / firstHalf.length;
+                    const secondMood = secondHalf.reduce((s, c) => s + c.mood, 0) / secondHalf.length;
+
+                    let moodTrend = 'stable';
+                    if (secondMood > firstMood + 0.5) moodTrend = 'improving';
+                    else if (secondMood < firstMood - 0.5) moodTrend = 'declining';
+
+                    setCheckInTrends({
+                        total,
+                        avgMood,
+                        avgEnergy,
+                        avgStress,
+                        moodTrend
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching check-in trends:', error);
+            }
+        };
+        fetchCheckInTrends();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
 
     // Build context for AI - COMPREHENSIVE
     const buildContext = () => {
@@ -246,6 +329,146 @@ export default function AICoachPage() {
                 const remaining = g.target_amount - g.current_amount;
                 context.push(`- ${g.title}: ${g.current_amount}/${g.target_amount} (${progress}% complete, ${remaining} remaining)`);
             });
+        }
+
+        // Games Progress
+        if (gamesData.length > 0) {
+            context.push('');
+            context.push('=== GAMES ACTIVITY ===');
+            const last7Days = gamesData.filter(g =>
+                (Date.now() - new Date(g.created_at).getTime()) < 7 * 24 * 60 * 60 * 1000
+            );
+            context.push(`Total games played: ${gamesData.length}`);
+            context.push(`Games this week: ${last7Days.length}`);
+
+            // Game type breakdown
+            const gameTypes: Record<string, number> = gamesData.reduce((acc: Record<string, number>, g: any) => {
+                acc[g.game_type] = (acc[g.game_type] || 0) + 1;
+                return acc;
+            }, {});
+
+            const topGames = Object.entries(gameTypes)
+                .sort(([, a], [, b]) => (b as number) - (a as number))
+                .slice(0, 3)
+                .map(([type, count]) => `${type} (${count})`)
+                .join(', ');
+
+            if (topGames) {
+                context.push(`Favorite games: ${topGames}`);
+            }
+
+            if (last7Days.length === 0) {
+                context.push('⚠️ No games played this week - suggest playing together!');
+            }
+        }
+
+        // Journeys Progress
+        if (journeysData && Object.keys(journeysData).length > 0) {
+            context.push('');
+            context.push('=== JOURNEYS PROGRESS ===');
+            Object.entries(journeysData).forEach(([type, progress]: any) => {
+                const completion = Math.round((progress.completed_steps / progress.total_steps) * 100);
+                context.push(`- ${type}: ${progress.completed_steps}/${progress.total_steps} steps (${completion}%)`);
+
+                if (completion === 100 && progress.completed_at) {
+                    context.push(`  ✅ COMPLETED on ${progress.completed_at}`);
+                } else if (completion > 0 && completion < 100) {
+                    context.push(`  📍 IN PROGRESS - ${progress.total_steps - progress.completed_steps} steps remaining`);
+                }
+            });
+        }
+
+        // Achievements
+        if (achievements && achievements.length > 0) {
+            context.push('');
+            context.push('=== ACHIEVEMENTS ===');
+            const unlocked = achievements.filter((a: any) => a.unlocked);
+            const inProgress = achievements.filter((a: any) => !a.unlocked && a.progress > 0);
+
+            context.push(`Unlocked: ${unlocked.length}/${achievements.length}`);
+
+            if (unlocked.length > 0) {
+                context.push('Recent unlocks:');
+                unlocked.slice(-3).forEach((a: any) => {
+                    context.push(`  🏆 ${a.title} - ${a.description}`);
+                });
+            }
+
+            if (inProgress.length > 0) {
+                context.push('Almost there:');
+                inProgress.forEach((a: any) => {
+                    const percentage = Math.round((a.progress / a.target) * 100);
+                    context.push(`  ⏳ ${a.title}: ${a.progress}/${a.target} (${percentage}%)`);
+                });
+            }
+        }
+
+        // Whisper Activity
+        const whisperActivity = [];
+        if (incomingWhisper) whisperActivity.push({ ...incomingWhisper, direction: 'received' });
+        if (outgoingWhisper) whisperActivity.push({ ...outgoingWhisper, direction: 'sent' });
+
+        if (whisperActivity.length > 0) {
+            context.push('');
+            context.push('=== WHISPER ACTIVITY ===');
+            whisperActivity.forEach((w: any) => {
+                const direction = w.direction === 'sent' ? 'Sent' : 'Received';
+                context.push(`  - ${direction}: "${w.message}" [${w.type}] - Status: ${w.status}`);
+            });
+
+            if (incomingWhisper && incomingWhisper.status === 'pending') {
+                context.push(`⚠️ Pending whisper from partner - remind user to respond!`);
+            }
+        }
+
+        // Check-in Trends
+        if (checkInTrends) {
+            context.push('');
+            context.push('=== CHECK-IN TRENDS (Last 30 Days) ===');
+            context.push(`Total check-ins: ${checkInTrends.total}`);
+            context.push(`Average mood: ${checkInTrends.avgMood.toFixed(1)}/5`);
+            context.push(`Average energy: ${checkInTrends.avgEnergy.toFixed(1)}/5`);
+            context.push(`Average stress: ${checkInTrends.avgStress.toFixed(1)}/5`);
+
+            // Trend analysis
+            if (checkInTrends.moodTrend === 'improving') {
+                context.push('📈 Mood is IMPROVING over time!');
+            } else if (checkInTrends.moodTrend === 'declining') {
+                context.push('📉 Mood is DECLINING - needs attention!');
+            }
+        }
+
+        // Progress Stats
+        if (progressStats) {
+            context.push('');
+            context.push('=== RELATIONSHIP PROGRESS ===');
+            context.push(`Current streak: ${progressStats.streak} days 🔥`);
+            context.push(`Trend: ${progressStats.trend}`);
+            context.push(`Alignment score: ${progressStats.alignment}/5`);
+            context.push(`Focus area: ${progressStats.focus}`);
+            context.push(`Sessions this week: ${progressStats.sessions}`);
+            context.push(`Check-ins this week: ${progressStats.checkIns}`);
+
+            if (progressStats.streak === 0) {
+                context.push('⚠️ NO ACTIVE STREAK - encourage daily check-ins!');
+            } else if (progressStats.streak >= 7) {
+                context.push('🎉 Strong streak! Celebrate this achievement!');
+            }
+        }
+
+        // Insights
+        if (insightsData) {
+            context.push('');
+            context.push('=== AI INSIGHTS ===');
+            if (insightsData.weeklyInsight) {
+                context.push(`This week: ${insightsData.weeklyInsight}`);
+            }
+            if (insightsData.suggestions && insightsData.suggestions.length > 0) {
+                context.push('Suggestions:');
+                insightsData.suggestions.slice(0, 3).forEach((s: string) => {
+                    context.push(`  - ${s}`);
+                });
+            }
         }
 
         return context.join('\n');
@@ -425,22 +648,56 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`
 - تهتم حقاً بسعادة الزوجين
 - تعطي نصائح عملية وقابلة للتطبيق
 
-=== القدرات ===
-1. استخدم البيانات المحفوظة (ملاحظات، تواريخ، تقويم، صحة) للإجابة على الأسئلة
+=== فهم النية (Intent Understanding) - مهم جداً ===
+عليك أن تفهم بدقة ما يريد المستخدم:
+
+1. **أسئلة** (User is ASKING):
+   - أمثلة: "كيف حال شريكي؟", "ماذا لعبنا؟", "ما مستوى التقدم؟"
+   - **الرد**: أجب مباشرة باستخدام البيانات المتوفرة في السياق
+   - **لا تنفذ إجراءات** - فقط قدم المعلومات
+
+2. **طلب إجراء** (User wants TO DO something):
+   - أمثلة: "أضف ملاحظة", "جدولة موعد", "حفظ هدف ميزانية"
+   - **الرد**: نفذ الإجراء المطلوب باستخدام [ACTION:...] واشرح ما تم
+   - Explicit keywords: "أضف", "احفظ", "سجل", "جدول", "أنشئ"
+
+3. **تعديل/حذف** (User wants to EDIT or DELETE):
+   - أمثلة: "غير الملاحظة", "احذف الموعد", "عدل الميزانية"
+   - **الرد**: اعتذر بأدب واطلب منهم التعديل يدوياً من التطبيق
+   - **لا تنفذ DELETE/UPDATE** - فقط CREATE متاح
+
+=== استخدام البيانات الشامل ===
+لديك الآن وصول كامل لجميع بيانات المستخدم:
+- استخدم الألعاب والرحلات والإنجازات لتخصيص النصائح
+- اشر إلى أحداث محددة ("الأسبوع الماضي لعبتم...")
+- اكتشف الأنماط ("ألاحظ أن مزاجك منخفض في الإثنين...")
+- احتفل بالإنجازات ("مبروك على الـ 7 أيام متتالية!")
+- ذكرهم بالأمور المعلقة ("لديك whisper معلق من شريكك")
+- اقترح بناءً على البيانات ("بما أنكم لم تلعبوا هذا الأسبوع...")
+
+===القدرات ===
+1. استخدم البيانات المحفوظة (ملاحظات، تواريخ، تقويم، صحة، ألعاب، رحلات) للإجابة
 2. قدم اقتراحات استباقية عند رؤية مناسبات قريبة أو ظروف خاصة
 3. ساعد في حفظ الملاحظات والمواعيد والميزانية عند الطلب الصريح
 4. اعط نصائح رومانسية وأفكار هدايا ومساعدة في الاعتذار
+5. اكتشف الأنماط والاتجاهات وحذر من المشاكل المحتملة
 
 === التنسيق ===
 - استخدم ردود مختصرة ومنظمة
 - استخدم الإيموجي باعتدال للتعبير
 - عند إعطاء نصائح متعددة، رقمها
+- عند الإشارة للبيانات، كن محدداً ("الأسبوع الماضي في الخميس...")
 
 === الإجراءات ===
 ${actionInstructions}
 
 === السياق الحالي ===
 ${context}
+
+**تذكير مهم**: 
+- إذا سأل المستخدم سؤالاً → أجب من البيانات فوراً
+- إذا طلب فعل شيء → نفذ الإجراء
+- إذا طلب تعديل/حذف → اعتذر واطلب التعديل يدوياً
 
 Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
 
