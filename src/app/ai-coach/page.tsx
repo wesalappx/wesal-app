@@ -511,26 +511,29 @@ export default function AICoachPage() {
 
         for (const { action, params } of actions) {
             try {
-                switch (action) {
-                    case 'ADD_NOTE':
+                const actionLower = action.toLowerCase();
+
+                switch (actionLower) {
+                    case 'add_note':
                         if (params.title) {
                             await createNote(params.title, params.content || '', (params.category as any) || 'general');
                             results.push(isRTL ? `✅ تم إضافة ملاحظة: "${params.title}"` : `✅ Added note: "${params.title}"`);
                         }
                         break;
-                    case 'ADD_DATE':
+                    case 'add_special_date':
                         if (params.title && params.date) {
                             await createSpecialDate(params.title, params.date, (params.type as any) || 'custom');
                             results.push(isRTL ? `✅ تم إضافة مناسبة: "${params.title}"` : `✅ Added date: "${params.title}"`);
                         }
                         break;
-                    case 'ADD_BUDGET':
-                        if (params.title && params.amount) {
-                            await createBudgetGoal(params.title, parseFloat(params.amount));
+                    case 'add_budget':
+                        if (params.title && (params.target || params.amount)) {
+                            const amount = parseFloat(params.target || params.amount);
+                            await createBudgetGoal(params.title, amount);
                             results.push(isRTL ? `✅ تم إضافة هدف: "${params.title}"` : `✅ Added goal: "${params.title}"`);
                         }
                         break;
-                    case 'ADD_CALENDAR':
+                    case 'add_calendar':
                         if (params.title && params.date) {
                             await createSession({
                                 title: params.title,
@@ -544,6 +547,7 @@ export default function AICoachPage() {
                 }
             } catch (error) {
                 console.error('Action error:', error);
+                results.push(isRTL ? '❌ حدث خطأ في تنفيذ الإجراء' : '❌ Error executing action');
             }
         }
 
