@@ -102,6 +102,11 @@ export default function AICoachPage() {
     const [gamesData, setGamesData] = useState<any[]>([]);
     const [checkInTrends, setCheckInTrends] = useState<any | null>(null);
     const [showPrivacyDisclaimer, setShowPrivacyDisclaimer] = useState(false);
+    const [pendingAction, setPendingAction] = useState<{
+        action: string;
+        params: Record<string, string>;
+        messageId: string;
+    } | null>(null);
 
     // Separate storage for intimate mode messages (privacy: hidden when exiting)
     const [savedIntimateMessages, setSavedIntimateMessages] = useState<Message[]>([]);
@@ -460,12 +465,12 @@ export default function AICoachPage() {
         if (insightsData) {
             context.push('');
             context.push('=== AI INSIGHTS ===');
-            if (insightsData.weeklyInsight) {
-                context.push(`This week: ${insightsData.weeklyInsight}`);
+            if (insightsData.weeklyHighlight) {
+                context.push(`This week: ${insightsData.weeklyHighlight}`);
             }
-            if (insightsData.suggestions && insightsData.suggestions.length > 0) {
+            if (insightsData.recommendations && insightsData.recommendations.length > 0) {
                 context.push('Suggestions:');
-                insightsData.suggestions.slice(0, 3).forEach((s: string) => {
+                insightsData.recommendations.slice(0, 3).forEach((s: string) => {
                     context.push(`  - ${s}`);
                 });
             }
@@ -581,23 +586,29 @@ export default function AICoachPage() {
             const actionInstructions = `
 === ACTION SYSTEM ===
 RULE 1: ONLY add actions when user EXPLICITLY asks to save/record/add using words like: "سجل", "احفظ", "أضف", "ذكرني", "save", "add", "record", "remember"
-RULE 2: Do NOT add notes when user is just sharing info or asking questions
-RULE 3: Use the CONTEXT DATA to answer questions - don't add new notes for questions
-RULE 4: You can add calendar events when user wants to schedule something
+When the user explicitly asks you to DO something (add note, schedule event, save budget):
 
-Available actions (ONLY when explicitly requested):
-- [ACTION:ADD_NOTE|title=Note Title|content=Content|category=general]
-- [ACTION:ADD_DATE|title=Event|date=YYYY-MM-DD|type=birthday/anniversary/custom]
-- [ACTION:ADD_BUDGET|title=Goal|amount=1000]
-- [ACTION:ADD_CALENDAR|title=Event Title|date=YYYY-MM-DD|type=JOURNEY/ACTIVITY/CHECK_IN/CUSTOM]
+**IMPORTANT - Ask for Confirmation First:**
+1. Describe what you will do in detail
+2. Ask: "هل تريد مني [action description]?" (Arabic) or "Would you like me to [action description]?" (English)
+3. Add the action at the END of your response: [ACTION:type|param1=value1|param2=value2]
+4. The user will see "Yes" and "No" buttons to confirm
+5. DO NOT say "Done!" or "✅" - just ask for confirmation
 
-Categories: general, journey, budget, wishlist, memories
+**Available Actions:**
+- [ACTION:add_note|title=Note Title|content=Note content|category=personal]
+- [ACTION:add_special_date|title=Event Name|date=YYYY-MM-DD]
+- [ACTION:add_budget|title=Goal Name|target=5000|current=0]
+- [ACTION:add_calendar|title=Event|date=YYYY-MM-DD|type=date]
 
-Examples:
-✅ "سجل أنها تحب الورد" → [ACTION:ADD_NOTE|title=تحب الورد|category=general]
-✅ "ذكرني يوم 15 عشان العشاء" → [ACTION:ADD_CALENDAR|title=موعد عشاء|date=2025-01-15|type=CUSTOM]
-❌ "زوجتي تحب الورد" (sharing) → Just respond naturally
-❌ "شو تحب زوجتي؟" (question) → Answer from notes context
+**Example:**
+User: "أضف ملاحظة عن ذكرى زواجنا"
+AI: "هل تريد مني إضافة ملاحظة بعنوان 'ذكرى الزواج' في الملاحظات الشخصية؟ [ACTION:add_note|title=ذكرى الزواج|content=|category=personal]"
+
+**Rules:**
+✅ DO: Ask for confirmation → Add [ACTION:...]
+❌ DON'T: Execute and say "Done!"
+❌ DON'T: Add actions for simple questions like "How is my partner?"
 `;
 
             const systemPrompt = mode === 'intimate'
@@ -718,15 +729,9 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
             const data = await response.json();
             const rawContent = data.content || data.message || 'Sorry, I could not process that.';
 
-            // Parse and execute actions
+            // Parse actions
             const actions = parseActions(rawContent);
-            const actionResults = await executeActions(actions);
-
-            // Clean response and append action results
             let finalContent = cleanResponse(rawContent);
-            if (actionResults.length > 0) {
-                finalContent += '\n\n' + actionResults.join('\n');
-            }
 
             const assistantMessage: Message = {
                 id: (Date.now() + 1).toString(),
@@ -736,6 +741,15 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
             };
 
             setMessages(prev => [...prev, assistantMessage]);
+
+            // If there are actions, store first one as pending (require confirmation)
+            if (actions.length > 0) {
+                setPendingAction({
+                    action: actions[0].action,
+                    params: actions[0].params,
+                    messageId: assistantMessage.id
+                });
+            }
         } catch (error) {
             console.error('AI error:', error);
             const errorMessage: Message = {
@@ -752,8 +766,59 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
         }
     };
 
+    // Handle action confirmation (Yes/No buttons)
+    const handleConfirmAction = async (confirmed: boolean) => {
+        if (!pendingAction) return;
+
+        if (!confirmed) {
+            // User clicked No - add cancellation message
+            const cancelMessage: Message = {
+                id: Date.now().toString(),
+                role: 'assistant',
+                content: isRTL ? 'حسناً، تم الإلغاء.' : 'Okay, cancelled.',
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, cancelMessage]);
+            setPendingAction(null);
+            return;
+        }
+
+        // User clicked Yes - execute the action
+        setIsLoading(true);
+        try {
+            const result = await executeActions([{
+                action: pendingAction.action,
+                params: pendingAction.params
+            }]);
+
+            // Add confirmation message
+            const confirmMessage: Message = {
+                id: Date.now().toString(),
+                role: 'assistant',
+                content: result.length > 0
+                    ? result.join('\n')
+                    : (isRTL ? '✅ تم!' : '✅ Done!'),
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, confirmMessage]);
+        } catch (error) {
+            console.error('Action execution error:', error);
+            const errorMessage: Message = {
+                id: Date.now().toString(),
+                role: 'assistant',
+                content: isRTL ? 'عذراً، حدث خطأ في تنفيذ الإجراء.' : 'Sorry, an error occurred while executing the action.',
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setPendingAction(null);
+            setIsLoading(false);
+        }
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        setPendingAction(null); // Clear any pending action when user sends new message
         sendMessage(inputValue);
     };
 
@@ -953,6 +1018,30 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
                                             <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
                                         </div>
                                     </div>
+
+                                    {/* Action Confirmation Buttons - Show only for this message if pending */}
+                                    {pendingAction && pendingAction.messageId === message.id && message.role === 'assistant' && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="flex gap-2 mt-3 justify-end"
+                                        >
+                                            <button
+                                                onClick={() => handleConfirmAction(false)}
+                                                disabled={isLoading}
+                                                className="px-4 py-2 rounded-xl bg-surface-700/50 text-surface-300 hover:bg-surface-700 transition-colors disabled:opacity-50 text-sm font-medium"
+                                            >
+                                                {isRTL ? 'لا' : 'No'}
+                                            </button>
+                                            <button
+                                                onClick={() => handleConfirmAction(true)}
+                                                disabled={isLoading}
+                                                className="px-5 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 text-white hover:shadow-lg hover:shadow-primary-500/30 transition-all disabled:opacity-50 text-sm font-bold"
+                                            >
+                                                {isRTL ? 'نعم' : 'Yes'}
+                                            </button>
+                                        </motion.div>
+                                    )}
                                 </div>
                             </motion.div>
                         ))}
