@@ -26,7 +26,9 @@ const MODE_TO_JOURNEY: Record<string, string> = {
     'compliment-battle': 'gratitude',
     'love-roulette': 'intimacy',
     'memory-lane': 'connection',
-    'truth-or-dare': 'adventure'
+    'truth-or-dare': 'adventure',
+    'couple-quiz': 'knowledge',
+    'minute-challenges': 'active'
 };
 
 // Shuffle array helper (Fisher-Yates algorithm)
@@ -54,6 +56,8 @@ function GameSessionContent() {
             case 'compliment-battle': return t('games.complimentBattle', 'Compliment Battle');
             case 'love-roulette': return t('games.loveRoulette', 'Love Roulette');
             case 'memory-lane': return t('games.memoryLane', 'Memory Lane');
+            case 'couple-quiz': return 'معركة الأسئلة';
+            case 'minute-challenges': return 'تحدي الدقيقة';
             default: return t('games.game', 'Game');
         }
     };
@@ -74,6 +78,25 @@ function GameSessionContent() {
     const [todTruths, setTodTruths] = useState<any[]>([]);
     const [todDares, setTodDares] = useState<any[]>([]);
     const [todCurrentChallenge, setTodCurrentChallenge] = useState<any>(null);
+
+    // Couple Quiz state
+    const [quizScore, setQuizScore] = useState(0);
+    const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+    const [showAnswer, setShowAnswer] = useState(false);
+
+    // Minute to Win It state
+    const [timeLeft, setTimeLeft] = useState(60);
+    const [timerRunning, setTimerRunning] = useState(false);
+    const [challengeComplete, setChallengeComplete] = useState(false);
+
+    // Would You Rather fix - voting
+    const [p1Vote, setP1Vote] = useState<string | null>(null);
+    const [p2Vote, setP2Vote] = useState<string | null>(null);
+    const [showVotes, setShowVotes] = useState(false);
+
+    // Compliment Battle fix - ratings
+    const [complimentRating, setComplimentRating] = useState<number>(0);
+    const [complimentScores, setComplimentScores] = useState<number[]>([]);
 
     // Prepare questions - RANDOMIZED ORDER
     const questions = sessionData[mode] || sessionData['values'] || [];
@@ -125,6 +148,17 @@ function GameSessionContent() {
 
     const [hasNotified, setHasNotified] = useState(false);
     const { getStatus } = usePairing(); // Need partner ID
+
+    // Timer effect for Minute to Win It
+    useEffect(() => {
+        if (mode === 'minute-challenges' && timerRunning && timeLeft > 0) {
+            const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+        if (timeLeft === 0 && timerRunning) {
+            setTimerRunning(false);
+        }
+    }, [mode, timerRunning, timeLeft]);
 
     // Handle Mode Selection
     const handleModeSelect = (selectedMode: 'local' | 'remote') => {
@@ -673,6 +707,206 @@ function GameSessionContent() {
                         <button onClick={handleNext} className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-900/20 hover:scale-[1.02] transition-transform">
                             التالي <ChevronRight className="inline w-5 h-5 transform rotate-180" />
                         </button>
+                    </div>
+                );
+
+            // ========================
+            // COUPLE QUIZ BATTLE
+            // ========================
+            case 'couple-quiz':
+                return (
+                    <div className="space-y-6">
+                        {/* Score Display */}
+                        <div className="flex justify-between items-center mb-6">
+                            <div className="text-center">
+                                <div className="text-4xl font-bold text-primary-400">{currentIndex + 1}</div>
+                                <div className="text-sm text-surface-400">/{currentQuestions.length}</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-3xl font-bold text-green-400">⭐ {quizScore}</div>
+                                <div className="text-sm text-surface-400">النتيجة</div>
+                            </div>
+                        </div>
+
+                        {/* Question Card */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-gradient-to-br from-surface-800/80 to-surface-800/50 p-8 rounded-3xl border border-surface-700/50"
+                        >
+                            <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-4" dir="rtl">
+                                {question.question}
+                            </h2>
+                            <p className="text-surface-400 text-sm text-center mb-8">{question.hint}</p>
+
+                            {/* Options */}
+                            <div className="grid gap-4">
+                                {question.options?.map((option: string, idx: number) => (
+                                    <motion.button
+                                        key={idx}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={() => {
+                                            if (!showAnswer) {
+                                                setSelectedAnswer(option);
+                                                setShowAnswer(true);
+                                            }
+                                        }}
+                                        disabled={showAnswer}
+                                        className={`p-5 rounded-xl border-2 transition-all text-lg font-medium text-right
+                                            ${showAnswer && selectedAnswer === option
+                                                ? 'border-primary-500 bg-primary-500/20 ring-2 ring-primary-500/30'
+                                                : showAnswer
+                                                    ? 'border-surface-700 bg-surface-800/30 opacity-50 cursor-not-allowed'
+                                                    : 'border-surface-700 hover:border-primary-500/50 hover:bg-surface-700/50 cursor-pointer'
+                                            }`}
+                                        dir="rtl"
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span>{option}</span>
+                                            {showAnswer && selectedAnswer === option && <span>✓</span>}
+                                        </div>
+                                    </motion.button>
+                                ))}
+                            </div>
+
+                            {/* Answer Reveal */}
+                            {showAnswer && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl text-center"
+                                >
+                                    <p className="text-blue-400 mb-3">⏳ الشريك يختار الإجابة الصحيحة</p>
+                                    <div className="flex gap-3 justify-center">
+                                        <button
+                                            onClick={() => {
+                                                setQuizScore(quizScore + 1);
+                                                setShowAnswer(false);
+                                                setSelectedAnswer(null);
+                                                handleNext();
+                                            }}
+                                            className="px-6 py-2 bg-green-500 rounded-lg hover:bg-green-600 font-bold"
+                                        >
+                                            ✓ صحيح
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setShowAnswer(false);
+                                                setSelectedAnswer(null);
+                                                handleNext();
+                                            }}
+                                            className="px-6 py-2 bg-red-500/80 rounded-lg hover:bg-red-500 font-bold"
+                                        >
+                                            ✗ خطأ
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </motion.div>
+                    </div>
+                );
+
+            // ========================
+            // MINUTE TO WIN IT
+            // ========================
+            case 'minute-challenges':
+                return (
+                    <div className="space-y-6">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="bg-gradient-to-br from-orange-500/10 to-red-500/10 p-8 rounded-3xl border border-orange-500/30"
+                        >
+                            {/* Challenge Title */}
+                            <div className="text-center mb-6">
+                                <h2 className="text-3xl md:text-4xl font-bold text-white mb-2" dir="rtl">
+                                    {question.title}
+                                </h2>
+                                <p className="text-xl text-surface-200 mb-4" dir="rtl">
+                                    {question.description}
+                                </p>
+                                <p className="text-sm text-orange-400">💡 {question.hint}</p>
+                            </div>
+
+                            {/* Timer Display */}
+                            <div className="flex justify-center mb-8">
+                                <div className="relative">
+                                    <div className={`w-40 h-40 rounded-full border-8 flex items-center justify-center transition-all
+                                        ${timerRunning
+                                            ? timeLeft > 10
+                                                ? 'border-primary-500 animate-pulse'
+                                                : 'border-red-500 animate-bounce'
+                                            : timeLeft === 0
+                                                ? 'border-green-500'
+                                                : 'border-surface-700'
+                                        }`}
+                                    >
+                                        <span className="text-6xl font-bold">
+                                            {timeLeft}
+                                        </span>
+                                    </div>
+                                    <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 text-sm text-surface-400">
+                                        {timerRunning ? 'جاري...' : timeLeft === 0 ? 'انتهى!' : 'جاهز'}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col gap-4">
+                                {!timerRunning && timeLeft === 60 && (
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => setTimerRunning(true)}
+                                        className="w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl hover:from-orange-600 hover:to-red-600 text-xl font-bold shadow-lg"
+                                    >
+                                        🚀 ابدأ التحدي!
+                                    </motion.button>
+                                )}
+
+                                {timeLeft === 0 && (
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button
+                                            onClick={() => {
+                                                setTimeLeft(60);
+                                                setTimerRunning(false);
+                                            }}
+                                            className="py-3 bg-surface-700 rounded-xl hover:bg-surface-600 font-bold"
+                                        >
+                                            🔄 إعادة
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setTimeLeft(60);
+                                                setTimerRunning(false);
+                                                handleNext();
+                                            }}
+                                            className="py-3 bg-primary-500 rounded-xl hover:bg-primary-600 font-bold"
+                                        >
+                                            التالي ⏭
+                                        </button>
+                                    </div>
+                                )}
+
+                                {timerRunning && (
+                                    <button
+                                        onClick={() => setTimerRunning(false)}
+                                        className="py-3 bg-red-500/80 rounded-xl hover:bg-red-500 font-bold"
+                                    >
+                                        ⏸ إيقاف
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Goal */}
+                            {question.goal && (
+                                <div className="mt-6 p-4 bg-surface-800/50 rounded-xl text-center">
+                                    <span className="text-sm text-surface-400">الهدف: </span>
+                                    <span className="text-white font-bold">{question.goal}</span>
+                                </div>
+                            )}
+                        </motion.div>
                     </div>
                 );
 

@@ -61,7 +61,24 @@ export interface MemoryItem {
     hint: string;
 }
 
-export type GameContentItem = ValuesQuestion | DeepQuestion | TruthOrDareItem | WouldYouRatherItem | ComplimentItem | RouletteItem | MemoryItem;
+export interface CoupleQuizItem {
+    id: string;
+    question: string;
+    options: string[];
+    category: string;
+    hint: string;
+}
+
+export interface MinuteChallengeItem {
+    id: string;
+    title: string;
+    description: string;
+    type: string;
+    hint: string;
+    goal?: string;
+}
+
+export type GameContentItem = ValuesQuestion | DeepQuestion | TruthOrDareItem | WouldYouRatherItem | ComplimentItem | RouletteItem | MemoryItem | CoupleQuizItem | MinuteChallengeItem;
 
 // Main content database - using any[] for backward compatibility with page.tsx
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -580,6 +597,113 @@ Object.assign(sessionData, {
         { id: 'leg6', text: "كيف ودك يكون أثرنا في مجتمعنا؟", hint: "مسؤولية اجتماعية" },
         { id: 'leg7', text: "وش تعريفك لـ 'حياة ناجحة' في نهايتها؟", hint: "الرضا" },
         { id: 'leg8', text: "جملة ودك تنكتب في سيرتنا الذاتية العائلية.", hint: "عنوان الحياة" }
+    ]
+});
+
+// Add new games content
+Object.assign(sessionData, {
+    // COUPLE QUIZ BATTLE
+    'couple-quiz': [
+        // Favorites (15)
+        { id: 'cq1', question: "وش لوني المفضل؟", options: ["أزرق", "أحمر", "أخضر"], category: "favorites", hint: "فكر في ملابسي" },
+        { id: 'cq2', question: "وش أكلتي المفضلة؟", options: ["كبسة", "بيتزا", "سوشي"], category: "favorites", hint: "وش أطلب دايماً؟" },
+        { id: 'cq3', question: "وش فيلمي المفضل؟", options: ["رومانسي", "أكشن", "كوميدي"], category: "favorites", hint: "نوع الفلم" },
+        { id: 'cq4', question: "وش موسمي المفضل؟", options: ["شتاء", "صيف", "ربيع"], category: "favorites", hint: "الجو المريح لي" },
+        { id: 'cq5', question: "وش هوايتي المفضلة؟", options: ["قراءة", "رياضة", "ألعاب"], category: "favorites", hint: "وش أسوي بوقت فراغي؟" },
+        { id: 'cq6', question: "وش مكاني المفضل للسفر؟", options: ["بحر", "جبال", "مدن"], category: "favorites", hint: "طبيعة ولا حضارة؟" },
+        { id: 'cq7', question: "وش مشروبي المفضل؟", options: ["قهوة", "شاي", "عصير"], category: "favorites", hint: "كل صباح" },
+        { id: 'cq8', question: "وش وقتي المفضل في اليوم؟", options: ["صباح", "ظهر", "ليل"], category: "favorites", hint: "متى أكون نشيط؟" },
+        { id: 'cq9', question: "وش رياضتي المفضلة؟", options: ["مشي", "سباحة", "كرة"], category: "favorites", hint: "لياقة" },
+        { id: 'cq10', question: "وش نوع الموسيقى المفضل عندي؟", options: ["عربي", "غربي", "كلاسيك"], category: "favorites", hint: "سمع" },
+        { id: 'cq11', question: "وش حيواني الأليف المفضل؟", options: ["قطة", "كلب", "عصفور"], category: "favorites", hint: "لو نربي" },
+        { id: 'cq12', question: "وش طريقتي المفضلة للاسترخاء؟", options: ["نوم", "مساج", "قراءة"], category: "favorites", hint: "راحة" },
+        { id: 'cq13', question: "وش ذكرتنا المفضلة سوا؟", options: ["أول لقاء", "سفرة", "يوم عادي"], category: "favorites", hint: "أحلى لحظة" },
+        { id: 'cq14', question: "وش أجمل مكان رحنا له سوا؟", options: ["مطعم", "بحر", "جبل"], category: "favorites", hint: "ذكريات" },
+        { id: 'cq15', question: "وش الشي اللي يفرحني أكثر؟", options: ["هدية", "كلمة حلوة", "وقت سوا"], category: "favorites", hint: "لغة الحب" },
+
+        // Dislikes (10)
+        { id: 'cq16', question: "وش الأكل اللي أكرهه؟", options: ["باذنجان", "كبدة", "سمك"], category: "dislikes", hint: "ما آكله أبداً" },
+        { id: 'cq17', question: "وش يعصبني بسرعة؟", options: ["زحمة", "كذب", "تأخير"], category: "dislikes", hint: "يشعل فتيلي" },
+        { id: 'cq18', question: "وش العادة اللي تزعجني؟", options: ["فوضى", "صوت عالي", "تأخير"], category: "dislikes", hint: "مو أطيقها" },
+        { id: 'cq19', question: "وش أكره نوع أفلام؟", options: ["رعب", "حزين", "ممل"], category: "dislikes", hint: "ما أشوفها" },
+        { id: 'cq20', question: "وش أكره وقت في اليوم؟", options: ["صحيان بدري", "ظهر حار", "سهر"], category: "dislikes", hint: "تعب" },
+        { id: 'cq21', question: "وش الشي اللي يخوفني؟", options: ["ظلام", "عناكب", "ارتفاع"], category: "dislikes", hint: "فوبيا" },
+        { id: 'cq22', question: "وش أكره موقف اجتماعي؟", options: ["زحمة", "كلام قدام ناس", "مجاملات"], category: "dislikes", hint: "احراج" },
+        { id: 'cq23', question: "وش أكره نوع موسيقى؟", options: ["صاخب", "حزين", "قديم"], category: "dislikes", hint: "أذني ما تطيقها" },
+        { id: 'cq24', question: "وش يضايقني في السواقة؟", options: ["زحمة", "سواقين مجانين", "طريق طويل"], category: "dislikes", hint: "شارع" },
+        { id: 'cq25', question: "وش أكره عطر/ريحة؟", options: ["عود قوي", "دخان", "عطر حلو زيادة"], category: "dislikes", hint: "شم" },
+
+        // Dreams & Goals (10)
+        { id: 'cq26', question: "وش حلمي الوظيفي؟", options: ["ترقية", "مشروع خاص", "تقاعد مبكر"], category: "dreams", hint: "طموح مهني" },
+        { id: 'cq27', question: "وين أحلم أعيش مستقبلاً؟", options: ["مدينة كبيرة", "قرية هادية", "خارج البلد"], category: "dreams", hint: "سكن الأحلام" },
+        { id: 'cq28', question: "كم طفل أبي مستقبلاً؟", options: ["ولد", "بنت", "اتنين"], category: "dreams", hint: "عائلة" },
+        { id: 'cq29', question: "وش أكبر هدف مالي؟", options: ["بيت", "سيارة فخمة", "استثمار"], category: "dreams", hint: "فلوس" },
+        { id: 'cq30', question: "وش أحب أتعلمه مستقبلاً؟", options: ["لغة جديدة", "مهارة تقنية", "طبخ احترافي"], category: "dreams", hint: "مهارة جديدة" },
+        { id: 'cq31', question: "وش الدولة اللي أحلم أزورها؟", options: ["اليابان", "سويسرا", "جزر المالديف"], category: "dreams", hint: "سفر أحلام" },
+        { id: 'cq32', question: "متى أبي أتقاعد؟", options: ["40 سنة", "50 سنة", "60 سنة"], category: "dreams", hint: "راحة" },
+        { id: 'cq33', question: "وش الهواية اللي أبي أتبناها؟", options: ["رسم", "كتابة", "رياضة"], category: "dreams", hint: "وقت فراغ" },
+        { id: 'cq34', question: "وش نوع البيت اللي أحلم فيه؟", options: ["فيلا", "شقة فخمة", "مزرعة"], category: "dreams", hint: "عقار" },
+        { id: 'cq35', question: "وش أكبر مغامرة أبي أجربها؟", options: ["قفز مظلي", "غوص عميق", "تسلق جبل"], category: "dreams", hint: "أدرينالين" },
+
+        // Past & Memories (10)
+        { id: 'cq36', question: "وش كان انطباعي الأول عنك؟", options: ["خجول", "ودود", "غامض"], category: "past", hint: "أول لقاء" },
+        { id: 'cq37', question: "وين كان أول لقاء؟", options: ["مطعم", "كافيه", "مكان عام"], category: "past", hint: "البداية" },
+        { id: 'cq38', question: "وش أول هدية جبتها لك؟", options: ["ورد", "شوكلاته", "شي شخصي"], category: "past", hint: "عطاء" },
+        { id: 'cq39', question: "متى قلت 'أحبك' أول مرة؟", options: ["بعد شهر", "بعد 3 شهور", "بعد سنة"], category: "past", hint: "اعتراف" },
+        { id: 'cq40', question: "وش كان أول خلاف بيننا؟", options: ["وقت", "فهم غلط", "أولويات"], category: "past", hint: "مشاكل صغيرة" },
+        { id: 'cq41', question: "وش لون لبسي يوم التعارف؟", options: ["أبيض", "أسود", "ملون"], category: "past", hint: "تفاصيل" },
+        { id: 'cq42', question: "وش أول فيلم شفناه سوا؟", options: ["رومانسي", "أكشن", "كوميدي"], category: "past", hint: "سينما" },
+        { id: 'cq43', question: "متى عرفت إنك 'الشخص المناسب'؟", options: ["من البداية", "بعد فترة", "تدريجياً"], category: "past", hint: "يقين" },
+        { id: 'cq44', question: "وش أحلى مفاجأة سويتها لي؟", options: ["هدية", "رحلة", "حدث خاص"], category: "past", hint: "ذكرى حلوة" },
+        { id: 'cq45', question: "وين كانت أول سفرة لنا؟", options: ["داخل البلد", "خارج", "ما سافرنا"], category: "past", hint: "مغامرة" },
+
+        // Random Fun (5)
+        { id: 'cq46', question: "لو عندي قوة خارقة، وش بتكون؟", options: ["طيران", "قراءة أفكار", "اختفاء"], category: "random", hint: "خيال" },
+        { id: 'cq47', question: "لو أنا حيوان، وش بكون؟", options: ["أسد", "قطة", "نسر"], category: "random", hint: "شخصية" },
+        { id: 'cq48', question: "لو فزت بمليون، أول شي أسويه؟", options: ["أسافر", "أشتري بيت", "أستثمر"], category: "random", hint: "أحلام" },
+        { id: 'cq49', question: "لو اخترت مهنة ثانية، وش بتكون؟", options: ["فنان", "رياضي", "رجل أعمال"], category: "random", hint: "بديل" },
+        { id: 'cq50', question: "وش أهم شي في الحياة بالنسبة لي؟", options: ["العائلة", "النجاح", "السعادة"], category: "random", hint: "قيم" }
+    ],
+
+    // MINUTE TO WIN IT
+    'minute-challenges': [
+        // Romantic (10)
+        { id: 'mc1', title: "ماراثون البوسات", description: "كم بوسة تقدرون تتبادلون في 60 ثانية؟", type: "romantic", hint: "سرعة + حب!", goal: "15+ بوسة" },
+        { id: 'mc2', title: "ماراثون المجاملات", description: "تبادلوا مجاملات بدون تكرار لمدة دقيقة!", type: "romantic", hint: "كل واحد دور", goal: "20+ مجاملة" },
+        { id: 'mc3', title: "تحدي النظرات", description: "شوفوا في عيون بعض بدون ما تضحكون أو ترمشون!", type: "romantic", hint: "ممنوع الضحك!", goal: "60 ثانية كاملة" },
+        { id: 'mc4', title: "همسات الحب", description: "اهمس كلمات حب في أذن الشريك بدون تكرار!", type: "romantic", hint: "إبداع!", goal: "30+ همسة" },
+        { id: 'mc5', title: "رقصة بطيئة", description: "ارقصوا رقصة بطيئة بدون موسيقى لمدة دقيقة!", type: "romantic", hint: "رومانسية صامتة", goal: "استمرار 60 ثانية" },
+        { id: 'mc6', title: "رسم القلب", description: "ارسموا قلب على يد بعض بالإصبع بدون توقف!", type: "romantic", hint: "موصول", goal: "60 ثانية رسم" },
+        { id: 'mc7', title: "عد الغمزات", description: "كم غمزة تقدر ترسل لشريكك في دقيقة؟", type: "romantic", hint: "عيون شقية!", goal: "50+ غمزة" },
+        { id: 'mc8', title: "حضن طويل", description: "حضن متواصل لمدة دقيقة كاملة!", type: "romantic", hint: "طمأنينة", goal: "60 ثانية" },
+        { id: 'mc9', title: "مساج سريع", description: "سوي مساج لكتف الشريك بسرعة وفعالية!", type: "romantic", hint: "راحة", goal: "تغطية المنطقة" },
+        { id: 'mc10', title: "قول 'أحبك'", description: "قولوا 'أحبك' بطرق مختلفة بدون تكرار!", type: "romantic", hint: "إبداع في التعبير", goal: "20+ طريقة" },
+
+        // Physical (8)
+        { id: 'mc11', title: "تحدي التوازن", description: "وقف على رجل وحدة أطول مدة!", type: "physical", hint: "توازن!", goal: "60 ثانية" },
+        { id: 'mc12', title: "برج الأغراض", description: "رص 10 أغراض من البيت فوق بعض!", type: "physical", hint: "استقرار", goal: "10 قطع واقفة" },
+        { id: 'mc13', title: "الكتاب على الراس", description: "امش بكتاب على راسك بدون ما يطيح!", type: "physical", hint: "توازن", goal: "عبور الغرفة" },
+        { id: 'mc14', title: "تحدي الضغط", description: "كم ضغطة تقدر تسوي في 60 ثانية؟", type: "physical", hint: "قوة!", goal: "15+ ضغطة" },
+        { id: 'mc15', title: "القفز المتواصل", description: "اقفز بدون توقف لمدة دقيقة!", type: "physical", hint: "نشاط!", goal: "60 ثانية قفز" },
+        { id: 'mc16', title: "تحدي البطن", description: "كم سِت أب تقدر تسوي في دقيقة؟", type: "physical", hint: "عضلات!", goal: "20+ مرة" },
+        { id: 'mc17', title: "المشي للخلف", description: "امش للخلف في الغرفة بدون توقف!", type: "physical", hint: "تركيز!", goal: "دورة كاملة" },
+        { id: 'mc18', title: "الوقوف بالحائط", description: "اسند على الحائط وكأنك قاعد بدون كرسي!", type: "physical", hint: "قوة أرجل!", goal: "45+ ثانية" },
+
+        // Creative (7)
+        { id: 'mc19', title: "ضحك الشريك", description: "خل شريكك يضحك من قلب في دقيقة!", type: "creative", hint: "كوميديا!", goal: "ضحكة حقيقية" },
+        { id: 'mc20', title: "تقليد مشهور", description: "قلد مشهور لمدة 30 ثانية والشريك يخمن!", type: "creative", hint: "ممثل!", goal: "تخمين صح" },
+        { id: 'mc21', title: "غني أغنية", description: "غن أغنية حب كاملة بصوت عالي!", type: "creative", hint: "موسيقى!", goal: "60 ثانية غناء" },
+        { id: 'mc22', title: "قصة من 5 كلمات", description: "اخترع قصة حب بس 5 كلمات!", type: "creative", hint: "اختصار!", goal: "قصة منطقية" },
+        { id: 'mc23', title: "رسم بدون نظر", description: "ارسم شريكك بدون ما تطالع الورقة!", type: "creative", hint: "فن أعمى!", goal: "رسمة مضحكة" },
+        { id: 'mc24', title: "نكتة سريعة", description: "قول 5 نكت بـ 60 ثانية!", type: "creative", hint: "كوميديان!", goal: "5 نكت" },
+        { id: 'mc25', title: "تمثيل صامت", description: "مثل موقف والشريك يخمن (بدون كلام)!", type: "creative", hint: "مايم!", goal: "تخمين صح" },
+
+        // Teamwork (5)
+        { id: 'mc26', title: "المرايا", description: "واحد يتحرك والثاني يقلده بالضبط!", type: "teamwork", hint: "تزامن!", goal: "60 ثانية تقليد" },
+        { id: 'mc27', title: "تصفيق متزامن", description: "صفقوا بنفس الوقت بدون عد!", type: "teamwork", hint: "توافق!", goal: "20 تصفيقة متزامنة" },
+        { id: 'mc28', title: "نقل الكرة", description: "انقلوا كرة/كورة بين جباهكم بدون يدين!", type: "teamwork", hint: "تعاون!", goal: "عبور 5 متر" },
+        { id: 'mc29', title: "العد المشترك", description: "عدوا من 1-30 بالتناوب بدون غلط!", type: "teamwork", hint: "تركيز مشترك!", goal: "وصول 30" },
+        { id: 'mc30', title: "الرقص الجماعي", description: "ارقصوا نفس الحركات في نفس الوقت!", type: "teamwork", hint: "كوريو!", goal: "60 ثانية متزامنة" }
     ]
 });
 
