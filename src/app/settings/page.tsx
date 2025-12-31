@@ -15,7 +15,8 @@ import {
     Trash2,
     CreditCard,
     Crown,
-    Flame
+    Flame,
+    Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 import { ToggleSwitch } from '@/components/SettingsCard';
@@ -26,6 +27,7 @@ import { usePairing } from '@/hooks/usePairing';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useProgress } from '@/hooks/useProgress';
+import { soundManager } from '@/lib/sounds';
 
 export default function SettingsPage() {
     const { t, language } = useTranslation();
@@ -40,6 +42,8 @@ export default function SettingsPage() {
 
     const [partnerInfo, setPartnerInfo] = useState<{ name: string; isPaired: boolean } | null>(null);
     const [showUnpairConfirm, setShowUnpairConfirm] = useState(false);
+    const [soundEnabled, setSoundEnabled] = useState(soundManager.isEnabled());
+    const [soundVolume, setSoundVolume] = useState(soundManager.getVolume());
     const [subscription, setSubscription] = useState<{
         isPremium: boolean;
         expiresAt: string | null;
@@ -288,6 +292,59 @@ export default function SettingsPage() {
                                 enabled={notificationsEnabled}
                                 onChange={setNotificationsEnabled}
                             />
+                        </div>
+
+                        {/* Sound Effects */}
+                        <div className="p-4 rounded-2xl glass-card">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                                        <Sparkles className="w-5 h-5 text-purple-400" />
+                                    </div>
+                                    <div className={isRTL ? 'text-right' : 'text-left'}>
+                                        <p className="font-medium">{isRTL ? 'الأصوات' : 'Sound Effects'}</p>
+                                        <p className="text-sm text-surface-400">
+                                            {soundEnabled ? (isRTL ? 'مفعل' : 'Enabled') : (isRTL ? 'معطل' : 'Disabled')}
+                                        </p>
+                                    </div>
+                                </div>
+                                <ToggleSwitch
+                                    enabled={soundEnabled}
+                                    onChange={(enabled) => {
+                                        setSoundEnabled(enabled);
+                                        soundManager.setEnabled(enabled);
+                                        if (enabled) soundManager.play('click');
+                                    }}
+                                />
+                            </div>
+
+                            {soundEnabled && (
+                                <div className="mt-3 pt-3 border-t border-white/5">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-sm text-surface-400">
+                                            {isRTL ? 'مستوى الصوت' : 'Volume'}
+                                        </span>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            value={soundVolume * 100}
+                                            onChange={(e) => {
+                                                const vol = parseInt(e.target.value) / 100;
+                                                setSoundVolume(vol);
+                                                soundManager.setVolume(vol);
+                                            }}
+                                            className="flex-1 h-2 bg-surface-700 rounded-full outline-none appearance-none cursor-pointer
+                                                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+                                                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary-500
+                                                [&::-webkit-slider-thumb]:cursor-pointer"
+                                        />
+                                        <span className="text-sm text-surface-300 min-w-[3rem] text-right">
+                                            {Math.round(soundVolume * 100)}%
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </motion.section>

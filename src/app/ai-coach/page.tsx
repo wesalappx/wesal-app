@@ -516,32 +516,64 @@ export default function AICoachPage() {
                 switch (actionLower) {
                     case 'add_note':
                         if (params.title) {
-                            await createNote(params.title, params.content || '', (params.category as any) || 'general');
-                            results.push(isRTL ? `✅ تم إضافة ملاحظة: "${params.title}"` : `✅ Added note: "${params.title}"`);
+                            const result = await createNote(params.title, params.content || '', (params.category as any) || 'general');
+
+                            if (result.error) {
+                                results.push(isRTL
+                                    ? `❌ فشل إضافة الملاحظة: ${result.error === 'Not paired' ? 'يجب أن تكون مقترناً بشريك' : result.error}`
+                                    : `❌ Failed to add note: ${result.error === 'Not paired' ? 'You need to be paired with a partner' : result.error}`
+                                );
+                            } else {
+                                results.push(isRTL ? `✅ تم إضافة ملاحظة: "${params.title}"` : `✅ Added note: "${params.title}"`);
+                            }
                         }
                         break;
                     case 'add_special_date':
                         if (params.title && params.date) {
-                            await createSpecialDate(params.title, params.date, (params.type as any) || 'custom');
-                            results.push(isRTL ? `✅ تم إضافة مناسبة: "${params.title}"` : `✅ Added date: "${params.title}"`);
+                            const result = await createSpecialDate(params.title, params.date, (params.type as any) || 'custom');
+
+                            if (result.error) {
+                                results.push(isRTL
+                                    ? `❌ فشل إضافة المناسبة: ${result.error === 'Not paired' ? 'يجب أن تكون مقترناً بشريك' : result.error}`
+                                    : `❌ Failed to add date: ${result.error === 'Not paired' ? 'You need to be paired with a partner' : result.error}`
+                                );
+                            } else {
+                                results.push(isRTL ? `✅ تم إضافة مناسبة: "${params.title}"` : `✅ Added date: "${params.title}"`);
+                            }
                         }
                         break;
                     case 'add_budget':
                         if (params.title && (params.target || params.amount)) {
                             const amount = parseFloat(params.target || params.amount);
-                            await createBudgetGoal(params.title, amount);
-                            results.push(isRTL ? `✅ تم إضافة هدف: "${params.title}"` : `✅ Added goal: "${params.title}"`);
+                            const result = await createBudgetGoal(params.title, amount);
+
+                            if (result.error) {
+                                results.push(isRTL
+                                    ? `❌ فشل إضافة الهدف: ${result.error === 'Not paired' ? 'يجب أن تكون مقترناً بشريك' : result.error}`
+                                    : `❌ Failed to add goal: ${result.error === 'Not paired' ? 'You need to be paired with a partner' : result.error}`
+                                );
+                            } else {
+                                results.push(isRTL ? `✅ تم إضافة هدف: "${params.title}"` : `✅ Added goal: "${params.title}"`);
+                            }
                         }
                         break;
                     case 'add_calendar':
                         if (params.title && params.date) {
-                            await createSession({
+                            const result = await createSession({
                                 title: params.title,
                                 scheduled_date: params.date,
                                 type: (params.type as any) || 'CUSTOM',
                                 reminder_enabled: true
                             });
-                            results.push(isRTL ? `📅 تم إضافة للتقويم: "${params.title}"` : `📅 Added to calendar: "${params.title}"`);
+
+                            if (result.error) {
+                                results.push(isRTL
+                                    ? `❌ فشل إضافة الموعد: ${result.error === 'Not paired' ? 'يجب أن تكون مقترناً بشريك' : result.error}`
+                                    : `❌ Failed to add event: ${result.error === 'Not paired' ? 'You need to be paired with a partner' : result.error}`
+                                );
+                            } else {
+                                results.push(isRTL ? `📅 تم إضافة ل تقويم: "${params.title}"` : `📅 Added to calendar: "${params.title}"`);
+                            }
                         }
                         break;
                 }
