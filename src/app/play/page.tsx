@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation';
 import { useSound } from '@/hooks/useSound';
 
 // Game Types
-type GameType = 'would-you-rather' | 'compliment-battle' | 'memory-lane' | 'deep-questions' | 'love-roulette' | 'truth-or-dare' | null;
+type GameType = 'would-you-rather' | 'compliment-battle' | 'memory-lane' | 'deep-questions' | 'love-roulette' | 'truth-or-dare' | 'couple-quiz' | 'minute-challenges' | null;
 
 interface GameCard {
     id: string;
@@ -47,6 +47,8 @@ export default function PlayPage() {
         { id: '4', type: 'deep-questions', title: t('play.deep'), description: t('play.deepDesc'), icon: MessageCircle, color: 'text-purple-400', bgGradient: 'from-purple-500/20 to-violet-500/10' },
         { id: '5', type: 'memory-lane', title: t('play.memory'), description: t('play.memoryDesc'), icon: Camera, color: 'text-blue-400', bgGradient: 'from-blue-500/20 to-cyan-500/10' },
         { id: '6', type: 'truth-or-dare', title: t('play.tod'), description: t('play.todDesc'), icon: Flame, color: 'text-red-400', bgGradient: 'from-red-600/20 to-orange-600/10' },
+        { id: '7', type: 'couple-quiz', title: 'معركة الأسئلة', description: 'اختبر معرفتك بشريكك (50 سؤال)', icon: Gamepad2, color: 'text-cyan-400', bgGradient: 'from-cyan-500/20 to-blue-500/10' },
+        { id: '8', type: 'minute-challenges', title: 'تحدي الدقيقة', description: 'تحديات مرحة في 60 ثانية', icon: Zap, color: 'text-orange-400', bgGradient: 'from-orange-500/20 to-red-500/10' },
     ];
 
     const handleGameSelect = (type: GameType) => {
