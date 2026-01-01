@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Shield, Mail, ArrowRight, CheckCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+
+// Force dynamic rendering to avoid build errors with useSearchParams
+export const dynamic = 'force-dynamic';
 
 // Allowed admin emails - must match the list in verify-otp route
 const ALLOWED_ADMIN_EMAILS = [
@@ -11,7 +14,7 @@ const ALLOWED_ADMIN_EMAILS = [
     'admin@wesal.app',
 ];
 
-function AdminLoginForm() {
+export default function AdminLogin() {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
