@@ -35,13 +35,15 @@ export default function NotesPage() {
     const {
         notes, specialDates, budgetGoals, loading,
         createNote, updateNote, deleteNote,
-        createSpecialDate, deleteSpecialDate,
-        createBudgetGoal, updateBudgetGoal
+        createSpecialDate, updateSpecialDate, deleteSpecialDate,
+        createBudgetGoal, updateBudgetGoal, deleteBudgetGoal
     } = useNotes();
 
     const [activeTab, setActiveTab] = useState<Tab>('notes');
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingNote, setEditingNote] = useState<Note | null>(null);
+    const [editingDate, setEditingDate] = useState<SpecialDate | null>(null);
+    const [editingBudget, setEditingBudget] = useState<BudgetGoal | null>(null);
 
     // Add Note Modal State
     const [newTitle, setNewTitle] = useState('');
@@ -71,19 +73,38 @@ export default function NotesPage() {
 
     const handleSaveDate = async () => {
         if (!newDateTitle.trim() || !newDateDate) return;
-        await createSpecialDate(newDateTitle, newDateDate, newDateType);
+
+        if (editingDate) {
+            await updateSpecialDate(editingDate.id, {
+                title: newDateTitle,
+                event_date: newDateDate,
+                event_type: newDateType
+            });
+        } else {
+            await createSpecialDate(newDateTitle, newDateDate, newDateType);
+        }
         resetModal();
     };
 
     const handleSaveBudget = async () => {
         if (!newBudgetTitle.trim() || !newBudgetAmount) return;
-        await createBudgetGoal(newBudgetTitle, parseFloat(newBudgetAmount));
+
+        if (editingBudget) {
+            await updateBudgetGoal(editingBudget.id, {
+                title: newBudgetTitle,
+                target_amount: parseFloat(newBudgetAmount)
+            });
+        } else {
+            await createBudgetGoal(newBudgetTitle, parseFloat(newBudgetAmount));
+        }
         resetModal();
     };
 
     const resetModal = () => {
         setShowAddModal(false);
         setEditingNote(null);
+        setEditingDate(null);
+        setEditingBudget(null);
         setNewTitle('');
         setNewContent('');
         setNewCategory('general');
@@ -147,8 +168,8 @@ export default function NotesPage() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex-1 py-3 px-3 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${activeTab === tab.id
-                                    ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
-                                    : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700 border border-white/5'
+                                ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
+                                : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700 border border-white/5'
                                 }`}
                         >
                             <tab.icon className="w-4 h-4" />
@@ -295,18 +316,26 @@ export default function NotesPage() {
                                                                 })}
                                                             </p>
                                                         </div>
-                                                        <div className="text-center">
-                                                            <span className={`text-2xl font-bold ${daysUntil <= 7 ? 'text-rose-400' : 'text-primary-400'}`}>
-                                                                {daysUntil}
-                                                            </span>
-                                                            <p className="text-xs text-surface-400">{isRTL ? 'يوم' : 'days'}</p>
+                                                        <div className="flex gap-1">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditingDate(date);
+                                                                    setNewDateTitle(date.title);
+                                                                    setNewDateDate(date.event_date);
+                                                                    setNewDateType(date.event_type);
+                                                                    setShowAddModal(true);
+                                                                }}
+                                                                className="p-2 text-surface-500 hover:text-white transition-colors"
+                                                            >
+                                                                <Edit3 className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => deleteSpecialDate(date.id)}
+                                                                className="p-2 text-surface-500 hover:text-red-400 transition-colors"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
                                                         </div>
-                                                        <button
-                                                            onClick={() => deleteSpecialDate(date.id)}
-                                                            className="p-2 text-surface-500 hover:text-red-400 transition-colors"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
                                                     </div>
                                                 </motion.div>
                                             );
@@ -363,25 +392,44 @@ export default function NotesPage() {
                                                                     const input = e.target as HTMLInputElement;
                                                                     const amount = parseFloat(input.value);
                                                                     if (amount > 0) {
-                                                                        updateBudgetGoal(goal.id, goal.current_amount + amount);
+                                                                        updateBudgetGoal(goal.id, { current_amount: goal.current_amount + amount });
                                                                         input.value = '';
                                                                     }
                                                                 }
                                                             }}
                                                         />
-                                                        <button
-                                                            onClick={() => {
-                                                                const input = document.querySelector(`input[placeholder="${isRTL ? 'أضف مبلغ' : 'Add amount'}"]`) as HTMLInputElement;
-                                                                const amount = parseFloat(input?.value || '0');
-                                                                if (amount > 0) {
-                                                                    updateBudgetGoal(goal.id, goal.current_amount + amount);
-                                                                    if (input) input.value = '';
-                                                                }
-                                                            }}
-                                                            className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm"
-                                                        >
-                                                            <Check className="w-4 h-4" />
-                                                        </button>
+                                                        <div className="flex gap-1">
+                                                            <button
+                                                                onClick={() => {
+                                                                    const input = document.querySelector(`input[placeholder="${isRTL ? 'أضف مبلغ' : 'Add amount'}"]`) as HTMLInputElement;
+                                                                    const amount = parseFloat(input?.value || '0');
+                                                                    if (amount > 0) {
+                                                                        updateBudgetGoal(goal.id, { current_amount: goal.current_amount + amount });
+                                                                        if (input) input.value = '';
+                                                                    }
+                                                                }}
+                                                                className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm"
+                                                            >
+                                                                <Check className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditingBudget(goal);
+                                                                    setNewBudgetTitle(goal.title);
+                                                                    setNewBudgetAmount(goal.target_amount.toString());
+                                                                    setShowAddModal(true);
+                                                                }}
+                                                                className="p-2 text-surface-500 hover:text-white transition-colors"
+                                                            >
+                                                                <Edit3 className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => deleteBudgetGoal(goal.id)}
+                                                                className="p-2 text-surface-500 hover:text-red-400 transition-colors"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </motion.div>
                                             );
@@ -416,11 +464,15 @@ export default function NotesPage() {
                                 <h2 className="text-lg font-bold text-white">
                                     {editingNote
                                         ? (isRTL ? 'تعديل الملاحظة' : 'Edit Note')
-                                        : activeTab === 'notes'
-                                            ? (isRTL ? 'ملاحظة جديدة' : 'New Note')
-                                            : activeTab === 'dates'
-                                                ? (isRTL ? 'مناسبة جديدة' : 'New Date')
-                                                : (isRTL ? 'هدف جديد' : 'New Goal')
+                                        : editingDate
+                                            ? (isRTL ? 'تعديل المناسبة' : 'Edit Date')
+                                            : editingBudget
+                                                ? (isRTL ? 'تعديل الهدف' : 'Edit Goal')
+                                                : activeTab === 'notes'
+                                                    ? (isRTL ? 'ملاحظة جديدة' : 'New Note')
+                                                    : activeTab === 'dates'
+                                                        ? (isRTL ? 'مناسبة جديدة' : 'New Date')
+                                                        : (isRTL ? 'هدف جديد' : 'New Goal')
                                     }
                                 </h2>
                                 <button onClick={resetModal} className="p-2 text-surface-400 hover:text-white">
@@ -451,8 +503,8 @@ export default function NotesPage() {
                                                 key={key}
                                                 onClick={() => setNewCategory(key as Note['category'])}
                                                 className={`p-3 rounded-xl border transition-all ${newCategory === key
-                                                        ? `${config.border} bg-gradient-to-br ${config.bg}`
-                                                        : 'border-white/10 hover:border-white/20'
+                                                    ? `${config.border} bg-gradient-to-br ${config.bg}`
+                                                    : 'border-white/10 hover:border-white/20'
                                                     }`}
                                             >
                                                 <config.icon className={`w-5 h-5 mx-auto ${config.color}`} />
@@ -491,8 +543,8 @@ export default function NotesPage() {
                                                 key={key}
                                                 onClick={() => setNewDateType(key as SpecialDate['event_type'])}
                                                 className={`p-3 rounded-xl border transition-all flex flex-col items-center gap-1 ${newDateType === key
-                                                        ? 'border-primary-500 bg-primary-500/10'
-                                                        : 'border-white/10 hover:border-white/20'
+                                                    ? 'border-primary-500 bg-primary-500/10'
+                                                    : 'border-white/10 hover:border-white/20'
                                                     }`}
                                             >
                                                 <config.icon className={`w-5 h-5 ${config.color}`} />
@@ -505,7 +557,7 @@ export default function NotesPage() {
                                         disabled={!newDateTitle.trim() || !newDateDate}
                                         className="w-full py-3 bg-primary-500 text-white rounded-xl font-bold disabled:opacity-50"
                                     >
-                                        {isRTL ? 'إضافة' : 'Add'}
+                                        {editingDate ? (isRTL ? 'حفظ التعديلات' : 'Save Changes') : (isRTL ? 'إضافة' : 'Add')}
                                     </button>
                                 </div>
                             )}
@@ -532,7 +584,7 @@ export default function NotesPage() {
                                         disabled={!newBudgetTitle.trim() || !newBudgetAmount}
                                         className="w-full py-3 bg-primary-500 text-white rounded-xl font-bold disabled:opacity-50"
                                     >
-                                        {isRTL ? 'إضافة' : 'Add'}
+                                        {editingBudget ? (isRTL ? 'حفظ التعديلات' : 'Save Changes') : (isRTL ? 'إضافة' : 'Add')}
                                     </button>
                                 </div>
                             )}

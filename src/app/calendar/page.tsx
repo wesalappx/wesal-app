@@ -4,9 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    ArrowLeft, ArrowRight, Calendar as CalendarIcon, Plus, X,
-    Heart, Gamepad2, Check, Gift, Star, Sparkles, Moon, Droplets,
-    ChevronLeft, ChevronRight, Grid3X3, LayoutGrid, Settings2, Trash2, Clock
+    ChevronLeft, ChevronRight, Grid3X3, LayoutGrid, Settings2, Trash2, Clock, Edit3
 } from 'lucide-react';
 import { useCalendar, ScheduledSession } from '@/hooks/useCalendar';
 import { useHealth } from '@/hooks/useHealth';
@@ -84,11 +82,12 @@ export default function CalendarPage() {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [editingEvent, setEditingEvent] = useState<ScheduledEvent | null>(null);
     const [showCycleSettings, setShowCycleSettings] = useState(false);
     const [showPeriodTracking, setShowPeriodTracking] = useState(true); // Toggle for period visibility
 
     // Data Hooks
-    const { getSessions, createSession, deleteSession } = useCalendar();
+    const { getSessions, createSession, deleteSession, updateSession } = useCalendar();
     const { getHealthData, updateHealthData, isLoading: healthLoading } = useHealth();
 
     // Data State
@@ -237,17 +236,28 @@ export default function CalendarPage() {
 
     // --- Add Event ---
     const handleAddEvent = async (data: { title: string; type: string; time: string; isRecurring: boolean; eventDate: Date }) => {
-        await createSession({
-            title: data.title,
-            type: mapLocalTypeToDb(data.type) as any,
-            scheduled_date: data.eventDate.toISOString().split('T')[0],
-            scheduled_time: data.time || undefined,
-            reminder_enabled: true,
-            is_recurring: data.isRecurring
-        });
+        if (editingEvent) {
+            await updateSession(editingEvent.id, {
+                title: data.title,
+                type: mapLocalTypeToDb(data.type) as any,
+                scheduled_date: data.eventDate.toISOString().split('T')[0],
+                scheduled_time: data.time || undefined,
+                is_recurring: data.isRecurring
+            });
+        } else {
+            await createSession({
+                title: data.title,
+                type: mapLocalTypeToDb(data.type) as any,
+                scheduled_date: data.eventDate.toISOString().split('T')[0],
+                scheduled_time: data.time || undefined,
+                reminder_enabled: true,
+                is_recurring: data.isRecurring
+            });
+        }
 
         await refreshData();
         setShowAddModal(false);
+        setEditingEvent(null);
     };
 
     // --- Delete Event ---
@@ -466,7 +476,10 @@ export default function CalendarPage() {
                                             </p>
                                         </div>
                                         <button
-                                            onClick={() => setShowAddModal(true)}
+                                            onClick={() => {
+                                                setEditingEvent(null);
+                                                setShowAddModal(true);
+                                            }}
                                             className="p-2 bg-primary-500 rounded-xl text-white hover:bg-primary-600 transition-colors"
                                         >
                                             <Plus className="w-5 h-5" />
@@ -495,12 +508,23 @@ export default function CalendarPage() {
                                                                 )}
                                                             </div>
                                                         </div>
-                                                        <button
-                                                            onClick={() => handleDeleteEvent(event.id)}
-                                                            className="p-2 text-surface-500 hover:text-rose-400 transition-colors"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
+                                                        <div className="flex gap-1">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditingEvent(event);
+                                                                    setShowAddModal(true);
+                                                                }}
+                                                                className="p-2 text-surface-500 hover:text-white transition-colors"
+                                                            >
+                                                                <Edit3 className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteEvent(event.id)}
+                                                                className="p-2 text-surface-500 hover:text-red-400 transition-colors"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 );
                                             })}
@@ -634,8 +658,12 @@ export default function CalendarPage() {
                 {showAddModal && (
                     <AddEventModal
                         date={selectedDate || new Date()}
+                        initialData={editingEvent}
                         isRTL={isRTL}
-                        onClose={() => setShowAddModal(false)}
+                        onClose={() => {
+                            setShowAddModal(false);
+                            setEditingEvent(null);
+                        }}
                         onSave={handleAddEvent}
                     />
                 )}
@@ -662,18 +690,19 @@ export default function CalendarPage() {
 }
 
 // --- Add Event Modal Component ---
-function AddEventModal({ date, isRTL, onClose, onSave }: {
+function AddEventModal({ date, initialData, isRTL, onClose, onSave }: {
     date: Date;
+    initialData: ScheduledEvent | null;
     isRTL: boolean;
     onClose: () => void;
     onSave: (data: { title: string; type: string; time: string; isRecurring: boolean; eventDate: Date }) => void;
 }) {
-    const [title, setTitle] = useState('');
-    const [type, setType] = useState('date');
-    const [time, setTime] = useState('');
-    const [isRecurring, setIsRecurring] = useState(false);
+    const [title, setTitle] = useState(initialData?.title || '');
+    const [type, setType] = useState(initialData?.type || 'date');
+    const [time, setTime] = useState(initialData?.time || '');
+    const [isRecurring, setIsRecurring] = useState(initialData?.isRecurring || false);
     const [saving, setSaving] = useState(false);
-    const [eventDate, setEventDate] = useState<Date>(date);
+    const [eventDate, setEventDate] = useState<Date>(initialData ? initialData.date : date);
 
     const monthNames = isRTL
         ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
@@ -722,7 +751,9 @@ function AddEventModal({ date, isRTL, onClose, onSave }: {
                         {/* Info */}
                         <div className="flex-1">
                             <h3 className="text-base font-bold text-white">
-                                {isRTL ? 'إضافة حدث' : 'Add Event'}
+                                {isRTL
+                                    ? (initialData ? 'تعديل الحدث' : 'إضافة حدث')
+                                    : (initialData ? 'Edit Event' : 'Add Event')}
                             </h3>
                             <p className="text-xs text-surface-400">
                                 {dayNames[date.getDay()]} • {monthNames[date.getMonth()]} {date.getFullYear()}
@@ -866,7 +897,9 @@ function AddEventModal({ date, isRTL, onClose, onSave }: {
                         ) : (
                             <>
                                 <Plus className="w-4 h-4" />
-                                {isRTL ? 'إضافة' : 'Add'}
+                                {isRTL
+                                    ? (initialData ? 'حفظ التعديلات' : 'إضافة')
+                                    : (initialData ? 'Save Changes' : 'Add')}
                             </>
                         )}
                     </button>

@@ -178,6 +178,22 @@ export function useNotes() {
         return { data, error };
     };
 
+    const updateSpecialDate = async (id: string, updates: Partial<Pick<SpecialDate, 'title' | 'event_date' | 'event_type'>>) => {
+        const { data, error } = await supabase
+            .from('special_dates')
+            .update(updates)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (data) {
+            setSpecialDates(prev => prev.map(d => d.id === id ? data : d).sort((a, b) =>
+                new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
+            ));
+        }
+        return { data, error };
+    };
+
     const deleteSpecialDate = async (id: string) => {
         const { error } = await supabase
             .from('special_dates')
@@ -212,25 +228,43 @@ export function useNotes() {
         return { data, error };
     };
 
-    const updateBudgetGoal = async (id: string, currentAmount: number) => {
+    const updateBudgetGoal = async (id: string, updates: Partial<Pick<BudgetGoal, 'title' | 'target_amount' | 'current_amount' | 'status'>>) => {
         const goal = budgetGoals.find(g => g.id === id);
-        const status = goal && currentAmount >= goal.target_amount ? 'completed' : 'active';
+        if (!goal) return { error: 'Goal not found' };
+
+        // Calculate status if current_amount is being updated
+        let status = updates.status || goal.status;
+        if (updates.current_amount !== undefined) {
+            status = updates.current_amount >= (updates.target_amount || goal.target_amount) ? 'completed' : 'active';
+        }
 
         const { data, error } = await supabase
             .from('budget_goals')
-            .update({ current_amount: currentAmount, status, updated_at: new Date().toISOString() })
+            .update({ ...updates, status, updated_at: new Date().toISOString() })
             .eq('id', id)
             .select()
             .single();
 
         if (data) {
-            if (status === 'completed') {
+            if (status === 'completed' && updates.status !== 'active') { // Remove if completed unless explicitly setting active
                 setBudgetGoals(prev => prev.filter(g => g.id !== id));
             } else {
                 setBudgetGoals(prev => prev.map(g => g.id === id ? data : g));
             }
         }
         return { data, error };
+    };
+
+    const deleteBudgetGoal = async (id: string) => {
+        const { error } = await supabase
+            .from('budget_goals')
+            .delete()
+            .eq('id', id);
+
+        if (!error) {
+            setBudgetGoals(prev => prev.filter(g => g.id !== id));
+        }
+        return { error };
     };
 
     return {
@@ -244,10 +278,12 @@ export function useNotes() {
         deleteNote,
         // Special Dates
         createSpecialDate,
+        updateSpecialDate,
         deleteSpecialDate,
         // Budget
         createBudgetGoal,
         updateBudgetGoal,
+        deleteBudgetGoal,
         // Refresh
         refresh: fetchData
     };
