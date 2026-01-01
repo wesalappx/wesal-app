@@ -92,7 +92,7 @@ export default function RegisterPage() {
     };
 
     const getArabicError = (message: string): string => {
-        console.log('Error message:', message);
+
         if (message.includes('already registered') || message.includes('already exists')) {
             return 'هذا البريد الإلكتروني مسجل مسبقاً';
         }

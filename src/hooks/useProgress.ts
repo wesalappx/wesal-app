@@ -59,13 +59,13 @@ export function useProgress() {
                     .eq('couple_id', coupleId)
                     .maybeSingle();
 
-                console.log('[useProgress] Streak fetch:', { coupleId, streakData, streakError });
+
 
                 if (streakData) {
                     streak = streakData.current_streak;
                 }
             } else {
-                console.log('[useProgress] Not paired or no coupleId:', { isPaired, coupleId });
+
             }
 
             // Get sessions this week

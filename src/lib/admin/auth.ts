@@ -1,7 +1,37 @@
-import { jwtVerify } from 'jose';
+import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
+const JWT_SECRET = new TextEncoder().encode(
+    process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production'
+);
+
+// Whitelist of allowed admin emails
+const ALLOWED_ADMIN_EMAILS = [
+    'wesalapp.x@gmail.com',
+    'admin@wesal.app',
+];
+
+export function isAdminEmail(email: string): boolean {
+    return ALLOWED_ADMIN_EMAILS.includes(email.toLowerCase());
+}
+
+export async function createAdminSession(email: string, userId: string) {
+    const token = await new SignJWT({ email, userId, role: 'admin' })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('24h')
+        .sign(JWT_SECRET);
+
+    (await cookies()).set('admin_session', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24, // 24 hours
+        path: '/',
+    });
+
+    return token;
+}
 
 export async function getAdminSession() {
     try {
@@ -12,10 +42,7 @@ export async function getAdminSession() {
             return null;
         }
 
-        const { payload } = await jwtVerify(
-            token,
-            new TextEncoder().encode(JWT_SECRET)
-        );
+        const { payload } = await jwtVerify(token, JWT_SECRET);
 
         return {
             email: payload.email as string,
@@ -27,10 +54,14 @@ export async function getAdminSession() {
     }
 }
 
+export async function clearAdminSession() {
+    (await cookies()).delete('admin_session');
+}
+
 export async function requireAdminSession() {
     const session = await getAdminSession();
 
-    if (!session) {
+    if (!session || !isAdminEmail(session.email)) {
         throw new Error('Unauthorized');
     }
 

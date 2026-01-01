@@ -130,7 +130,7 @@ export function usePairing() {
 
         try {
             const trimmedCode = code.trim();
-            console.log('Looking for pairing code:', trimmedCode);
+
 
             // Find the code - no uppercase needed since codes are numeric
             const { data: pairingCode, error: findError } = await supabase
@@ -141,7 +141,7 @@ export function usePairing() {
                 .gt('expires_at', new Date().toISOString())
                 .maybeSingle();
 
-            console.log('Pairing code search result:', { pairingCode, findError });
+
 
             if (findError) {
                 console.error('Database error:', findError);
