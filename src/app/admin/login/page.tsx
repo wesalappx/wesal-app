@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Shield, Mail, ArrowRight, CheckCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -11,7 +11,7 @@ const ALLOWED_ADMIN_EMAILS = [
     'admin@wesal.app',
 ];
 
-export default function AdminLogin() {
+function AdminLoginForm() {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');

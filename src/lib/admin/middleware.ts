@@ -31,3 +31,9 @@ export function unauthorizedResponse(message: string = 'Unauthorized') {
 export function forbiddenResponse(message: string = 'Forbidden') {
     return NextResponse.json({ error: message }, { status: 403 });
 }
+
+// Simplified permission check - all whitelisted admins have full access
+export function hasPermission(_email: string, _permission: string): boolean {
+    // Since we use simple email whitelist, all admins have all permissions
+    return true;
+}
