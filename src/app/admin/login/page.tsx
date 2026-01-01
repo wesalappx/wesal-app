@@ -1,12 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Shield, Mail, ArrowRight, CheckCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-
-// Force dynamic rendering to avoid build errors with useSearchParams
-export const dynamic = 'force-dynamic';
 
 // Allowed admin emails - must match the list in verify-otp route
 const ALLOWED_ADMIN_EMAILS = [
@@ -20,22 +17,7 @@ export default function AdminLogin() {
     const [error, setError] = useState('');
     const [sent, setSent] = useState(false);
     const router = useRouter();
-    const searchParams = useSearchParams();
     const supabase = createClient();
-
-    // Check for error in URL params
-    useEffect(() => {
-        const urlError = searchParams.get('error');
-        if (urlError) {
-            const errorMessages: Record<string, string> = {
-                'no_code': 'No authentication code provided',
-                'auth_failed': 'Authentication failed. Please try again.',
-                'unauthorized': 'This email is not authorized for admin access',
-                'server_error': 'Server error. Please try again later.',
-            };
-            setError(errorMessages[urlError] || 'An error occurred');
-        }
-    }, [searchParams]);
 
     const handleSendMagicLink = async (e: React.FormEvent) => {
         e.preventDefault();
