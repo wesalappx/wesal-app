@@ -58,6 +58,7 @@ export default function NotesPage() {
     // Add Budget Modal State
     const [newBudgetTitle, setNewBudgetTitle] = useState('');
     const [newBudgetAmount, setNewBudgetAmount] = useState('');
+    const [newBudgetCurrent, setNewBudgetCurrent] = useState('');
 
     const handleSaveNote = async () => {
         if (!newTitle.trim()) return;
@@ -92,7 +93,8 @@ export default function NotesPage() {
         if (editingBudget) {
             await updateBudgetGoal(editingBudget.id, {
                 title: newBudgetTitle,
-                target_amount: parseFloat(newBudgetAmount)
+                target_amount: parseFloat(newBudgetAmount),
+                current_amount: parseFloat(newBudgetCurrent) || 0
             });
         } else {
             await createBudgetGoal(newBudgetTitle, parseFloat(newBudgetAmount));
@@ -417,6 +419,7 @@ export default function NotesPage() {
                                                                     setEditingBudget(goal);
                                                                     setNewBudgetTitle(goal.title);
                                                                     setNewBudgetAmount(goal.target_amount.toString());
+                                                                    setNewBudgetCurrent(goal.current_amount.toString());
                                                                     setShowAddModal(true);
                                                                 }}
                                                                 className="p-2 text-surface-500 hover:text-white transition-colors"
@@ -579,6 +582,20 @@ export default function NotesPage() {
                                         onChange={e => setNewBudgetAmount(e.target.value)}
                                         className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white"
                                     />
+                                    {editingBudget && (
+                                        <div>
+                                            <label className="text-xs text-surface-400 mb-1 block">
+                                                {isRTL ? 'المبلغ المحفوظ حالياً' : 'Current saved amount'}
+                                            </label>
+                                            <input
+                                                type="number"
+                                                placeholder={isRTL ? 'المبلغ الحالي' : 'Current amount'}
+                                                value={newBudgetCurrent}
+                                                onChange={e => setNewBudgetCurrent(e.target.value)}
+                                                className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white"
+                                            />
+                                        </div>
+                                    )}
                                     <button
                                         onClick={handleSaveBudget}
                                         disabled={!newBudgetTitle.trim() || !newBudgetAmount}
