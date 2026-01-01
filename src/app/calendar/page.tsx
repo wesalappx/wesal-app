@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Heart, Gamepad2, Check, Gift, Star, Sparkles, Moon, Droplets,
-    ChevronLeft, ChevronRight, Grid3X3, LayoutGrid, Settings2, Trash2, Clock, Edit3
+    ChevronLeft, ChevronRight, Grid3X3, LayoutGrid, Settings2, Trash2, Clock, Edit3, ArrowRight, ArrowLeft
 } from 'lucide-react';
 import { useCalendar, ScheduledSession } from '@/hooks/useCalendar';
 import { useHealth } from '@/hooks/useHealth';
