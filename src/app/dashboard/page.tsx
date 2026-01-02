@@ -31,6 +31,7 @@ import { useProgress } from '@/hooks/useProgress';
 import { useNotifications } from '@/hooks/useNotifications';
 import MarriageAdviceModal from '@/components/MarriageAdviceModal';
 import CoolDownModal from '@/components/CoolDownModal';
+import SecretSparkInput from '@/components/SecretSparkInput';
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -456,6 +457,11 @@ export default function Dashboard() {
                     </Link>
                 </div>
 
+                {/* Secret Sparks */}
+                <div className="mt-4 flex justify-center">
+                    <SecretSparkInput />
+                </div>
+
                 {/* Daily Whisper - Static */}
                 <div className={`rounded-2xl p-5 mt-4 backdrop-blur-md border ${theme === 'light' ? 'bg-white/70 border-amber-100' : 'bg-surface-800/50 border-surface-700/30'}`}>
                     <div className="flex items-start gap-3">
@@ -469,12 +475,12 @@ export default function Dashboard() {
                             </p>
                         </div>
                     </div>
-                </div>
-            </div>
+                </div >
+            </div >
 
             {/* Modals */}
-            <MarriageAdviceModal isOpen={showAdviceModal} onClose={() => setShowAdviceModal(false)} />
-            <CoolDownModal isOpen={showCoolDown} onClose={() => setShowCoolDown(false)} />
-        </main>
+            < MarriageAdviceModal isOpen={showAdviceModal} onClose={() => setShowAdviceModal(false)} />
+            < CoolDownModal isOpen={showCoolDown} onClose={() => setShowCoolDown(false)} />
+        </main >
     );
 }
