@@ -1,11 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Crown, Check, Loader2, Sparkles, Heart, X } from 'lucide-react';
+import {
+    ArrowRight, Crown, Check, Loader2, Sparkles, Heart, X,
+    MessageCircle, Gamepad2, Map, BarChart3, Zap, Shield,
+    Gift, Star
+} from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useSettingsStore } from '@/stores/settings-store';
+import { SUBSCRIPTION_PLANS, FREE_TIER_LIMITS } from '@/lib/payments';
 
 export default function UpgradePage() {
     const { language } = useSettingsStore();
@@ -14,12 +19,12 @@ export default function UpgradePage() {
     const {
         isPremium,
         isLoading,
-        availablePlans,
         startUpgrade,
         formatPrice,
         currentPlan
     } = useSubscription();
 
+    const [selectedPlan, setSelectedPlan] = useState<'premium_monthly' | 'premium_annual'>('premium_monthly');
     const [isUpgrading, setIsUpgrading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +32,7 @@ export default function UpgradePage() {
         setError(null);
         setIsUpgrading(true);
 
-        const result = await startUpgrade('premium_lifetime');
+        const result = await startUpgrade(selectedPlan);
 
         if (!result.success) {
             setError(result.error || (isRTL ? 'حدث خطأ' : 'An error occurred'));
@@ -36,33 +41,60 @@ export default function UpgradePage() {
         // If successful, user is redirected to payment page
     };
 
-    const features = [
+    // Feature comparison data
+    const comparisonFeatures = [
         {
-            icon: '💬',
-            title: { ar: 'محادثات AI غير محدودة', en: 'Unlimited AI Chats' },
-            desc: { ar: 'استشر المستشار في أي وقت', en: 'Get advice anytime' }
+            icon: MessageCircle,
+            name: { ar: 'مستشار AI', en: 'AI Coach' },
+            free: { ar: '5 رسائل/يوم', en: '5 messages/day' },
+            premium: { ar: 'غير محدود', en: 'Unlimited' }
         },
         {
-            icon: '🎮',
-            title: { ar: 'جميع الألعاب', en: 'All Games' },
-            desc: { ar: 'الوصول لكل الألعاب المميزة', en: 'Access all premium games' }
+            icon: Shield,
+            name: { ar: 'حل النزاعات', en: 'Conflict AI' },
+            free: { ar: 'جلستين/أسبوع', en: '2 sessions/week' },
+            premium: { ar: 'غير محدود', en: 'Unlimited' }
         },
         {
-            icon: '🚀',
-            title: { ar: 'جميع الرحلات', en: 'All Journeys' },
-            desc: { ar: 'اكتشفوا رحلات جديدة معاً', en: 'Discover new journeys together' }
+            icon: Gamepad2,
+            name: { ar: 'الألعاب', en: 'Games' },
+            free: { ar: '4 ألعاب أساسية', en: '4 basic games' },
+            premium: { ar: 'جميع الألعاب (8+)', en: 'All games (8+)' }
         },
         {
-            icon: '📊',
-            title: { ar: 'إحصائيات متقدمة', en: 'Advanced Insights' },
-            desc: { ar: 'تحليل عميق لعلاقتكم', en: 'Deep relationship analytics' }
+            icon: Zap,
+            name: { ar: 'جلسات اللعب', en: 'Game Sessions' },
+            free: { ar: '3/يوم', en: '3/day' },
+            premium: { ar: 'غير محدود', en: 'Unlimited' }
         },
         {
-            icon: '⚡',
-            title: { ar: 'دعم أولوية', en: 'Priority Support' },
-            desc: { ar: 'رد سريع على استفساراتك', en: 'Fast response to questions' }
+            icon: Map,
+            name: { ar: 'الرحلات', en: 'Journeys' },
+            free: { ar: 'رحلتين', en: '2 journeys' },
+            premium: { ar: 'جميع الرحلات', en: 'All journeys' }
         },
+        {
+            icon: Heart,
+            name: { ar: 'همسات', en: 'Whispers' },
+            free: { ar: '3/أسبوع', en: '3/week' },
+            premium: { ar: 'غير محدود', en: 'Unlimited' }
+        },
+        {
+            icon: BarChart3,
+            name: { ar: 'التحليلات', en: 'Insights' },
+            free: { ar: 'أساسية', en: 'Basic' },
+            premium: { ar: 'متقدمة', en: 'Advanced' }
+        },
+        {
+            icon: Star,
+            name: { ar: 'دعم أولوية', en: 'Priority Support' },
+            free: { ar: '—', en: '—' },
+            premium: { ar: '✓', en: '✓' }
+        }
     ];
+
+    const monthlyPlan = SUBSCRIPTION_PLANS.find(p => p.id === 'premium_monthly')!;
+    const annualPlan = SUBSCRIPTION_PLANS.find(p => p.id === 'premium_annual')!;
 
     if (isLoading) {
         return (
@@ -79,7 +111,7 @@ export default function UpgradePage() {
                 <header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5">
                     <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
                         <Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                            <ArrowRight className="w-6 h-6 text-white" />
+                            <ArrowRight className={`w-6 h-6 text-white ${!isRTL && 'rotate-180'}`} />
                         </Link>
                         <h1 className="text-xl font-bold text-white">{isRTL ? 'الاشتراك' : 'Subscription'}</h1>
                     </div>
@@ -118,16 +150,14 @@ export default function UpgradePage() {
         );
     }
 
-    // Not premium - show upgrade UI
-    const plan = availablePlans[0]; // Lifetime plan
-
+    // Not premium - show upgrade UI with comparison
     return (
         <div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900">
             {/* Header */}
             <header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5">
                 <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
                     <Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <ArrowRight className="w-6 h-6 text-white" />
+                        <ArrowRight className={`w-6 h-6 text-white ${!isRTL && 'rotate-180'}`} />
                     </Link>
                     <h1 className="text-xl font-bold text-white">{isRTL ? 'ترقية للـ Premium' : 'Upgrade to Premium'}</h1>
                 </div>
@@ -150,55 +180,114 @@ export default function UpgradePage() {
 
                     <p className="text-surface-300">
                         {isRTL
-                            ? 'احصلوا على كل المميزات لتعزيز علاقتكم'
-                            : 'Get all features to strengthen your relationship'}
+                            ? 'افتحوا كل المميزات لتعزيز علاقتكم'
+                            : 'Unlock all features to strengthen your relationship'}
                     </p>
                 </motion.div>
 
-                {/* Features */}
+                {/* Plan Selection */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="space-y-3 mb-8"
+                    className="grid grid-cols-2 gap-3 mb-6"
                 >
-                    {features.map((feature, i) => (
-                        <div
-                            key={i}
-                            className="glass-card p-4 flex items-center gap-4"
-                        >
-                            <span className="text-2xl">{feature.icon}</span>
-                            <div className="flex-1 text-right">
-                                <h4 className="font-bold text-white">{feature.title[language]}</h4>
-                                <p className="text-sm text-surface-400">{feature.desc[language]}</p>
-                            </div>
-                            <Check className="w-5 h-5 text-emerald-400" />
-                        </div>
-                    ))}
+                    {/* Monthly Plan */}
+                    <button
+                        onClick={() => setSelectedPlan('premium_monthly')}
+                        className={`relative p-4 rounded-2xl border-2 transition-all text-center ${selectedPlan === 'premium_monthly'
+                                ? 'border-primary-500 bg-primary-500/10'
+                                : 'border-white/10 bg-white/5 hover:border-white/20'
+                            }`}
+                    >
+                        {monthlyPlan.isMostPopular && (
+                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary-500 text-white text-xs font-bold">
+                                {isRTL ? 'الأكثر طلباً' : 'Most Popular'}
+                            </span>
+                        )}
+                        <p className="text-surface-400 text-sm mb-1">
+                            {isRTL ? 'شهري' : 'Monthly'}
+                        </p>
+                        <p className="text-2xl font-bold text-white">
+                            {formatPrice(monthlyPlan.price)}
+                        </p>
+                        <p className="text-surface-500 text-xs">
+                            {isRTL ? '/شهر' : '/month'}
+                        </p>
+                    </button>
+
+                    {/* Annual Plan */}
+                    <button
+                        onClick={() => setSelectedPlan('premium_annual')}
+                        className={`relative p-4 rounded-2xl border-2 transition-all text-center ${selectedPlan === 'premium_annual'
+                                ? 'border-primary-500 bg-primary-500/10'
+                                : 'border-white/10 bg-white/5 hover:border-white/20'
+                            }`}
+                    >
+                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-emerald-500 text-white text-xs font-bold">
+                            {annualPlan.discount?.[language] || '2 months free'}
+                        </span>
+                        <p className="text-surface-400 text-sm mb-1">
+                            {isRTL ? 'سنوي' : 'Annual'}
+                        </p>
+                        <p className="text-2xl font-bold text-white">
+                            {formatPrice(annualPlan.price)}
+                        </p>
+                        <p className="text-surface-500 text-xs">
+                            {isRTL ? '/سنة' : '/year'}
+                        </p>
+                    </button>
                 </motion.div>
 
-                {/* Price Card */}
+                {/* Feature Comparison Table */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="glass-card p-6 text-center border-2 border-primary-500/50 mb-8"
+                    className="glass-card p-4 mb-6 overflow-hidden"
                 >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/20 text-primary-300 text-sm font-bold mb-4">
-                        <Sparkles className="w-4 h-4" />
-                        {isRTL ? 'دفعة واحدة' : 'One-time payment'}
+                    <h3 className="text-white font-bold text-center mb-4">
+                        {isRTL ? 'مقارنة المميزات' : 'Feature Comparison'}
+                    </h3>
+
+                    {/* Table Header */}
+                    <div className="grid grid-cols-3 gap-2 mb-3 text-center text-sm">
+                        <div className="text-surface-400"></div>
+                        <div className="text-surface-400 font-medium">
+                            {isRTL ? 'مجاني' : 'Free'}
+                        </div>
+                        <div className="text-primary-400 font-bold">
+                            Premium
+                        </div>
                     </div>
 
-                    <div className="text-5xl font-black text-white mb-2">
-                        {formatPrice(plan.price)}
+                    {/* Features */}
+                    <div className="space-y-3">
+                        {comparisonFeatures.map((feature, idx) => (
+                            <div key={idx} className="grid grid-cols-3 gap-2 items-center text-sm">
+                                <div className="flex items-center gap-2">
+                                    <feature.icon className="w-4 h-4 text-surface-500" />
+                                    <span className="text-white text-xs">{feature.name[language]}</span>
+                                </div>
+                                <div className="text-center text-surface-400 text-xs">
+                                    {feature.free[language]}
+                                </div>
+                                <div className="text-center text-emerald-400 text-xs font-medium">
+                                    {feature.premium[language]}
+                                </div>
+                            </div>
+                        ))}
                     </div>
+                </motion.div>
 
-                    <p className="text-surface-400 mb-6">
-                        {isRTL ? 'اشتراك مدى الحياة - لا رسوم شهرية!' : 'Lifetime access - no monthly fees!'}
-                    </p>
-
+                {/* CTA Button */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                >
                     {error && (
-                        <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm">
+                        <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm text-center">
                             {error}
                         </div>
                     )}
@@ -212,18 +301,27 @@ export default function UpgradePage() {
                             <Loader2 className="w-6 h-6 animate-spin" />
                         ) : (
                             <>
-                                <Heart className="w-6 h-6" />
+                                <Sparkles className="w-6 h-6" />
                                 {isRTL ? 'اشترك الآن' : 'Subscribe Now'}
+                                <span className="opacity-80">
+                                    - {formatPrice(selectedPlan === 'premium_monthly' ? monthlyPlan.price : annualPlan.price)}
+                                </span>
                             </>
                         )}
                     </button>
                 </motion.div>
 
                 {/* Trust badges */}
-                <div className="text-center text-surface-500 text-sm space-y-2">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-center text-surface-500 text-sm space-y-2 mt-6"
+                >
                     <p>🔒 {isRTL ? 'دفع آمن عبر Moyasar' : 'Secure payment via Moyasar'}</p>
                     <p>💳 {isRTL ? 'نقبل مدى، فيزا، ماستركارد' : 'We accept Mada, Visa, Mastercard'}</p>
-                </div>
+                    <p>🔄 {isRTL ? 'إلغاء في أي وقت' : 'Cancel anytime'}</p>
+                </motion.div>
             </main>
         </div>
     );

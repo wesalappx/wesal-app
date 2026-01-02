@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Send, Loader2, Link2, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Send, Loader2, Link2, Check, Sparkles, Crown } from 'lucide-react';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useAuth } from '@/hooks/useAuth';
 import { usePairing } from '@/hooks/usePairing';
 import { createClient } from '@/lib/supabase/client';
 import { useSound } from '@/hooks/useSound';
+import { useTierLimits } from '@/hooks/useTierLimits';
 
 const whisperMessages = [
     { id: 'hint', emoji: '😏', ar: 'احم احم...', en: 'Ahem ahem...' },
@@ -35,6 +36,11 @@ export default function WhisperPage() {
     const [sending, setSending] = useState(false);
     const [sent, setSent] = useState(false);
 
+    // Tier limits
+    const { canUse, trackUsage, isPremium } = useTierLimits();
+    const [whisperUsage, setWhisperUsage] = useState<{ remaining: number; limit: number } | null>(null);
+    const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+
     useEffect(() => {
         async function load() {
             if (authLoading) return;
@@ -55,8 +61,27 @@ export default function WhisperPage() {
         load();
     }, [user, authLoading]);
 
+    // Fetch whisper usage on mount
+    useEffect(() => {
+        const fetchUsage = async () => {
+            const usage = await canUse('whisper');
+            if (usage.limit > 0) {
+                setWhisperUsage({ remaining: usage.remaining, limit: usage.limit });
+            }
+        };
+        fetchUsage();
+    }, [canUse]);
+
     const handleSend = async () => {
         if (!selectedId || !coupleId || !user?.id) return;
+
+        // Check whisper limit
+        const usage = await canUse('whisper');
+        if (!usage.canUse && usage.limit > 0) {
+            setShowUpgradePrompt(true);
+            return;
+        }
+
         setSending(true);
         playSound('whoosh');
 
@@ -85,6 +110,12 @@ export default function WhisperPage() {
                 });
             }
 
+            // Track usage after successful send
+            const trackResult = await trackUsage('whisper');
+            if (trackResult.remaining >= 0) {
+                setWhisperUsage({ remaining: trackResult.remaining, limit: usage.limit });
+            }
+
             setSent(true);
             playSound('romantic');
             setTimeout(() => { setSent(false); setSelectedId(null); }, 2500);
@@ -106,8 +137,62 @@ export default function WhisperPage() {
                     {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
                 </Link>
                 <h1 className="flex-1 text-center text-lg font-semibold text-white">{isRTL ? 'همسة' : 'Whisper'}</h1>
-                <div className="w-9" />
+                {/* Usage Counter */}
+                {whisperUsage && whisperUsage.limit > 0 && (
+                    <div className={`px-2.5 py-1 rounded-full text-xs font-medium ${whisperUsage.remaining <= 1
+                            ? 'bg-orange-500/20 text-orange-400'
+                            : 'bg-white/10 text-white/60'
+                        }`}>
+                        {whisperUsage.remaining}/{whisperUsage.limit}
+                    </div>
+                )}
+                {!whisperUsage && <div className="w-9" />}
             </header>
+
+            {/* Upgrade Prompt Modal */}
+            <AnimatePresence>
+                {showUpgradePrompt && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4"
+                        onClick={() => setShowUpgradePrompt(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-surface-800 rounded-3xl p-6 max-w-sm w-full text-center border border-white/10"
+                        >
+                            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-pink-400 to-purple-600 flex items-center justify-center">
+                                <Sparkles className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">
+                                {isRTL ? 'انتهت همسات الأسبوع' : 'Weekly Whispers Used'}
+                            </h3>
+                            <p className="text-white/60 mb-6">
+                                {isRTL
+                                    ? 'اشترك في Premium للهمسات غير المحدودة'
+                                    : 'Upgrade to Premium for unlimited whispers'}
+                            </p>
+                            <Link
+                                href="/settings/upgrade"
+                                className="block w-full py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold mb-3"
+                            >
+                                {isRTL ? 'ترقية الآن' : 'Upgrade Now'}
+                            </Link>
+                            <button
+                                onClick={() => setShowUpgradePrompt(false)}
+                                className="text-white/40 text-sm"
+                            >
+                                {isRTL ? 'لاحقاً' : 'Maybe Later'}
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Content */}
             <main className="relative z-10 px-5 py-4 max-w-md mx-auto">

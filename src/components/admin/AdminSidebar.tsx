@@ -11,6 +11,7 @@ import {
     Settings,
     Shield,
     DollarSign,
+    Crown,
     LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,7 @@ const navigation = [
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { name: 'Content', href: '/admin/content', icon: FileText },
     { name: 'Finance', href: '/admin/finance', icon: DollarSign },
+    { name: 'Subscriptions', href: '/admin/subscriptions', icon: Crown },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 

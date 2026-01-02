@@ -22,29 +22,83 @@ export interface PaymentResult {
     redirectUrl?: string;
 }
 
+export type SubscriptionTier = 'free' | 'premium';
+
 export interface SubscriptionPlan {
     id: string;
     name: { ar: string; en: string };
     price: number;           // In SAR
-    interval: 'lifetime' | 'monthly' | 'yearly';
-    features: string[];
+    interval: 'forever' | 'monthly' | 'yearly';
+    tier: SubscriptionTier;
+    features: { ar: string[]; en: string[] };
+    discount?: { ar: string; en: string };
+    isMostPopular?: boolean;
 }
+
+export interface TierLimit {
+    feature: string;
+    limit: number | null;  // null = unlimited
+    period: 'daily' | 'weekly' | 'monthly' | 'forever' | null;
+    descriptionAr: string;
+    descriptionEn: string;
+}
+
+// Free tier limits configuration
+export const FREE_TIER_LIMITS: Record<string, TierLimit> = {
+    ai_chat: { feature: 'ai_chat', limit: 5, period: 'daily', descriptionAr: '5 رسائل يومياً', descriptionEn: '5 messages/day' },
+    conflict_ai: { feature: 'conflict_ai', limit: 2, period: 'weekly', descriptionAr: 'جلستين أسبوعياً', descriptionEn: '2 sessions/week' },
+    game_sessions: { feature: 'game_sessions', limit: 3, period: 'daily', descriptionAr: '3 جلسات يومياً', descriptionEn: '3 sessions/day' },
+    games_available: { feature: 'games_available', limit: 4, period: 'forever', descriptionAr: '4 ألعاب أساسية', descriptionEn: '4 basic games' },
+    journeys: { feature: 'journeys', limit: 2, period: 'forever', descriptionAr: 'رحلتين للبداية', descriptionEn: '2 starter journeys' },
+    whisper: { feature: 'whisper', limit: 3, period: 'weekly', descriptionAr: '3 همسات أسبوعياً', descriptionEn: '3 whispers/week' },
+    insights: { feature: 'insights', limit: 1, period: 'forever', descriptionAr: 'إحصائيات أساسية', descriptionEn: 'Basic insights' },
+    health_tracking: { feature: 'health_tracking', limit: 1, period: 'forever', descriptionAr: 'عرض فقط', descriptionEn: 'View only' },
+};
+
+// List of games available for free tier (first 4 games)
+export const FREE_GAMES = ['would-you-rather', 'compliment-battle', 'love-roulette', 'deep-questions'];
+export const PREMIUM_GAMES = ['memory-lane', 'truth-or-dare', 'couple-quiz', 'minute-challenges'];
+
+// List of journeys available for free tier
+export const FREE_JOURNEYS = ['communication-basics', 'gratitude-start'];
 
 // Subscription plans
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     {
-        id: 'premium_lifetime',
-        name: { ar: 'اشتراك مدى الحياة', en: 'Lifetime Premium' },
-        price: 99,           // 99 SAR one-time
-        interval: 'lifetime',
-        features: [
-            'unlimited_ai_chat',
-            'all_games',
-            'all_journeys',
-            'advanced_insights',
-            'priority_support',
-        ],
+        id: 'free',
+        name: { ar: 'مجاني', en: 'Free' },
+        price: 0,
+        interval: 'forever',
+        tier: 'free',
+        features: {
+            ar: ['5 رسائل AI يومياً', '4 ألعاب أساسية', '3 همسات أسبوعياً', 'رحلتين للبداية'],
+            en: ['5 AI messages/day', '4 basic games', '3 whispers/week', '2 starter journeys']
+        }
     },
+    {
+        id: 'premium_monthly',
+        name: { ar: 'مميز', en: 'Premium' },
+        price: 29,
+        interval: 'monthly',
+        tier: 'premium',
+        isMostPopular: true,
+        features: {
+            ar: ['AI غير محدود', 'جميع الألعاب (8+)', 'جميع الرحلات', 'تحليلات متقدمة', 'دعم أولوية'],
+            en: ['Unlimited AI Coach', 'All games (8+)', 'All journeys', 'Advanced insights', 'Priority support']
+        }
+    },
+    {
+        id: 'premium_annual',
+        name: { ar: 'سنوي', en: 'Annual' },
+        price: 249,
+        interval: 'yearly',
+        tier: 'premium',
+        discount: { ar: 'شهرين مجاناً', en: '2 months free' },
+        features: {
+            ar: ['كل مزايا Premium', 'وفر 99 ريال'],
+            en: ['All Premium features', 'Save 99 SAR']
+        }
+    }
 ];
 
 // Get current plan by ID

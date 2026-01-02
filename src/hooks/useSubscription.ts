@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthStore } from '@/stores/auth-store';
-import { SUBSCRIPTION_PLANS, formatPrice, getPlanById } from '@/lib/payments';
+import { SUBSCRIPTION_PLANS, formatPrice, getPlanById, SubscriptionTier } from '@/lib/payments';
 
 interface Subscription {
     id: string;
@@ -73,7 +73,7 @@ export function useSubscription() {
     }, [fetchSubscription]);
 
     // Start upgrade flow
-    const startUpgrade = async (planId: string = 'premium_lifetime') => {
+    const startUpgrade = async (planId: string = 'premium_monthly') => {
         if (!user) {
             return { success: false, error: 'Not logged in' };
         }

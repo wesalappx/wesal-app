@@ -12,9 +12,17 @@ import {
     TrendingDown,
     Activity,
     Clock,
-    Sparkles
+    Sparkles,
+    Crown,
+    DollarSign,
+    Shield,
+    User,
+    Bell,
+    RefreshCw
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 interface Stats {
     users: {
@@ -43,6 +51,31 @@ interface Stats {
     lastUpdated: string;
 }
 
+interface HealthStats {
+    subscriptions: {
+        premium: number;
+        monthly: number;
+        annual: number;
+        trials: number;
+    };
+    revenue: {
+        thisMonth: number;
+        currency: string;
+    };
+    activity: {
+        activeToday: number;
+    };
+}
+
+interface ActivityItem {
+    id: string;
+    type: string;
+    message: string;
+    timestamp: string;
+    icon: string;
+    color: string;
+}
+
 const StatCard = ({ title, value, subtext, icon: Icon, color, trend, delay }: any) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -60,7 +93,7 @@ const StatCard = ({ title, value, subtext, icon: Icon, color, trend, delay }: an
                 </div>
                 <div className="flex items-end justify-between">
                     <div>
-                        <h3 className="text-3xl font-bold text-white mb-1">{value.toLocaleString()}</h3>
+                        <h3 className="text-3xl font-bold text-white mb-1">{typeof value === 'number' ? value.toLocaleString() : value}</h3>
                         <div className="flex items-center text-xs font-medium">
                             {trend === 'up' && <TrendingUp className="w-3 h-3 text-green-400 mr-1" />}
                             {trend === 'down' && <TrendingDown className="w-3 h-3 text-red-400 mr-1" />}
@@ -75,29 +108,60 @@ const StatCard = ({ title, value, subtext, icon: Icon, color, trend, delay }: an
     </motion.div>
 );
 
+const ActivityIcon = ({ type }: { type: string }) => {
+    switch (type) {
+        case 'user': return <User className="w-4 h-4" />;
+        case 'dollar': return <DollarSign className="w-4 h-4" />;
+        case 'shield': return <Shield className="w-4 h-4" />;
+        default: return <Bell className="w-4 h-4" />;
+    }
+};
+
 export default function AdminDashboard() {
     const [stats, setStats] = useState<Stats | null>(null);
+    const [healthStats, setHealthStats] = useState<HealthStats | null>(null);
+    const [activities, setActivities] = useState<ActivityItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
-        fetchStats();
+        fetchAllData();
     }, []);
 
-    const fetchStats = async () => {
+    const fetchAllData = async () => {
         try {
-            const res = await fetch('/api/admin/stats');
-            if (!res.ok) {
-                const errData = await res.json().catch(() => ({}));
-                throw new Error(errData.error || 'Failed to fetch stats');
+            // Fetch main stats
+            const statsRes = await fetch('/api/admin/stats');
+            if (statsRes.ok) {
+                const data = await statsRes.json();
+                setStats(data);
             }
-            const data = await res.json();
-            setStats(data);
+
+            // Fetch health stats
+            const healthRes = await fetch('/api/admin/health');
+            if (healthRes.ok) {
+                const data = await healthRes.json();
+                setHealthStats(data);
+            }
+
+            // Fetch activity
+            const activityRes = await fetch('/api/admin/activity?limit=10');
+            if (activityRes.ok) {
+                const data = await activityRes.json();
+                setActivities(data.activities || []);
+            }
         } catch (err: any) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        await fetchAllData();
+        setRefreshing(false);
     };
 
     if (loading) {
@@ -137,7 +201,7 @@ export default function AdminDashboard() {
             trend: (stats?.couples.pairedThisWeek || 0) > 0 ? 'up' : 'neutral',
         },
         {
-            title: 'Check-ins',
+            title: 'Check-ins Today',
             value: stats?.checkins.today || 0,
             subtext: `Avg mood: ${stats?.checkins.avgMood || 0}`,
             icon: MessageSquare,
@@ -163,12 +227,22 @@ export default function AdminDashboard() {
                     <p className="text-slate-400 mt-1">Real-time insights and activity monitoring</p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRefresh}
+                        disabled={refreshing}
+                        className="border-slate-700 text-slate-400 hover:bg-slate-800"
+                    >
+                        <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                        Refresh
+                    </Button>
                     <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                         </span>
-                        <span className="text-xs font-medium text-emerald-400">Live Updates</span>
+                        <span className="text-xs font-medium text-emerald-400">Live</span>
                     </div>
                     <Badge variant="outline" className="bg-slate-900 border-slate-700 text-slate-400 py-1.5 px-3">
                         <Clock className="w-3 h-3 mr-2" />
@@ -184,13 +258,63 @@ export default function AdminDashboard() {
                 ))}
             </div>
 
-            {/* Activity Overview */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Recent Activity */}
+            {/* Subscription Stats - Premium Banner */}
+            {healthStats && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.4 }}
+                >
+                    <div className="rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-orange-500/10 border border-amber-500/20 p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                                    <Crown className="w-5 h-5 text-amber-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-white font-bold">Subscription Overview</h3>
+                                    <p className="text-slate-400 text-sm">Real-time subscription metrics</p>
+                                </div>
+                            </div>
+                            <Link href="/admin/subscriptions">
+                                <Button variant="outline" size="sm" className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10">
+                                    Manage
+                                </Button>
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div className="bg-slate-900/40 rounded-xl p-4 text-center">
+                                <p className="text-2xl font-bold text-amber-400">{healthStats.subscriptions.premium}</p>
+                                <p className="text-xs text-slate-400">Total Premium</p>
+                            </div>
+                            <div className="bg-slate-900/40 rounded-xl p-4 text-center">
+                                <p className="text-2xl font-bold text-white">{healthStats.subscriptions.monthly}</p>
+                                <p className="text-xs text-slate-400">Monthly</p>
+                            </div>
+                            <div className="bg-slate-900/40 rounded-xl p-4 text-center">
+                                <p className="text-2xl font-bold text-white">{healthStats.subscriptions.annual}</p>
+                                <p className="text-xs text-slate-400">Annual</p>
+                            </div>
+                            <div className="bg-slate-900/40 rounded-xl p-4 text-center">
+                                <p className="text-2xl font-bold text-blue-400">{healthStats.subscriptions.trials}</p>
+                                <p className="text-xs text-slate-400">Active Trials</p>
+                            </div>
+                            <div className="bg-slate-900/40 rounded-xl p-4 text-center">
+                                <p className="text-2xl font-bold text-green-400">{healthStats.revenue.currency} {healthStats.revenue.thisMonth}</p>
+                                <p className="text-xs text-slate-400">Revenue (30d)</p>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+
+            {/* Activity Overview */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* User Growth */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.5 }}
                 >
                     <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm h-full">
                         <CardHeader>
@@ -217,56 +341,53 @@ export default function AdminDashboard() {
                                 </div>
                                 <div className="flex items-center justify-between p-4 bg-slate-800/30 rounded-xl border border-slate-800/50 hover:border-slate-700 transition-colors">
                                     <div>
-                                        <p className="text-slate-400 text-sm">This Month</p>
-                                        <p className="text-2xl font-bold text-white">{stats?.users.newThisMonth || 0}</p>
+                                        <p className="text-slate-400 text-sm">Active Today</p>
+                                        <p className="text-2xl font-bold text-white">{healthStats?.activity.activeToday || 0}</p>
                                     </div>
-                                    <Badge variant="outline" className="border-slate-600 text-slate-400">Total Added</Badge>
+                                    <Badge className="bg-purple-500/10 text-purple-400 border-0">Online</Badge>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
                 </motion.div>
 
-                {/* Game Stats */}
+                {/* Activity Feed */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.5 }}
+                    transition={{ duration: 0.4, delay: 0.6 }}
                 >
                     <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm h-full">
                         <CardHeader>
                             <CardTitle className="text-white flex items-center gap-2 text-lg">
-                                <Gamepad2 className="w-5 h-5 text-purple-400" />
-                                Popular Games
+                                <Bell className="w-5 h-5 text-amber-400" />
+                                Recent Activity
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-3">
-                                {stats?.games.byType && Object.entries(stats.games.byType).length > 0 ? (
-                                    Object.entries(stats.games.byType)
-                                        .sort(([, a], [, b]) => b - a)
-                                        .slice(0, 5)
-                                        .map(([game, count], idx) => (
-                                            <div key={game} className="flex items-center gap-4 p-3 rounded-lg hover:bg-slate-800/30 transition-colors group">
-                                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-violet-500/20 flex items-center justify-center text-purple-400 font-bold text-sm group-hover:from-purple-500/30 group-hover:to-violet-500/30 transition-all">
-                                                    #{idx + 1}
-                                                </div>
-                                                <div className="flex-1">
-                                                    <p className="text-white font-medium capitalize">{game.replace(/-/g, ' ')}</p>
-                                                    <div className="h-1.5 w-full bg-slate-800 rounded-full mt-1.5 overflow-hidden">
-                                                        <div
-                                                            className="h-full bg-purple-500/50 rounded-full"
-                                                            style={{ width: `${Math.min((count / (stats.games.total || 1)) * 100, 100)}%` }}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <Badge variant="secondary" className="bg-slate-800 text-purple-300">{count} plays</Badge>
+                            <div className="space-y-3 max-h-[280px] overflow-y-auto pr-2">
+                                {activities.length > 0 ? (
+                                    activities.slice(0, 8).map((activity) => (
+                                        <div key={activity.id} className="flex items-start gap-3 p-3 bg-slate-800/30 rounded-lg hover:bg-slate-800/50 transition-colors">
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activity.color === 'blue' ? 'bg-blue-500/20 text-blue-400' :
+                                                activity.color === 'green' ? 'bg-green-500/20 text-green-400' :
+                                                    activity.color === 'purple' ? 'bg-purple-500/20 text-purple-400' :
+                                                        'bg-slate-700 text-slate-400'
+                                                }`}>
+                                                <ActivityIcon type={activity.icon} />
                                             </div>
-                                        ))
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-white text-sm truncate">{activity.message}</p>
+                                                <p className="text-slate-500 text-xs">
+                                                    {new Date(activity.timestamp).toLocaleString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center py-10 text-slate-500">
+                                    <div className="flex flex-col items-center justify-center py-8 text-slate-500">
                                         <Sparkles className="w-8 h-8 mb-2 opacity-50" />
-                                        <p>No game data available yet</p>
+                                        <p>No recent activity</p>
                                     </div>
                                 )}
                             </div>
@@ -275,42 +396,52 @@ export default function AdminDashboard() {
                 </motion.div>
             </div>
 
-            {/* Quick Stats Bar */}
+            {/* Game Stats */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.6 }}
+                transition={{ duration: 0.4, delay: 0.7 }}
             >
-                <div className="rounded-2xl bg-gradient-to-r from-primary-500/10 via-purple-500/10 to-accent-500/10 border border-primary-500/20 p-8 backdrop-blur-md">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                        <div>
-                            <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
-                                {stats?.users.total || 0}
-                            </div>
-                            <p className="text-primary-300 text-sm font-medium mt-1">Total Users</p>
+                <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm">
+                    <CardHeader>
+                        <CardTitle className="text-white flex items-center gap-2 text-lg">
+                            <Gamepad2 className="w-5 h-5 text-purple-400" />
+                            Popular Games
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {stats?.games.byType && Object.entries(stats.games.byType).length > 0 ? (
+                                Object.entries(stats.games.byType)
+                                    .sort(([, a], [, b]) => b - a)
+                                    .slice(0, 4)
+                                    .map(([game, count], idx) => (
+                                        <div key={game} className="p-4 rounded-lg bg-slate-800/30 hover:bg-slate-800/50 transition-colors group">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 text-xs font-bold">
+                                                    #{idx + 1}
+                                                </span>
+                                                <p className="text-white font-medium capitalize text-sm truncate">{game.replace(/-/g, ' ')}</p>
+                                            </div>
+                                            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-purple-500/50 rounded-full"
+                                                    style={{ width: `${Math.min((count / (stats.games.total || 1)) * 100, 100)}%` }}
+                                                />
+                                            </div>
+                                            <p className="text-slate-500 text-xs mt-2">{count} plays</p>
+                                        </div>
+                                    ))
+                            ) : (
+                                <div className="col-span-4 flex flex-col items-center justify-center py-10 text-slate-500">
+                                    <Sparkles className="w-8 h-8 mb-2 opacity-50" />
+                                    <p>No game data available yet</p>
+                                </div>
+                            )}
                         </div>
-                        <div>
-                            <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
-                                {stats?.couples.total || 0}
-                            </div>
-                            <p className="text-primary-300 text-sm font-medium mt-1">Total Couples</p>
-                        </div>
-                        <div>
-                            <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
-                                {stats?.checkins.total || 0}
-                            </div>
-                            <p className="text-primary-300 text-sm font-medium mt-1">Total Check-ins</p>
-                        </div>
-                        <div>
-                            <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
-                                {stats?.games.total || 0}
-                            </div>
-                            <p className="text-primary-300 text-sm font-medium mt-1">Games Played</p>
-                        </div>
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
             </motion.div>
         </div>
     );
 }
-

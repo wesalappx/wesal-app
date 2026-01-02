@@ -20,6 +20,7 @@ import { useAchievements } from '@/hooks/useAchievements';
 import { useJourneys } from '@/hooks/useJourneys';
 import { useWhisper } from '@/hooks/useWhisper';
 import { useInsights } from '@/hooks/useInsights';
+import { useTierLimits } from '@/hooks/useTierLimits';
 import { createClient } from '@/lib/supabase/client';
 
 interface Message {
@@ -89,7 +90,12 @@ export default function AICoachPage() {
     const { progressMap: journeysData } = useJourneys();
     const { incomingWhisper, outgoingWhisper } = useWhisper();
     const { insights: insightsData } = useInsights();
+    const { canUse, trackUsage, isPremium, getUpgradePrompt } = useTierLimits();
     const supabase = createClient();
+
+    // AI usage tracking state
+    const [aiUsage, setAiUsage] = useState<{ remaining: number; limit: number } | null>(null);
+    const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState('');
@@ -591,9 +597,33 @@ export default function AICoachPage() {
         return response.replace(/\[ACTION:[^\]]+\]/g, '').trim();
     };
 
+    // Fetch AI usage on mount
+    useEffect(() => {
+        const fetchUsage = async () => {
+            const usage = await canUse('ai_chat');
+            if (usage.limit > 0) {
+                setAiUsage({ remaining: usage.remaining, limit: usage.limit });
+            }
+        };
+        fetchUsage();
+    }, [canUse]);
+
     // Send message to AI
     const sendMessage = async (content: string) => {
         if (!content.trim() || isLoading) return;
+
+        // Check if user can send more messages (tier limit)
+        const usage = await canUse('ai_chat');
+        if (!usage.canUse && usage.limit > 0) {
+            setShowUpgradePrompt(true);
+            return;
+        }
+
+        // Track usage
+        const trackResult = await trackUsage('ai_chat');
+        if (trackResult.remaining >= 0) {
+            setAiUsage({ remaining: trackResult.remaining, limit: usage.limit });
+        }
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -941,8 +971,62 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
                             {isRTL ? 'خروج' : 'Exit'}
                         </button>
                     )}
+                    {/* Usage Counter Badge */}
+                    {aiUsage && aiUsage.limit > 0 && mode !== 'intimate' && (
+                        <div className={`px-3 py-1.5 rounded-full text-xs font-medium ${aiUsage.remaining <= 1
+                                ? 'bg-orange-500/20 text-orange-400'
+                                : 'bg-surface-700/50 text-surface-300'
+                            }`}>
+                            {aiUsage.remaining}/{aiUsage.limit}
+                        </div>
+                    )}
                 </div>
             </header>
+
+            {/* Upgrade Prompt Modal */}
+            <AnimatePresence>
+                {showUpgradePrompt && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4"
+                        onClick={() => setShowUpgradePrompt(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-surface-800 rounded-3xl p-6 max-w-sm w-full text-center border border-white/10"
+                        >
+                            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center">
+                                <Sparkles className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">
+                                {isRTL ? 'انتهت رسائل اليوم' : 'Daily Limit Reached'}
+                            </h3>
+                            <p className="text-surface-400 mb-6">
+                                {isRTL
+                                    ? 'اشترك في Premium للحصول على محادثات غير محدودة مع رفيق وصال'
+                                    : 'Upgrade to Premium for unlimited AI conversations'}
+                            </p>
+                            <Link
+                                href="/settings/upgrade"
+                                className="block w-full py-3 rounded-2xl bg-gradient-to-r from-primary-500 to-accent-500 text-white font-bold mb-3"
+                            >
+                                {isRTL ? 'ترقية الآن' : 'Upgrade Now'}
+                            </Link>
+                            <button
+                                onClick={() => setShowUpgradePrompt(false)}
+                                className="text-surface-500 text-sm"
+                            >
+                                {isRTL ? 'لاحقاً' : 'Maybe Later'}
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Content Area */}
             {messages.length === 0 ? (
