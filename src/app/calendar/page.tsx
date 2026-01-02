@@ -12,6 +12,7 @@ import { useCalendar, ScheduledSession } from '@/hooks/useCalendar';
 import { useHealth } from '@/hooks/useHealth';
 import { usePairing } from '@/hooks/usePairing';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useSettingsStore } from '@/stores/settings-store';
 
 // --- Types ---
 interface ScheduledEvent {
@@ -77,6 +78,7 @@ const mapLocalTypeToDb = (localType: string): string => {
 // --- Main Component ---
 export default function CalendarPage() {
     const { t, language } = useTranslation();
+    const { theme } = useSettingsStore();
     const isRTL = language === 'ar';
 
     // State
