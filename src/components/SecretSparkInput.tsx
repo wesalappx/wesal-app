@@ -113,8 +113,8 @@ export default function SecretSparkInput() {
                                                     key={cat}
                                                     onClick={() => setCategory(cat)}
                                                     className={`px-3 py-1.5 rounded-full border transition-colors ${category === cat
-                                                            ? 'bg-primary-500 border-primary-500 text-white'
-                                                            : 'border-white/10 text-slate-400 hover:bg-white/5'
+                                                        ? 'bg-primary-500 border-primary-500 text-white'
+                                                        : 'border-white/10 text-slate-400 hover:bg-white/5'
                                                         }`}
                                                 >
                                                     {cat}
@@ -123,6 +123,7 @@ export default function SecretSparkInput() {
                                         </div>
                                     </div>
 
+                                    <div className="space-y-2">
                                         <label className="text-xs font-medium text-slate-400">
                                             {isRTL ? 'ما هي رغبتك؟' : 'What is your desire?'}
                                         </label>
@@ -143,12 +144,11 @@ export default function SecretSparkInput() {
                                         {isRTL ? 'إطلاق الشرارة' : 'Ignite Spark'}
                                     </Button>
                                 </div>
+                            )}
+                        </motion.div>
+                    </div>
                 )}
-            </motion.div>
-        </div >
-                )
-}
-            </AnimatePresence >
+            </AnimatePresence>
         </>
     );
 }
