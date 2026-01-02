@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Send, Lock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { useSettingsStore } from '@/stores/settings-store';
 
 export default function SecretSparkInput() {
@@ -124,15 +123,14 @@ export default function SecretSparkInput() {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
                                         <label className="text-xs font-medium text-slate-400">
                                             {isRTL ? 'ما هي رغبتك؟' : 'What is your desire?'}
                                         </label>
-                                        <Textarea
+                                        <textarea
                                             value={secret}
                                             onChange={(e) => setSecret(e.target.value)}
                                             placeholder={isRTL ? 'مثلاً: أريد تجربة رقص السالسا...' : 'e.g., I want to try salsa dancing...'}
-                                            className="bg-slate-950/50 border-white/10 text-white min-h-[100px]"
+                                            className="flex min-h-[100px] w-full rounded-md border border-white/10 bg-slate-950/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-white"
                                         />
                                     </div>
 
@@ -145,11 +143,12 @@ export default function SecretSparkInput() {
                                         {isRTL ? 'إطلاق الشرارة' : 'Ignite Spark'}
                                     </Button>
                                 </div>
-                            )}
-                        </motion.div>
-                    </div>
                 )}
-            </AnimatePresence>
+            </motion.div>
+        </div >
+                )
+}
+            </AnimatePresence >
         </>
     );
 }
