@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
@@ -11,6 +11,13 @@ import {
 import { useSubscription } from '@/hooks/useSubscription';
 import { useSettingsStore } from '@/stores/settings-store';
 import { SUBSCRIPTION_PLANS, FREE_TIER_LIMITS } from '@/lib/payments';
+
+interface DynamicPricing {
+    monthly: number;
+    annual: number;
+    currency: string;
+    savings: number;
+}
 
 export default function UpgradePage() {
     const { language } = useSettingsStore();
@@ -27,6 +34,30 @@ export default function UpgradePage() {
     const [selectedPlan, setSelectedPlan] = useState<'premium_monthly' | 'premium_annual'>('premium_monthly');
     const [isUpgrading, setIsUpgrading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Dynamic pricing state
+    const [pricing, setPricing] = useState<DynamicPricing>({
+        monthly: 29,
+        annual: 249,
+        currency: 'SAR',
+        savings: 99
+    });
+
+    // Fetch dynamic pricing on mount
+    useEffect(() => {
+        const fetchPricing = async () => {
+            try {
+                const res = await fetch('/api/pricing');
+                if (res.ok) {
+                    const data = await res.json();
+                    setPricing(data);
+                }
+            } catch (err) {
+                console.error('Failed to fetch pricing:', err);
+            }
+        };
+        fetchPricing();
+    }, []);
 
     const handleUpgrade = async () => {
         setError(null);
@@ -93,10 +124,12 @@ export default function UpgradePage() {
         }
     ];
 
-    const monthlyPlan = SUBSCRIPTION_PLANS.find(p => p.id === 'premium_monthly')!;
-    const annualPlan = SUBSCRIPTION_PLANS.find(p => p.id === 'premium_annual')!;
+    // Use dynamic pricing instead of hardcoded plans
+    const monthlyPrice = pricing.monthly;
+    const annualPrice = pricing.annual;
 
     if (isLoading) {
+
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-primary-400" />
@@ -196,20 +229,18 @@ export default function UpgradePage() {
                     <button
                         onClick={() => setSelectedPlan('premium_monthly')}
                         className={`relative p-4 rounded-2xl border-2 transition-all text-center ${selectedPlan === 'premium_monthly'
-                                ? 'border-primary-500 bg-primary-500/10'
-                                : 'border-white/10 bg-white/5 hover:border-white/20'
+                            ? 'border-primary-500 bg-primary-500/10'
+                            : 'border-white/10 bg-white/5 hover:border-white/20'
                             }`}
                     >
-                        {monthlyPlan.isMostPopular && (
-                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary-500 text-white text-xs font-bold">
-                                {isRTL ? 'الأكثر طلباً' : 'Most Popular'}
-                            </span>
-                        )}
+                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary-500 text-white text-xs font-bold">
+                            {isRTL ? 'الأكثر طلباً' : 'Most Popular'}
+                        </span>
                         <p className="text-surface-400 text-sm mb-1">
                             {isRTL ? 'شهري' : 'Monthly'}
                         </p>
                         <p className="text-2xl font-bold text-white">
-                            {formatPrice(monthlyPlan.price)}
+                            {formatPrice(monthlyPrice)}
                         </p>
                         <p className="text-surface-500 text-xs">
                             {isRTL ? '/شهر' : '/month'}
@@ -220,18 +251,18 @@ export default function UpgradePage() {
                     <button
                         onClick={() => setSelectedPlan('premium_annual')}
                         className={`relative p-4 rounded-2xl border-2 transition-all text-center ${selectedPlan === 'premium_annual'
-                                ? 'border-primary-500 bg-primary-500/10'
-                                : 'border-white/10 bg-white/5 hover:border-white/20'
+                            ? 'border-primary-500 bg-primary-500/10'
+                            : 'border-white/10 bg-white/5 hover:border-white/20'
                             }`}
                     >
                         <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-emerald-500 text-white text-xs font-bold">
-                            {annualPlan.discount?.[language] || '2 months free'}
+                            {isRTL ? `وفر ${pricing.savings} ريال` : `Save ${pricing.savings} SAR`}
                         </span>
                         <p className="text-surface-400 text-sm mb-1">
                             {isRTL ? 'سنوي' : 'Annual'}
                         </p>
                         <p className="text-2xl font-bold text-white">
-                            {formatPrice(annualPlan.price)}
+                            {formatPrice(annualPrice)}
                         </p>
                         <p className="text-surface-500 text-xs">
                             {isRTL ? '/سنة' : '/year'}
