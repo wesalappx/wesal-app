@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useNotes, Note, SpecialDate, BudgetGoal } from '@/hooks/useNotes';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useSettingsStore } from '@/stores/settings-store';
 
 const categoryConfig = {
     general: { icon: StickyNote, color: 'text-blue-400', bg: 'from-blue-500/20 to-cyan-500/20', border: 'border-blue-500/30' },
@@ -31,6 +32,7 @@ type Tab = 'notes' | 'dates' | 'budget';
 
 export default function NotesPage() {
     const { t, language } = useTranslation();
+    const { theme } = useSettingsStore();
     const isRTL = language === 'ar';
     const {
         notes, specialDates, budgetGoals, loading,
@@ -138,20 +140,23 @@ export default function NotesPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900 font-sans">
+        <div className={`min-h-screen font-sans ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}>
             {/* Background */}
-            <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-[100px] animate-pulse" />
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent-500/10 rounded-full blur-[100px] animate-pulse delay-1000" />
-            </div>
+            {/* Background */}
+            {theme === 'dark' && (
+                <div className="fixed inset-0 pointer-events-none">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-[100px] animate-pulse" />
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent-500/10 rounded-full blur-[100px] animate-pulse delay-1000" />
+                </div>
+            )}
 
             <div className="max-w-md mx-auto p-4 pb-32 relative z-10">
                 {/* Header */}
                 <header className="flex items-center justify-between mb-6 pt-4">
-                    <Link href="/dashboard" className="p-2 -ml-2 text-surface-400 hover:text-white transition-colors">
+                    <Link href="/dashboard" className={`p-2 -ml-2 transition-colors ${theme === 'light' ? 'text-slate-500 hover:text-slate-800' : 'text-surface-400 hover:text-white'}`}>
                         {isRTL ? <ArrowRight className="w-6 h-6" /> : <ArrowLeft className="w-6 h-6" />}
                     </Link>
-                    <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                    <h1 className={`text-xl font-bold flex items-center gap-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                         <StickyNote className="w-5 h-5 text-primary-400" />
                         {isRTL ? 'ملاحظاتنا' : 'Our Notes'}
                     </h1>
@@ -171,7 +176,9 @@ export default function NotesPage() {
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex-1 py-3 px-3 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${activeTab === tab.id
                                 ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
-                                : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700 border border-white/5'
+                                : theme === 'light'
+                                    ? 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-200'
+                                    : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700 border border-white/5'
                                 }`}
                         >
                             <tab.icon className="w-4 h-4" />
@@ -209,9 +216,9 @@ export default function NotesPage() {
                             {activeTab === 'notes' && (
                                 <div className="space-y-3">
                                     {notes.length === 0 ? (
-                                        <div className="glass-card p-8 text-center">
-                                            <StickyNote className="w-12 h-12 text-surface-600 mx-auto mb-3" />
-                                            <p className="text-surface-400">{isRTL ? 'لا توجد ملاحظات بعد' : 'No notes yet'}</p>
+                                        <div className={`${theme === 'light' ? 'bg-white border border-slate-100 shadow-sm' : 'glass-card'} p-8 text-center rounded-2xl`}>
+                                            <StickyNote className={`w-12 h-12 mx-auto mb-3 ${theme === 'light' ? 'text-slate-300' : 'text-surface-600'}`} />
+                                            <p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>{isRTL ? 'لا توجد ملاحظات بعد' : 'No notes yet'}</p>
                                             <button
                                                 onClick={() => setShowAddModal(true)}
                                                 className="mt-4 px-4 py-2 bg-primary-500 text-white rounded-xl text-sm"
@@ -229,19 +236,19 @@ export default function NotesPage() {
                                                     initial={{ opacity: 0, y: 20 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: idx * 0.05 }}
-                                                    className={`glass-card p-4 border ${config.border} bg-gradient-to-br ${config.bg}`}
+                                                    className={`${theme === 'light' ? 'bg-white shadow-sm' : 'glass-card'} p-4 border ${config.border} bg-gradient-to-br ${config.bg} rounded-2xl`}
                                                 >
                                                     <div className="flex items-start gap-3">
-                                                        <div className={`w-10 h-10 rounded-xl bg-surface-800/50 flex items-center justify-center ${config.color}`}>
+                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${config.color} ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-800/50'}`}>
                                                             <Icon className="w-5 h-5" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-2">
                                                                 {note.is_pinned && <Pin className="w-3 h-3 text-amber-400" />}
-                                                                <h3 className="font-bold text-white truncate">{note.title}</h3>
+                                                                <h3 className={`font-bold truncate ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{note.title}</h3>
                                                             </div>
                                                             {note.content && (
-                                                                <p className="text-sm text-surface-300 mt-1 line-clamp-2">{note.content}</p>
+                                                                <p className={`text-sm mt-1 line-clamp-2 ${theme === 'light' ? 'text-slate-500' : 'text-surface-300'}`}>{note.content}</p>
                                                             )}
                                                         </div>
                                                         <div className="flex gap-1">
@@ -282,9 +289,9 @@ export default function NotesPage() {
                             {activeTab === 'dates' && (
                                 <div className="space-y-3">
                                     {specialDates.length === 0 ? (
-                                        <div className="glass-card p-8 text-center">
-                                            <Calendar className="w-12 h-12 text-surface-600 mx-auto mb-3" />
-                                            <p className="text-surface-400">{isRTL ? 'لا توجد مناسبات' : 'No special dates'}</p>
+                                        <div className={`${theme === 'light' ? 'bg-white border border-slate-100 shadow-sm' : 'glass-card'} p-8 text-center rounded-2xl`}>
+                                            <Calendar className={`w-12 h-12 mx-auto mb-3 ${theme === 'light' ? 'text-slate-300' : 'text-surface-600'}`} />
+                                            <p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>{isRTL ? 'لا توجد مناسبات' : 'No special dates'}</p>
                                             <button
                                                 onClick={() => setShowAddModal(true)}
                                                 className="mt-4 px-4 py-2 bg-primary-500 text-white rounded-xl text-sm"
@@ -303,15 +310,15 @@ export default function NotesPage() {
                                                     initial={{ opacity: 0, y: 20 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: idx * 0.05 }}
-                                                    className="glass-card p-4"
+                                                    className={`${theme === 'light' ? 'bg-white shadow-sm border border-slate-100' : 'glass-card'} p-4 rounded-2xl`}
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center ${config.color}`}>
                                                             <Icon className="w-6 h-6" />
                                                         </div>
                                                         <div className="flex-1">
-                                                            <h3 className="font-bold text-white">{date.title}</h3>
-                                                            <p className="text-sm text-surface-400">
+                                                            <h3 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{date.title}</h3>
+                                                            <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                                                                 {new Date(date.event_date).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US', {
                                                                     month: 'long',
                                                                     day: 'numeric'
@@ -350,9 +357,9 @@ export default function NotesPage() {
                             {activeTab === 'budget' && (
                                 <div className="space-y-3">
                                     {budgetGoals.length === 0 ? (
-                                        <div className="glass-card p-8 text-center">
-                                            <Wallet className="w-12 h-12 text-surface-600 mx-auto mb-3" />
-                                            <p className="text-surface-400">{isRTL ? 'لا توجد أهداف' : 'No budget goals'}</p>
+                                        <div className={`${theme === 'light' ? 'bg-white border border-slate-100 shadow-sm' : 'glass-card'} p-8 text-center rounded-2xl`}>
+                                            <Wallet className={`w-12 h-12 mx-auto mb-3 ${theme === 'light' ? 'text-slate-300' : 'text-surface-600'}`} />
+                                            <p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>{isRTL ? 'لا توجد أهداف' : 'No budget goals'}</p>
                                             <button
                                                 onClick={() => setShowAddModal(true)}
                                                 className="mt-4 px-4 py-2 bg-primary-500 text-white rounded-xl text-sm"
@@ -369,10 +376,10 @@ export default function NotesPage() {
                                                     initial={{ opacity: 0, y: 20 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: idx * 0.05 }}
-                                                    className="glass-card p-4"
+                                                    className={`${theme === 'light' ? 'bg-white shadow-sm border border-slate-100' : 'glass-card'} p-4 rounded-2xl`}
                                                 >
                                                     <div className="flex items-center justify-between mb-3">
-                                                        <h3 className="font-bold text-white">{goal.title}</h3>
+                                                        <h3 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{goal.title}</h3>
                                                         <span className="text-green-400 font-bold">
                                                             {goal.current_amount.toLocaleString()} / {goal.target_amount.toLocaleString()}
                                                         </span>
@@ -461,10 +468,10 @@ export default function NotesPage() {
                             exit={{ y: '100%' }}
                             onClick={e => e.stopPropagation()}
                             dir={isRTL ? 'rtl' : 'ltr'}
-                            className="w-full sm:max-w-sm bg-surface-900 border-t sm:border border-white/10 rounded-t-2xl sm:rounded-2xl p-6"
+                            className={`w-full sm:max-w-sm border-t sm:border rounded-t-2xl sm:rounded-2xl p-6 ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-surface-900 border-white/10'}`}
                         >
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-bold text-white">
+                                <h2 className={`text-lg font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                     {editingNote
                                         ? (isRTL ? 'تعديل الملاحظة' : 'Edit Note')
                                         : editingDate
@@ -491,14 +498,14 @@ export default function NotesPage() {
                                         placeholder={isRTL ? 'العنوان' : 'Title'}
                                         value={newTitle}
                                         onChange={e => setNewTitle(e.target.value)}
-                                        className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white"
+                                        className={`w-full border rounded-xl px-4 py-3 ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400' : 'bg-surface-800 border-white/10 text-white placeholder:text-surface-500'}`}
                                     />
                                     <textarea
                                         placeholder={isRTL ? 'المحتوى (اختياري)' : 'Content (optional)'}
                                         value={newContent}
                                         onChange={e => setNewContent(e.target.value)}
                                         rows={3}
-                                        className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white resize-none"
+                                        className={`w-full border rounded-xl px-4 py-3 resize-none ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400' : 'bg-surface-800 border-white/10 text-white resize-none'}`}
                                     />
                                     <div className="grid grid-cols-5 gap-2">
                                         {Object.entries(categoryConfig).map(([key, config]) => (

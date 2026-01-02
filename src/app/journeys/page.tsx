@@ -25,6 +25,7 @@ import { usePairing } from '@/hooks/usePairing';
 import { createClient } from '@/lib/supabase/client';
 import { journeysData, getJourneySteps } from '@/data/journeys';
 import SessionModeModal from '@/components/SessionModeModal';
+import { useSettingsStore } from '@/stores/settings-store';
 
 export default function JourneysPage() {
     const supabase = createClient();
@@ -35,6 +36,7 @@ export default function JourneysPage() {
     // Hooks
     const { progressMap, isLoading } = useJourneys();
     const { getStatus } = usePairing();
+    const { theme } = useSettingsStore();
 
     // State
     const [selectedJourneyId, setSelectedJourneyId] = useState<string | null>(null);
@@ -149,14 +151,6 @@ export default function JourneysPage() {
         const { journeyId, stepIndex } = pendingExercise;
 
         if (mode === 'remote') {
-            // Create session if not exists logic will be handled by destination page or here?
-            // To ensure "Conflict-style" robustness, we should create it here IF we are the initiator,
-            // OR let the useSessionSync hook on the next page handle it.
-            // But useSessionSync requires activityId.
-            // Let's pass mode=remote to the page. 
-            // Better: Pre-create session to ensure it's ready?
-            // "ConflictPage" creates session then sets state.
-            // let's trust the destination page to use `useSessionSync` correctly with `initSession`.
             router.push(`/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=remote`);
         } else {
             router.push(`/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=local`);
@@ -168,9 +162,6 @@ export default function JourneysPage() {
     const handleJoinSession = () => {
         if (!activeSession) return;
         playSound('success');
-        // We assume activeSession.activity_id is the journeyId
-        // And state has the step? If not, defaults to 1?
-        // Let's assume active_sessions.activity_id holds the JOURNEY ID.
         const journeyId = activeSession.activity_id;
         const stepIndex = activeSession.state?.stepIndex || 0;
         router.push(`/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=remote`);
@@ -183,18 +174,27 @@ export default function JourneysPage() {
 
     if (isLoading) {
         return (
-            <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950">
-                <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+            <main className={`min-h-screen flex items-center justify-center transition-colors duration-500 ${theme === 'light'
+                ? 'bg-slate-50'
+                : 'bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950'
+                }`}>
+                <div className={`w-8 h-8 border-4 border-t-transparent rounded-full animate-spin ${theme === 'light' ? 'border-primary-500' : 'border-primary-500'
+                    }`} />
             </main>
         );
     }
 
     return (
-        <main className="min-h-screen p-4 pb-32 relative overflow-hidden bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950">
+        <main className={`min-h-screen p-4 pb-32 relative overflow-hidden font-sans transition-colors duration-500 ${theme === 'light'
+            ? 'bg-gradient-to-br from-slate-50 via-white to-pink-50/30'
+            : 'bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950'
+            }`}>
             {/* Creative Animated Background */}
             <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-radial from-primary-500/15 via-transparent to-transparent rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-radial from-accent-500/15 via-transparent to-transparent rounded-full blur-3xl" />
+                <div className={`absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-3xl transition-colors ${theme === 'light' ? 'bg-primary-200/20' : 'bg-gradient-radial from-primary-500/15 via-transparent to-transparent'
+                    }`} />
+                <div className={`absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-3xl transition-colors ${theme === 'light' ? 'bg-accent-200/20' : 'bg-gradient-radial from-accent-500/15 via-transparent to-transparent'
+                    }`} />
 
                 {/* Floating Hearts */}
                 <motion.div className="absolute top-24 right-8 text-3xl opacity-20" animate={{ y: [0, -15, 0], rotate: [0, 10, 0] }} transition={{ duration: 4, repeat: Infinity }}>💕</motion.div>
@@ -202,10 +202,13 @@ export default function JourneysPage() {
             </div>
 
             <div className="max-w-md mx-auto pt-4 relative z-10">
-                {/* Back Button with Glassmorphism */}
+                {/* Back Button */}
                 <Link
                     href="/dashboard"
-                    className="inline-flex items-center gap-2 text-surface-400 hover:text-white mb-6 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 transition-all hover:bg-white/10"
+                    className={`inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full backdrop-blur-sm border transition-all ${theme === 'light'
+                        ? 'bg-white/50 border-slate-200 text-slate-500 hover:bg-white hover:text-slate-800'
+                        : 'bg-white/5 border-white/10 text-surface-400 hover:text-white hover:bg-white/10'
+                        }`}
                 >
                     <ArrowRight className="w-4 h-4 transform rotate-180" />
                     {t('common.back')}
@@ -216,15 +219,21 @@ export default function JourneysPage() {
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-300 text-sm mb-4"
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm mb-4 ${theme === 'light'
+                            ? 'bg-primary-50 border-primary-100 text-primary-600'
+                            : 'bg-primary-500/10 border-primary-500/20 text-primary-300'
+                            }`}
                     >
                         <Sparkles className="w-4 h-4" />
                         رحلة التواصل
                     </motion.div>
-                    <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-white to-surface-300 bg-clip-text text-transparent">
+                    <h1 className={`text-3xl font-bold mb-2 bg-clip-text text-transparent ${theme === 'light'
+                        ? 'bg-gradient-to-r from-primary-600 to-accent-600'
+                        : 'bg-gradient-to-r from-white to-surface-300'
+                        }`}>
                         {t('journeys.title')}
                     </h1>
-                    <p className="text-surface-400">{t('journeys.subtitle')}</p>
+                    <p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>{t('journeys.subtitle')}</p>
                 </div>
 
                 {/* Active Session Banner */}
@@ -236,14 +245,18 @@ export default function JourneysPage() {
                             exit={{ height: 0, opacity: 0 }}
                             className="mb-6 overflow-hidden"
                         >
-                            <div className="bg-gradient-to-r from-primary-600/20 to-accent-600/20 border border-primary-500/30 p-4 rounded-2xl flex items-center justify-between backdrop-blur-md">
+                            <div className={`p-4 rounded-2xl flex items-center justify-between backdrop-blur-md border ${theme === 'light'
+                                ? 'bg-gradient-to-r from-primary-50 to-accent-50 border-primary-100 shadow-lg shadow-primary-500/10'
+                                : 'bg-gradient-to-r from-primary-600/20 to-accent-600/20 border-primary-500/30'
+                                }`}>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center animate-pulse">
-                                        <Users className="w-5 h-5 text-primary-400" />
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center animate-pulse ${theme === 'light' ? 'bg-primary-100' : 'bg-primary-500/20'
+                                        }`}>
+                                        <Users className={`w-5 h-5 ${theme === 'light' ? 'text-primary-600' : 'text-primary-400'}`} />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-white text-sm">جلسة نشطة مع الشريك</h3>
-                                        <p className="text-xs text-primary-200">يبدو أن شريكك بدأ رحلة!</p>
+                                        <h3 className={`font-bold text-sm ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>جلسة نشطة مع الشريك</h3>
+                                        <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-primary-200'}`}>يبدو أن شريكك بدأ رحلة!</p>
                                     </div>
                                 </div>
                                 <button
@@ -272,27 +285,40 @@ export default function JourneysPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: journeyIdx * 0.1 }}
-                                className={`rounded-3xl border overflow-hidden bg-white/5 backdrop-blur-xl ${journey.border} shadow-lg`}
+                                className={`rounded-3xl border overflow-hidden backdrop-blur-xl shadow-lg transition-all ${theme === 'light'
+                                    ? 'bg-white/80 border-slate-100 shadow-slate-200'
+                                    : `bg-white/5 border-white/5 ${journey.border}`
+                                    }`}
                             >
                                 {/* Journey Header */}
                                 <div
                                     onClick={() => toggleJourney(journey.id)}
-                                    className="p-5 cursor-pointer hover:bg-white/5 transition-colors"
+                                    className={`p-5 cursor-pointer transition-colors ${theme === 'light' ? 'hover:bg-slate-50' : 'hover:bg-white/5'
+                                        }`}
                                 >
                                     <div className="flex items-center gap-4">
                                         {/* Icon with Glow Effect */}
-                                        <div className={`relative w-14 h-14 rounded-2xl bg-gradient-to-br ${journey.bg} flex items-center justify-center`}>
-                                            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${journey.bg} blur-lg opacity-50`} />
-                                            <journey.icon className={`w-7 h-7 ${journey.color} relative z-10`} />
+                                        <div className={`relative w-14 h-14 rounded-2xl flex items-center justify-center ${theme === 'light' ? 'shadow-md' : `bg-gradient-to-br ${journey.bg}`
+                                            }`}>
+                                            {theme === 'light' ? (
+                                                <div className={`w-full h-full rounded-2xl flex items-center justify-center bg-white border border-slate-100`}>
+                                                    <journey.icon className={`w-7 h-7 ${journey.color.replace('text-', 'text-')}`} />
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${journey.bg} blur-lg opacity-50`} />
+                                                    <journey.icon className={`w-7 h-7 ${journey.color} relative z-10`} />
+                                                </>
+                                            )}
                                         </div>
 
                                         {/* Info */}
                                         <div className="flex-1">
-                                            <h3 className="font-bold text-lg text-white mb-1">{journey.title}</h3>
-                                            <div className="flex items-center gap-2 text-sm text-surface-400">
+                                            <h3 className={`font-bold text-lg mb-1 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{journey.title}</h3>
+                                            <div className={`flex items-center gap-2 text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                                                 <span>{completedSteps}/{journey.totalSteps} خطوات</span>
                                                 {progressPercent > 0 && (
-                                                    <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 text-xs">
+                                                    <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-500 text-xs font-medium">
                                                         {progressPercent}%
                                                     </span>
                                                 )}
@@ -302,19 +328,26 @@ export default function JourneysPage() {
                                         {/* Expand Arrow */}
                                         <motion.div
                                             animate={{ rotate: isExpanded ? 180 : 0 }}
-                                            className="w-8 h-8 rounded-full bg-surface-700/50 flex items-center justify-center text-surface-400"
+                                            className={`w-8 h-8 rounded-full flex items-center justify-center ${theme === 'light'
+                                                ? 'bg-slate-100 text-slate-500'
+                                                : 'bg-surface-700/50 text-surface-400'
+                                                }`}
                                         >
                                             <ChevronDown className="w-5 h-5" />
                                         </motion.div>
                                     </div>
 
                                     {/* Progress Bar */}
-                                    <div className="mt-4 h-2 bg-surface-700/50 rounded-full overflow-hidden">
+                                    <div className={`mt-4 h-2 rounded-full overflow-hidden ${theme === 'light' ? 'bg-slate-100' : 'bg-surface-700/50'
+                                        }`}>
                                         <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ width: `${progressPercent}%` }}
                                             transition={{ duration: 0.5 }}
-                                            className={`h-full rounded-full bg-gradient-to-r ${journey.bg.replace('/20', '')}`}
+                                            className={`h-full rounded-full ${theme === 'light'
+                                                ? 'bg-gradient-to-r from-primary-500 to-accent-500'
+                                                : `bg-gradient-to-r ${journey.bg.replace('/20', '')}`
+                                                }`}
                                         />
                                     </div>
                                 </div>
@@ -326,7 +359,7 @@ export default function JourneysPage() {
                                             initial={{ height: 0, opacity: 0 }}
                                             animate={{ height: 'auto', opacity: 1 }}
                                             exit={{ height: 0, opacity: 0 }}
-                                            className="border-t border-white/5"
+                                            className={`border-t ${theme === 'light' ? 'border-slate-100' : 'border-white/5'}`}
                                         >
                                             <div className="p-4 space-y-2">
                                                 {steps.map((step, idx) => {
@@ -340,10 +373,15 @@ export default function JourneysPage() {
                                                             animate={{ x: 0, opacity: 1 }}
                                                             transition={{ delay: idx * 0.05 }}
                                                             onClick={() => openStep(journey.id, idx)}
-                                                            className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all
+                                                            className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border
                                                                 ${isCurrent
-                                                                    ? 'bg-primary-500/10 border border-primary-500/30 shadow-lg shadow-primary-500/10'
-                                                                    : 'hover:bg-surface-700/50 border border-transparent'}`}
+                                                                    ? theme === 'light'
+                                                                        ? 'bg-primary-50 border-primary-200 shadow-sm'
+                                                                        : 'bg-primary-500/10 border-primary-500/30 shadow-lg shadow-primary-500/10'
+                                                                    : theme === 'light'
+                                                                        ? 'hover:bg-slate-50 border-transparent'
+                                                                        : 'hover:bg-surface-700/50 border-transparent'
+                                                                }`}
                                                         >
                                                             {/* Step Icon */}
                                                             <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all
@@ -351,7 +389,10 @@ export default function JourneysPage() {
                                                                     ? 'bg-green-500 text-white shadow-lg shadow-green-500/30'
                                                                     : isCurrent
                                                                         ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30'
-                                                                        : 'bg-surface-600 text-surface-300'}`}
+                                                                        : theme === 'light'
+                                                                            ? 'bg-slate-100 text-slate-400'
+                                                                            : 'bg-surface-600 text-surface-300'
+                                                                }`}
                                                             >
                                                                 {isCompleted ? (
                                                                     <CheckCircle className="w-5 h-5" />
@@ -363,18 +404,23 @@ export default function JourneysPage() {
                                                             {/* Step Info */}
                                                             <div className="flex-1 min-w-0">
                                                                 <h4 className={`font-medium text-sm truncate
-                                                                    ${isCompleted ? 'text-green-400' : isCurrent ? 'text-primary-300' : 'text-white'}`}
+                                                                    ${isCompleted
+                                                                        ? 'text-green-500'
+                                                                        : isCurrent
+                                                                            ? 'text-primary-500'
+                                                                            : theme === 'light' ? 'text-slate-700' : 'text-white'
+                                                                    }`}
                                                                 >
                                                                     {step.title}
                                                                 </h4>
-                                                                <div className="flex items-center gap-1 text-xs text-surface-500">
+                                                                <div className={`flex items-center gap-1 text-xs ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>
                                                                     <Clock className="w-3 h-3" />
                                                                     {step.duration}
                                                                 </div>
                                                             </div>
 
                                                             {/* Arrow */}
-                                                            <ChevronLeft className="w-4 h-4 text-surface-500" />
+                                                            <ChevronLeft className={`w-4 h-4 ${theme === 'light' ? 'text-slate-300' : 'text-surface-500'}`} />
                                                         </motion.div>
                                                     );
                                                 })}
@@ -414,18 +460,24 @@ export default function JourneysPage() {
                                 animate={{ y: 0, scale: 1 }}
                                 exit={{ y: '100%', scale: 0.95 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="bg-gradient-to-b from-surface-800 to-surface-900 border border-surface-700 w-full max-w-md rounded-3xl p-6 relative shadow-2xl"
+                                className={`w-full max-w-md rounded-3xl p-6 relative shadow-2xl border ${theme === 'light'
+                                    ? 'bg-white border-slate-100'
+                                    : 'bg-gradient-to-b from-surface-800 to-surface-900 border-surface-700'
+                                    }`}
                             >
                                 <button
                                     onClick={closeStep}
-                                    className="absolute top-4 left-4 p-2 bg-surface-700/50 rounded-full text-surface-400 hover:text-white hover:bg-surface-700 transition-all"
+                                    className={`absolute top-4 left-4 p-2 rounded-full transition-all ${theme === 'light'
+                                        ? 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                        : 'bg-surface-700/50 text-surface-400 hover:text-white hover:bg-surface-700'
+                                        }`}
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
 
                                 {/* Completed Badge */}
                                 {isCompleted && (
-                                    <div className="absolute top-4 right-4 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full text-green-400 text-xs font-bold flex items-center gap-1">
+                                    <div className="absolute top-4 right-4 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full text-green-500 text-xs font-bold flex items-center gap-1">
                                         <CheckCircle className="w-3 h-3" />
                                         مكتمل
                                     </div>
@@ -440,28 +492,38 @@ export default function JourneysPage() {
                                                 ? 'w-6 bg-primary-500'
                                                 : idx < completedSteps
                                                     ? 'w-1.5 bg-green-500'
-                                                    : 'w-1.5 bg-surface-600'
+                                                    : `w-1.5 ${theme === 'light' ? 'bg-slate-200' : 'bg-surface-600'}`
                                                 }`}
                                         />
                                     ))}
                                 </div>
 
                                 <div className="text-center mb-6">
-                                    <div className={`w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4 relative ${isCompleted ? 'bg-green-500/20 text-green-400' : 'bg-primary-500/20 text-primary-400'}`}>
+                                    <div className={`w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4 relative ${isCompleted ? 'bg-green-500/20 text-green-500' : 'bg-primary-500/20 text-primary-500'}`}>
                                         <div className={`absolute inset-0 rounded-2xl blur-xl opacity-50 ${isCompleted ? 'bg-green-500/30' : 'bg-primary-500/30'}`} />
                                         <step.icon className="w-10 h-10 relative z-10" />
                                     </div>
-                                    <div className="text-xs text-surface-500 mb-2">الخطوة {activeStep.stepIndex + 1} من {journey.totalSteps}</div>
-                                    <h2 className="text-2xl font-bold mb-2 text-white">{step.title}</h2>
-                                    <p className="text-surface-400 text-sm">{step.duration}</p>
+                                    <div className={`text-xs mb-2 ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>الخطوة {activeStep.stepIndex + 1} من {journey.totalSteps}</div>
+                                    <h2 className={`text-2xl font-bold mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{step.title}</h2>
+                                    <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>{step.duration}</p>
                                 </div>
 
-                                <div className="bg-surface-800/50 p-4 rounded-2xl mb-6 border border-surface-700">
-                                    <p className="text-surface-300 text-sm leading-relaxed text-center">{step.description}</p>
+                                <div className={`p-4 rounded-2xl mb-6 border ${theme === 'light'
+                                    ? 'bg-slate-50 border-slate-100'
+                                    : 'bg-surface-800/50 border-surface-700'
+                                    }`}>
+                                    <p className={`text-sm leading-relaxed text-center ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>{step.description}</p>
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    <button onClick={prevStep} disabled={isFirst} className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isFirst ? 'bg-surface-800/30 text-surface-600 cursor-not-allowed' : 'bg-surface-700 text-white hover:bg-surface-600'}`}>
+                                    <button onClick={prevStep} disabled={isFirst} className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isFirst
+                                        ? theme === 'light'
+                                            ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                                            : 'bg-surface-800/30 text-surface-600 cursor-not-allowed'
+                                        : theme === 'light'
+                                            ? 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            : 'bg-surface-700 text-white hover:bg-surface-600'
+                                        }`}>
                                         <ChevronRight className="w-5 h-5" />
                                     </button>
                                     <button
@@ -470,7 +532,14 @@ export default function JourneysPage() {
                                     >
                                         {isCompleted ? 'إعادة التمرين 🔁' : 'ابدأ التمرين'}
                                     </button>
-                                    <button onClick={nextStep} disabled={isLast} className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isLast ? 'bg-surface-800/30 text-surface-600 cursor-not-allowed' : 'bg-surface-700 text-white hover:bg-surface-600'}`}>
+                                    <button onClick={nextStep} disabled={isLast} className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isLast
+                                        ? theme === 'light'
+                                            ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                                            : 'bg-surface-800/30 text-surface-600 cursor-not-allowed'
+                                        : theme === 'light'
+                                            ? 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            : 'bg-surface-700 text-white hover:bg-surface-600'
+                                        }`}>
                                         <ChevronLeft className="w-5 h-5" />
                                     </button>
                                 </div>

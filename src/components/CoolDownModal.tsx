@@ -1,8 +1,7 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Wind, Clock, CheckCircle } from 'lucide-react';
+import { useSettingsStore } from '@/stores/settings-store';
 
 interface CoolDownModalProps {
     isOpen: boolean;
@@ -10,6 +9,7 @@ interface CoolDownModalProps {
 }
 
 export default function CoolDownModal({ isOpen, onClose }: CoolDownModalProps) {
+    const { theme } = useSettingsStore();
     const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
     const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
     const [sessionActive, setSessionActive] = useState(false);
@@ -71,8 +71,8 @@ export default function CoolDownModal({ isOpen, onClose }: CoolDownModalProps) {
 
     // Premium Ripple Animation Variants - Adjusted for Mobile/Safety
     const rippleVariants = {
-        inhale: { scale: 1.35, opacity: 0.4, transition: { duration: 4, ease: "easeInOut" } }, // Reduced from 1.5
-        hold: { scale: 1.45, opacity: 0.5, transition: { duration: 7, repeat: Infinity, repeatType: "reverse" as const } }, // Reduced from 1.6
+        inhale: { scale: 1.35, opacity: 0.4, transition: { duration: 4, ease: "easeInOut" } },
+        hold: { scale: 1.45, opacity: 0.5, transition: { duration: 7, repeat: Infinity, repeatType: "reverse" as const } },
         exhale: { scale: 1.2, opacity: 0.1, transition: { duration: 8, ease: "easeInOut" } }
     };
 
@@ -115,7 +115,8 @@ export default function CoolDownModal({ isOpen, onClose }: CoolDownModalProps) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/95 backdrop-blur-3xl"
+                        className={`fixed inset-0 backdrop-blur-3xl ${theme === 'light' ? 'bg-white/90' : 'bg-black/95'
+                            }`}
                     />
 
                     {/* Modal Content - Scrollable & Flexible, but optimized to FIT */}
@@ -127,13 +128,21 @@ export default function CoolDownModal({ isOpen, onClose }: CoolDownModalProps) {
                     >
                         {/* Header */}
                         <div className="w-full flex justify-between items-center mb-4">
-                            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-                                <Clock className="w-4 h-4 text-primary-300" />
-                                <span className="font-mono text-white/90 text-sm tracking-widest">{formatTime(timeLeft)}</span>
+                            <div className={`flex items-center gap-3 px-4 py-2 rounded-full border backdrop-blur-md ${theme === 'light'
+                                    ? 'bg-white/50 border-slate-200 shadow-sm'
+                                    : 'bg-white/5 border-white/10'
+                                }`}>
+                                <Clock className={`w-4 h-4 ${theme === 'light' ? 'text-primary-600' : 'text-primary-300'}`} />
+                                <span className={`font-mono text-sm tracking-widest ${theme === 'light' ? 'text-slate-700' : 'text-white/90'}`}>
+                                    {formatTime(timeLeft)}
+                                </span>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/5 text-white/70 hover:text-white"
+                                className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors border ${theme === 'light'
+                                        ? 'bg-white/50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+                                        : 'bg-white/5 border-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                                    }`}
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -142,7 +151,8 @@ export default function CoolDownModal({ isOpen, onClose }: CoolDownModalProps) {
                         {/* Central Breathing Visualization - Compacted */}
                         <div className="flex-1 flex flex-col items-center justify-center my-2">
                             {/* Ambient Light Orb */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] md:w-[450px] md:h-[450px] bg-indigo-500/20 rounded-full blur-[80px] animate-pulse pointer-events-none" />
+                            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] md:w-[450px] md:h-[450px] rounded-full blur-[80px] animate-pulse pointer-events-none ${theme === 'light' ? 'bg-indigo-300/30' : 'bg-indigo-500/20'
+                                }`} />
 
                             <div className="relative flex items-center justify-center mb-8">
                                 {/* Ripple Layers */}
@@ -152,7 +162,10 @@ export default function CoolDownModal({ isOpen, onClose }: CoolDownModalProps) {
                                         animate={phase}
                                         variants={rippleVariants}
                                         transition={{ delay: i * 0.2 }}
-                                        className="absolute w-56 h-56 md:w-64 md:h-64 border border-white/10 rounded-full bg-white/5"
+                                        className={`absolute w-56 h-56 md:w-64 md:h-64 border rounded-full ${theme === 'light'
+                                                ? 'border-indigo-200/50 bg-indigo-50/30'
+                                                : 'border-white/10 bg-white/5'
+                                            }`}
                                         style={{ zIndex: 0 }}
                                     />
                                 ))}
@@ -161,7 +174,7 @@ export default function CoolDownModal({ isOpen, onClose }: CoolDownModalProps) {
                                 <motion.div
                                     animate={phase}
                                     variants={coreVariants}
-                                    className={`relative z-10 w-40 h-40 md:w-48 md:h-48 rounded-full shadow-[0_0_60px_rgba(139,92,246,0.3)]
+                                    className={`relative z-10 w-40 h-40 md:w-48 md:h-48 rounded-full shadow-2xl
                                         flex items-center justify-center backdrop-blur-md border border-white/20
                                         ${phase === 'inhale' ? 'bg-gradient-to-b from-cyan-400 to-blue-600' :
                                             phase === 'hold' ? 'bg-gradient-to-b from-violet-400 to-purple-600' :
@@ -183,7 +196,10 @@ export default function CoolDownModal({ isOpen, onClose }: CoolDownModalProps) {
                                         initial="initial"
                                         animate="animate"
                                         exit="exit"
-                                        className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60 tracking-tight"
+                                        className={`text-4xl md:text-5xl font-black bg-clip-text text-transparent tracking-tight ${theme === 'light'
+                                                ? 'bg-gradient-to-b from-slate-900 to-slate-600'
+                                                : 'bg-gradient-to-b from-white to-white/60'
+                                            }`}
                                     >
                                         {getInstructionText()}
                                     </motion.h2>
@@ -195,7 +211,8 @@ export default function CoolDownModal({ isOpen, onClose }: CoolDownModalProps) {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="text-base md:text-lg text-primary-100/70 font-medium tracking-wide"
+                                        className={`text-base md:text-lg font-medium tracking-wide ${theme === 'light' ? 'text-slate-600' : 'text-primary-100/70'
+                                            }`}
                                     >
                                         {getInstructionSubtext()}
                                     </motion.p>
@@ -210,9 +227,13 @@ export default function CoolDownModal({ isOpen, onClose }: CoolDownModalProps) {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 2 }}
                                 onClick={onClose}
-                                className="w-full py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center gap-3 transition-all group backdrop-blur-md"
+                                className={`w-full py-4 rounded-2xl flex items-center justify-center gap-3 transition-all group backdrop-blur-md border ${theme === 'light'
+                                        ? 'bg-white/80 hover:bg-white border-slate-200 shadow-xl shadow-indigo-500/10'
+                                        : 'bg-white/5 hover:bg-white/10 border-white/10'
+                                    }`}
                             >
-                                <span className="font-bold text-lg text-white/90 group-hover:text-white">أشعر بالهدوء الآن</span>
+                                <span className={`font-bold text-lg group-hover:text-current ${theme === 'light' ? 'text-slate-700' : 'text-white/90 group-hover:text-white'
+                                    }`}>أشعر بالهدوء الآن</span>
                                 <CheckCircle className="w-5 h-5 text-emerald-400" />
                             </motion.button>
                         </div>

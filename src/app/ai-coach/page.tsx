@@ -22,6 +22,7 @@ import { useWhisper } from '@/hooks/useWhisper';
 import { useInsights } from '@/hooks/useInsights';
 import { useTierLimits } from '@/hooks/useTierLimits';
 import { createClient } from '@/lib/supabase/client';
+import { useSettingsStore } from '@/stores/settings-store';
 
 interface Message {
     id: string;
@@ -78,6 +79,7 @@ const quickActions: QuickAction[] = [
 
 export default function AICoachPage() {
     const { t, language } = useTranslation();
+    const { theme } = useSettingsStore();
     const isRTL = language === 'ar';
     const { user } = useAuth();
     const { getStatus } = usePairing();
@@ -910,7 +912,9 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
     return (
         <div className={`min-h-screen font-sans flex flex-col ${mode === 'intimate'
             ? 'bg-gradient-to-b from-purple-950 via-surface-900 to-purple-950'
-            : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'
+            : theme === 'light'
+                ? 'bg-slate-50'
+                : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'
             }`}>
             {/* Background */}
             <div className="fixed inset-0 pointer-events-none">
@@ -922,21 +926,25 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
 
             {/* Header */}
             <header className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors ${mode === 'conflict'
-                ? 'bg-orange-900/20 border-orange-500/30'
+                ? theme === 'light' ? 'bg-orange-50/90 border-orange-200' : 'bg-orange-900/20 border-orange-500/30'
                 : mode === 'intimate'
                     ? 'bg-purple-900/30 border-purple-500/30'
-                    : 'bg-surface-900/80 border-surface-700/30'
+                    : theme === 'light'
+                        ? 'bg-white/80 border-slate-200'
+                        : 'bg-surface-900/80 border-surface-700/30'
                 }`}>
                 <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
-                    <Link href="/dashboard" className="p-2 rounded-full hover:bg-white/10 transition-colors text-surface-400 hover:text-white">
+                    <Link href="/dashboard" className={`p-2 rounded-full hover:bg-white/10 transition-colors ${theme === 'light' ? 'text-slate-500 hover:text-slate-900' : 'text-surface-400 hover:text-white'}`}>
                         {isRTL ? <ArrowRight className="w-6 h-6" /> : <ArrowLeft className="w-6 h-6" />}
                     </Link>
                     <div className="flex-1">
-                        <h1 className="text-lg font-bold text-white flex items-center gap-2">
+                        <h1 className={`text-lg font-bold flex items-center gap-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                             {mode === 'conflict' ? (
                                 <>
-                                    <Shield className="w-5 h-5 text-orange-400" />
-                                    {isRTL ? 'وضع حل الخلاف' : 'Conflict Mode'}
+                                    <Shield className={`w-5 h-5 ${theme === 'light' ? 'text-orange-600' : 'text-orange-400'}`} />
+                                    <span className={theme === 'light' ? 'text-orange-900' : 'text-white'}>
+                                        {isRTL ? 'وضع حل الخلاف' : 'Conflict Mode'}
+                                    </span>
                                 </>
                             ) : mode === 'intimate' ? (
                                 <>
@@ -950,7 +958,7 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
                                 </>
                             )}
                         </h1>
-                        <p className="text-xs text-surface-400">
+                        <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                             {mode === 'conflict'
                                 ? (isRTL ? 'أساعدكم تحلون الخلاف' : 'Helping you resolve conflict')
                                 : mode === 'intimate'
@@ -964,7 +972,9 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
                             onClick={exitPrivateMode}
                             className={`px-3 py-1.5 rounded-full text-sm flex items-center gap-1 transition-colors ${mode === 'intimate'
                                 ? 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'
-                                : 'bg-orange-500/20 text-orange-400 hover:bg-orange-500/30'
+                                : theme === 'light'
+                                    ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                                    : 'bg-orange-500/20 text-orange-400 hover:bg-orange-500/30'
                                 }`}
                         >
                             <X className="w-4 h-4" />
@@ -974,8 +984,8 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
                     {/* Usage Counter Badge */}
                     {aiUsage && aiUsage.limit > 0 && mode !== 'intimate' && (
                         <div className={`px-3 py-1.5 rounded-full text-xs font-medium ${aiUsage.remaining <= 1
-                                ? 'bg-orange-500/20 text-orange-400'
-                                : 'bg-surface-700/50 text-surface-300'
+                            ? 'bg-orange-500/20 text-orange-400'
+                            : 'bg-surface-700/50 text-surface-300'
                             }`}>
                             {aiUsage.remaining}/{aiUsage.limit}
                         </div>
@@ -998,15 +1008,15 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-surface-800 rounded-3xl p-6 max-w-sm w-full text-center border border-white/10"
+                            className={`rounded-3xl p-6 max-w-sm w-full text-center border ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-surface-800 border-white/10'}`}
                         >
                             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center">
                                 <Sparkles className="w-8 h-8 text-white" />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">
+                            <h3 className={`text-xl font-bold mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                                 {isRTL ? 'انتهت رسائل اليوم' : 'Daily Limit Reached'}
                             </h3>
-                            <p className="text-surface-400 mb-6">
+                            <p className={`mb-6 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                                 {isRTL
                                     ? 'اشترك في Premium للحصول على محادثات غير محدودة مع رفيق وصال'
                                     : 'Upgrade to Premium for unlimited AI conversations'}
@@ -1029,183 +1039,210 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
             </AnimatePresence>
 
             {/* Content Area */}
-            {messages.length === 0 ? (
-                /* Full-page Welcome Screen */
-                <div className="flex-1 flex flex-col items-center justify-center px-4 max-w-lg mx-auto w-full">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-center w-full"
-                    >
-                        {/* AI Avatar - Static */}
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500 via-accent-500 to-primary-600 flex items-center justify-center shadow-xl shadow-primary-500/30 mx-auto mb-5">
-                            <Bot className="w-10 h-10 text-white" />
-                        </div>
+            <AnimatePresence>
+                {messages.length === 0 ? (
+                    /* Full-page Welcome Screen */
+                    <div className="flex-1 flex flex-col items-center justify-center px-4 max-w-lg mx-auto w-full">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-center w-full"
+                        >
+                            {/* AI Avatar - Static */}
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500 via-accent-500 to-primary-600 flex items-center justify-center shadow-xl shadow-primary-500/30 mx-auto mb-5">
+                                <Bot className="w-10 h-10 text-white" />
+                            </div>
 
-                        <h2 className="text-xl font-bold text-white mb-2">
-                            {isRTL ? 'مرحباً! أنا رفيق وصال' : 'Hello! I\'m Wesal AI'}
-                        </h2>
-                        <p className="text-surface-400 text-xs leading-relaxed max-w-xs mx-auto mb-6">
-                            {isRTL
-                                ? 'أقدر أساعدك في ملاحظاتك، مناسباتك، ميزانيتك، وأعطيك نصائح للعلاقة'
-                                : 'I can help with notes, dates, budget, and relationship advice'
-                            }
-                        </p>
+                            <h2 className={`text-xl font-bold mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
+                                {isRTL ? 'مرحباً! أنا رفيق وصال' : 'Hello! I\'m Wesal AI'}
+                            </h2>
+                            <p className={`text-xs leading-relaxed max-w-xs mx-auto mb-6 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
+                                {isRTL
+                                    ? 'أقدر أساعدك في ملاحظاتك، مناسباتك، ميزانيتك، وأعطيك نصائح للعلاقة'
+                                    : 'I can help with notes, dates, budget, and relationship advice'
+                                }
+                            </p>
 
-                        {/* Quick Actions - Compact 3 columns */}
-                        <p className="text-xs text-surface-500 mb-3">
-                            {isRTL ? 'اختر موضوع أو اكتب سؤالك' : 'Choose a topic or type below'}
-                        </p>
-                        <div className="grid grid-cols-3 gap-2">
-                            {quickActions.map((action, idx) => (
-                                <motion.button
-                                    key={action.id}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: idx * 0.03 }}
-                                    onClick={() => handleQuickAction(action)}
-                                    className={`p-3 rounded-xl border transition-all flex flex-col items-center gap-1.5 ${action.id === 'intimate-wellness'
-                                        ? 'bg-purple-500/5 border-purple-500/20 hover:bg-purple-500/15'
-                                        : 'bg-surface-800/30 border-white/10 hover:bg-primary-500/10'
-                                        }`}
-                                >
-                                    <action.icon className={`w-5 h-5 ${action.id === 'intimate-wellness' ? 'text-purple-400' : 'text-primary-400'
-                                        }`} />
-                                    <span className="text-[10px] text-surface-300 leading-tight">{action.label[language]}</span>
-                                </motion.button>
-                            ))}
-                        </div>
-                    </motion.div>
-                </div>
-            ) : (
-                /* Messages Area when chatting */
-                <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 max-w-lg mx-auto w-full">
+                            {/* Quick Actions - Compact 3 columns */}
+                            <p className={`text-xs mb-3 ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>
+                                {isRTL ? 'اختر موضوع أو اكتب سؤالك' : 'Choose a topic or type below'}
+                            </p>
+                            <div className="grid grid-cols-3 gap-2">
+                                {quickActions.map((action, idx) => (
+                                    <motion.button
+                                        key={action.id}
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: idx * 0.03 }}
+                                        onClick={() => handleQuickAction(action)}
+                                        className={`p-3 rounded-xl border transition-all flex flex-col items-center gap-1.5 ${action.id === 'intimate-wellness'
+                                            ? 'bg-purple-500/5 border-purple-500/20 hover:bg-purple-500/15'
+                                            : theme === 'light'
+                                                ? 'bg-white border-slate-200 hover:bg-slate-50'
+                                                : 'bg-surface-800/30 border-white/10 hover:bg-primary-500/10'
+                                            }`}
+                                    >
+                                        <action.icon className={`w-5 h-5 ${action.id === 'intimate-wellness' ? 'text-purple-400' : (theme === 'light' ? 'text-primary-500' : 'text-primary-400')
+                                            }`} />
+                                        <span className={`text-[10px] leading-tight ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>{action.label[language]}</span>
+                                    </motion.button>
+                                ))}
+                            </div>
+                        </motion.div>
+                    </div>
+                ) : (
+                    /* Messages Area when chatting */
+                    <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 max-w-lg mx-auto w-full">
 
-                    {/* Messages */}
-                    <AnimatePresence>
-                        {messages.map((message, idx) => (
+                        {messages.map((msg, idx) => (
                             <motion.div
-                                key={message.id}
+                                key={msg.id}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.05 }}
-                                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                             >
-                                <div className={`max-w-[85%] ${message.role === 'user' ? 'order-2' : 'order-1'}`}>
-                                    <div className={`flex items-start gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${message.role === 'user'
-                                            ? 'bg-primary-500'
-                                            : mode === 'conflict'
-                                                ? 'bg-orange-500'
-                                                : 'bg-gradient-to-br from-primary-500 to-accent-500'
-                                            }`}>
-                                            {message.role === 'user'
-                                                ? <User className="w-4 h-4 text-white" />
-                                                : <Bot className="w-4 h-4 text-white" />
-                                            }
-                                        </div>
-                                        <div className={`rounded-2xl px-4 py-3 ${message.role === 'user'
-                                            ? 'bg-primary-500 text-white'
-                                            : mode === 'conflict'
-                                                ? 'bg-orange-500/10 border border-orange-500/30 text-white'
-                                                : 'bg-surface-800/50 border border-white/10 text-white'
-                                            }`}>
-                                            <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Action Confirmation Buttons - Show only for this message if pending */}
-                                    {pendingAction && pendingAction.messageId === message.id && message.role === 'assistant' && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            className="flex gap-2 mt-3 justify-end"
-                                        >
-                                            <button
-                                                onClick={() => handleConfirmAction(false)}
-                                                disabled={isLoading}
-                                                className="px-4 py-2 rounded-xl bg-surface-700/50 text-surface-300 hover:bg-surface-700 transition-colors disabled:opacity-50 text-sm font-medium"
-                                            >
-                                                {isRTL ? 'لا' : 'No'}
-                                            </button>
-                                            <button
-                                                onClick={() => handleConfirmAction(true)}
-                                                disabled={isLoading}
-                                                className="px-5 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 text-white hover:shadow-lg hover:shadow-primary-500/30 transition-all disabled:opacity-50 text-sm font-bold"
-                                            >
-                                                {isRTL ? 'نعم' : 'Yes'}
-                                            </button>
-                                        </motion.div>
-                                    )}
+                                <div className={`max-w-[85%] rounded-2xl px-5 py-3 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user'
+                                    ? theme === 'light'
+                                        ? 'bg-primary-500 text-white rounded-tr-none shadow-lg shadow-primary-500/20'
+                                        : 'bg-primary-600 text-white rounded-tr-none shadow-lg shadow-primary-600/20'
+                                    : theme === 'light'
+                                        ? 'bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-sm'
+                                        : 'bg-surface-800 text-white rounded-tl-none'
+                                    }`}>
+                                    {msg.content}
                                 </div>
                             </motion.div>
                         ))}
-                    </AnimatePresence>
-
-                    {/* Loading Indicator */}
-                    {isLoading && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex items-center gap-2"
-                        >
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${mode === 'conflict' ? 'bg-orange-500' : 'bg-gradient-to-br from-primary-500 to-accent-500'
-                                }`}>
-                                <Bot className="w-4 h-4 text-white" />
-                            </div>
-                            <div className="bg-surface-800/50 border border-white/10 rounded-2xl px-4 py-3">
-                                <div className="flex gap-1">
-                                    <span className="w-2 h-2 bg-surface-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <span className="w-2 h-2 bg-surface-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <span className="w-2 h-2 bg-surface-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        {isLoading && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+                                <div className={`rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-2 ${theme === 'light'
+                                    ? 'bg-white border border-slate-200'
+                                    : 'bg-surface-800'
+                                    }`}>
+                                    <div className="w-2 h-2 rounded-full bg-primary-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                                    <div className="w-2 h-2 rounded-full bg-primary-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                                    <div className="w-2 h-2 rounded-full bg-primary-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                                 </div>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    <div ref={messagesEndRef} />
-                </div>
-            )}
+                            </motion.div>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
+                )}
+            </AnimatePresence>
 
             {/* Input Area */}
-            <div className={`sticky bottom-0 border-t backdrop-blur-xl transition-colors ${mode === 'conflict'
-                ? 'bg-orange-900/30 border-orange-500/30'
-                : 'bg-surface-900/90 border-surface-700/50'
+            <div className={`fixed bottom-0 left-0 right-0 p-4 border-t backdrop-blur-xl z-20 transition-colors ${theme === 'light'
+                ? 'bg-white/80 border-white/50'
+                : 'bg-surface-900/90 border-surface-800'
                 }`}>
-                <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-4 py-4">
-                    <div className={`flex items-center gap-2 p-2 rounded-2xl transition-all ${mode === 'conflict'
-                        ? 'bg-surface-800/80 border border-orange-500/30'
-                        : 'bg-surface-800/80 border border-white/10'
+                <div className="max-w-2xl mx-auto flex items-end gap-2">
+                    <button
+                        onClick={() => setShowQuickActions(!showQuickActions)}
+                        className={`p-3 rounded-xl transition-colors ${theme === 'light'
+                            ? 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                            : 'bg-surface-800 text-surface-400 hover:bg-surface-700'
+                            }`}
+                    >
+                        {showQuickActions ? <ChevronDown className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
+                    </button>
+
+                    <div className={`flex-1 rounded-2xl border transition-all flex items-center px-4 py-2 ${theme === 'light'
+                        ? 'bg-slate-50 border-slate-200 focus-within:border-primary-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-primary-100'
+                        : 'bg-surface-800 border-surface-700 focus-within:border-primary-500/50 focus-within:ring-1 focus-within:ring-primary-500/20'
                         }`}>
                         <input
                             ref={inputRef}
                             type="text"
                             value={inputValue}
-                            onChange={e => setInputValue(e.target.value)}
-                            placeholder={isRTL ? 'اكتب رسالتك...' : 'Type your message...'}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && sendMessage(inputValue)}
+                            placeholder={isRTL ? 'اكتب رسالتك هنا...' : 'Type your message here...'}
+                            className={`w-full bg-transparent border-none focus:ring-0 text-sm py-2 ${theme === 'light' ? 'text-slate-800 placeholder:text-slate-400' : 'text-white placeholder:text-surface-400'
+                                }`}
                             disabled={isLoading}
-                            dir={isRTL ? 'rtl' : 'ltr'}
-                            className="flex-1 bg-transparent px-3 py-2 text-white placeholder-surface-500 focus:outline-none text-base"
                         />
-                        <button
-                            type="submit"
-                            disabled={!inputValue.trim() || isLoading}
-                            className={`w-10 h-10 rounded-xl flex items-center justify-center text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg ${mode === 'conflict'
-                                ? 'bg-gradient-to-br from-orange-500 to-red-500 shadow-orange-500/25 hover:shadow-orange-500/40'
-                                : 'bg-gradient-to-br from-primary-500 to-accent-500 shadow-primary-500/25 hover:shadow-primary-500/40'
-                                } ${!inputValue.trim() ? '' : 'hover:scale-105'}`}
-                        >
-                            {isLoading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                            ) : (
-                                <ArrowUp className="w-5 h-5" />
-                            )}
-                        </button>
                     </div>
-                </form>
+
+                    <button
+                        onClick={() => sendMessage(inputValue)}
+                        disabled={!inputValue.trim() || isLoading}
+                        className={`p-3 rounded-xl transition-all shadow-lg ${inputValue.trim() && !isLoading
+                            ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white hover:shadow-primary-500/25 hover:scale-105 active:scale-95'
+                            : theme === 'light'
+                                ? 'bg-slate-200 text-slate-400'
+                                : 'bg-surface-800 text-surface-500'
+                            }`}
+                    >
+                        {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isRTL ? <ArrowLeft className="w-5 h-5" /> : <ArrowUp className="w-5 h-5" />)}
+                    </button>
+                </div>
             </div>
 
-            {/* Privacy Disclaimer Modal for Intimate Wellness */}
+            {/* Pending Action Confirmation Modal */}
+            <AnimatePresence>
+                {pendingAction && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className={`w-full max-w-sm rounded-2xl p-6 shadow-2xl border ${theme === 'light'
+                                ? 'bg-white border-slate-200'
+                                : 'bg-surface-900 border-surface-700'
+                                }`}
+                        >
+                            <div className="text-center mb-6">
+                                <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 ${theme === 'light' ? 'bg-primary-50 text-primary-600' : 'bg-primary-900/30 text-primary-400'
+                                    }`}>
+                                    <Bot className="w-7 h-7" />
+                                </div>
+                                <h3 className={`text-lg font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                    {isRTL ? 'تأكيد الإجراء' : 'Confirm Action'}
+                                </h3>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
+                                    {isRTL ? 'هل تريد مني تنفيذ هذا الإجراء؟' : 'Would you like me to proceed with this action?'}
+                                </p>
+                            </div>
+
+                            <div className={`p-4 rounded-xl mb-6 text-sm font-medium border ${theme === 'light'
+                                ? 'bg-slate-50 border-slate-100 text-slate-700'
+                                : 'bg-surface-800 border-surface-700 text-surface-200'
+                                }`}>
+                                {isRTL ? 'الإجراء: ' : 'Action: '} {pendingAction.action.replace('_', ' ')}
+                                <br />
+                                <span className={theme === 'light' ? 'text-slate-500 font-normal' : 'text-surface-400 font-normal'}>
+                                    {Object.entries(pendingAction.params).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={() => setPendingAction(null)}
+                                    className={`py-2.5 rounded-xl font-medium transition-colors ${theme === 'light'
+                                        ? 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                        : 'bg-surface-800 text-surface-300 hover:bg-surface-700'
+                                        }`}
+                                >
+                                    {isRTL ? 'إلغاء' : 'Cancel'}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (pendingAction) {
+                                            executeActions([pendingAction]);
+                                            setPendingAction(null);
+                                        }
+                                    }}
+                                    className="py-2.5 rounded-xl font-medium bg-primary-600 text-white hover:bg-primary-500 transition-colors"
+                                >
+                                    {isRTL ? 'نعم، نفذ' : 'Yes, Proceed'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Privacy Disclaimer (First Time) */}
             <AnimatePresence>
                 {showPrivacyDisclaimer && (
                     <motion.div
@@ -1271,6 +1308,6 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 }

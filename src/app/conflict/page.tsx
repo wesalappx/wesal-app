@@ -45,7 +45,7 @@ const rules = [
 ];
 
 // Helper function to render AI response with proper formatting
-const renderFormattedText = (text: string) => {
+const renderFormattedText = (text: string, theme: string) => {
     // First, clean up the text - remove --- dividers
     const cleanedText = text.replace(/^---+$/gm, '').replace(/---/g, '');
     const lines = cleanedText.split('\n');
@@ -64,7 +64,7 @@ const renderFormattedText = (text: string) => {
             // Clean any ** from the header
             const cleanHeader = trimmedLine.replace(/\*\*/g, '');
             return (
-                <h3 key={i} className="text-base font-bold text-white mt-5 mb-2 pb-1 border-b border-purple-500/20">
+                <h3 key={i} className={`text-base font-bold mt-5 mb-2 pb-1 border-b border-purple-500/20 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                     {cleanHeader}
                 </h3>
             );
@@ -74,7 +74,7 @@ const renderFormattedText = (text: string) => {
         if (trimmedLine.startsWith('#')) {
             const cleanHeader = trimmedLine.replace(/^#+\s*/, '').replace(/\*\*/g, '');
             return (
-                <h3 key={i} className="text-base font-bold text-purple-200 mt-4 mb-2">
+                <h3 key={i} className={`text-base font-bold mt-4 mb-2 ${theme === 'light' ? 'text-purple-700' : 'text-purple-200'}`}>
                     {cleanHeader}
                 </h3>
             );
@@ -88,7 +88,7 @@ const renderFormattedText = (text: string) => {
             return (
                 <div key={i} className="flex gap-3 items-start py-1 mr-2">
                     <span className="text-purple-400 mt-1 text-sm">◆</span>
-                    <span className="text-surface-200 leading-relaxed">{renderInlineFormatting(content)}</span>
+                    <span className={`leading-relaxed ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>{renderInlineFormatting(content, theme)}</span>
                 </div>
             );
         }
@@ -99,19 +99,19 @@ const renderFormattedText = (text: string) => {
             const label = trimmedLine.substring(0, colonIndex + 1).replace(/\*\*/g, '');
             const value = trimmedLine.substring(colonIndex + 1).trim();
             return (
-                <p key={i} className="text-surface-200 py-1 leading-relaxed">
-                    <strong className="text-purple-300">{label}</strong> {renderInlineFormatting(value)}
+                <p key={i} className={`py-1 leading-relaxed ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
+                    <strong className={theme === 'light' ? 'text-purple-600' : 'text-purple-300'}>{label}</strong> {renderInlineFormatting(value, theme)}
                 </p>
             );
         }
 
         // Regular paragraph with inline formatting
-        return <p key={i} className="text-surface-200 py-1 leading-relaxed">{renderInlineFormatting(trimmedLine)}</p>;
+        return <p key={i} className={`py-1 leading-relaxed ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>{renderInlineFormatting(trimmedLine, theme)}</p>;
     });
 };
 
 // Helper to render inline bold text - strips ** and renders as bold
-const renderInlineFormatting = (text: string): React.ReactNode => {
+const renderInlineFormatting = (text: string, theme: string): React.ReactNode => {
     if (!text) return null;
 
     // Split by **bold** pattern
@@ -120,7 +120,7 @@ const renderInlineFormatting = (text: string): React.ReactNode => {
     return parts.map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
             // Extract text between ** and render as bold
-            return <strong key={i} className="text-white font-semibold">{part.slice(2, -2)}</strong>;
+            return <strong key={i} className={`font-semibold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{part.slice(2, -2)}</strong>;
         }
         // Also handle any stray * that might be left
         return part.replace(/\*/g, '');
@@ -132,7 +132,7 @@ export default function ConflictPage() {
     const { user } = useAuth();
     const { getStatus } = usePairing();
 
-    const { language } = useSettingsStore();
+    const { language, theme } = useSettingsStore();
     const { t } = useTranslation();
     const isRTL = language === 'ar';
 
@@ -500,7 +500,7 @@ export default function ConflictPage() {
 
 
     return (
-        <main className="min-h-screen p-4 pb-44 relative overflow-hidden font-sans">
+        <main className={`min-h-screen p-4 pb-44 relative overflow-hidden font-sans ${theme === 'light' ? 'bg-slate-50' : ''}`}>
             <Confetti isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
 
             {/* Background */}
@@ -512,7 +512,7 @@ export default function ConflictPage() {
             <div className="max-w-md mx-auto pt-4 relative z-10">
                 <Link
                     href="/dashboard"
-                    className="inline-flex items-center gap-2 text-surface-400 hover:text-white mb-6"
+                    className={`inline-flex items-center gap-2 mb-6 transition-colors ${theme === 'light' ? 'text-slate-500 hover:text-slate-800' : 'text-surface-400 hover:text-white'}`}
                 >
                     {isRTL ? <ArrowRight className="w-5 h-5 transform rotate-180" /> : <ArrowLeft className="w-5 h-5" />}
                     {t('nav.home') || (language === 'ar' ? 'الرئيسية' : 'Home')}
@@ -641,7 +641,7 @@ export default function ConflictPage() {
                             <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-300 to-indigo-300 bg-clip-text text-transparent">
                                 {language === 'ar' ? 'المستشار ⚖️' : 'The Consultant ⚖️'}
                             </h1>
-                            <p className="text-surface-300 mb-8 leading-relaxed">
+                            <p className={`mb-8 leading-relaxed ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>
                                 {language === 'ar'
                                     ? 'عندكم اختلاف وتبون حل؟ المستشار يستخدم الذكاء الاصطناعي ليحكم بينكم بالعدل ويقرب وجهات النظر.'
                                     : 'Have a conflict? The Consultant uses AI to judge fairly and bring you closer together.'}
@@ -717,12 +717,12 @@ export default function ConflictPage() {
                                         setMode('solo');
                                         handleStart();
                                     }}
-                                    className="w-full py-4 bg-surface-700 hover:bg-surface-600 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 border border-surface-600"
+                                    className={`w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 border ${theme === 'light' ? 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200' : 'bg-surface-700 hover:bg-surface-600 text-white border-surface-600'}`}
                                 >
                                     <User className="w-5 h-5" />
                                     {language === 'ar' ? 'جلسة فردية (جهازي فقط)' : 'Solo Session (My Device)'}
                                 </button>
-                                <div className="text-xs text-surface-500">
+                                <div className={`text-xs ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>
                                     {language === 'ar' ? 'ممتازة إذا كنتم بجانب بعض وتستخدمون جوال واحد' : 'Best if you are together using one phone'}
                                 </div>
 
@@ -733,7 +733,7 @@ export default function ConflictPage() {
                                     <MessageCircle className="w-5 h-5" />
                                     {language === 'ar' ? 'دعوة الشريك (عن بعد)' : 'Call Partner (Remote)'}
                                 </button>
-                                <div className="text-xs text-surface-500">
+                                <div className={`text-xs ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>
                                     {language === 'ar' ? 'كتابة منفصلة من الطرفين، وحل مشترك من المستشار.' : 'Separate input from both parties, joint resolution by The Consultant.'}
                                 </div>
                             </div>
@@ -805,7 +805,7 @@ export default function ConflictPage() {
                                     value={topic}
                                     onChange={(e) => setTopic(e.target.value)}
                                     placeholder={language === 'ar' ? "اكتب الموضوع هنا..." : "Type topic here..."}
-                                    className="w-full bg-surface-800 border-2 border-surface-700 rounded-2xl p-4 text-lg text-center focus:border-purple-500 focus:outline-none transition-colors mb-6"
+                                    className={`w-full border-2 rounded-2xl p-4 text-lg text-center focus:border-purple-500 focus:outline-none transition-colors mb-6 ${theme === 'light' ? 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400' : 'bg-surface-800 border-surface-700 text-white'}`}
                                     autoFocus
                                 />
                                 <button
@@ -848,7 +848,7 @@ export default function ConflictPage() {
 
                             <div className="flex-1">
                                 <textarea
-                                    className="w-full h-48 bg-surface-800/50 border border-surface-700 rounded-2xl p-4 text-base focus:border-purple-500 focus:outline-none resize-none mb-4"
+                                    className={`w-full h-48 border rounded-2xl p-4 text-base focus:border-purple-500 focus:outline-none resize-none mb-4 ${theme === 'light' ? 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400' : 'bg-surface-800/50 border-surface-700 text-white'}`}
                                     placeholder={language === 'ar' ? "اشرح وجهة نظرك.. ليش متضايق؟ وش اللي صار بالضبط؟ خذ راحتك.." : "Explain your perspective... Why are you upset? What happened?"}
                                     autoFocus
                                     onKeyDown={(e) => {
@@ -861,7 +861,7 @@ export default function ConflictPage() {
                                         }
                                     }}
                                 ></textarea>
-                                <p className="text-xs text-surface-500 flex items-center gap-1 mb-6">
+                                <p className={`text-xs flex items-center gap-1 mb-6 ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>
                                     <Shield className="w-3 h-3" />
                                     {language === 'ar' ? 'كلامك محفوظ وسري' : 'Your words are private'}
                                 </p>
@@ -910,7 +910,7 @@ export default function ConflictPage() {
 
                     {/* VERDICT / CHAT STEP - Premium Redesign */}
                     {step === 'verdict' && (
-                        <div className="fixed inset-0 bg-surface-950 z-50 flex flex-col font-sans">
+                        <div className={`fixed inset-0 z-50 flex flex-col font-sans ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-950'}`}>
                             {/* Decorative Background Mesh */}
                             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '8s' }} />
@@ -918,9 +918,9 @@ export default function ConflictPage() {
                             </div>
 
                             {/* Top Header - Glassmorphic */}
-                            <div className="relative shrink-0 flex items-center justify-between px-5 py-4 border-b border-white/5 bg-surface-900/60 backdrop-blur-xl z-10">
-                                <Link href="/dashboard" className="flex items-center gap-2 text-surface-400 hover:text-white transition-all group">
-                                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                            <div className={`relative shrink-0 flex items-center justify-between px-5 py-4 border-b backdrop-blur-xl z-10 ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/60 border-white/5'}`}>
+                                <Link href="/dashboard" className={`flex items-center gap-2 transition-all group ${theme === 'light' ? 'text-slate-600 hover:text-slate-900' : 'text-surface-400 hover:text-white'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${theme === 'light' ? 'bg-slate-100 group-hover:bg-slate-200' : 'bg-white/5 group-hover:bg-white/10'}`}>
                                         <ArrowLeft className="w-4 h-4" />
                                     </div>
                                     <span className="text-sm font-medium">{language === 'ar' ? 'خروج' : 'Exit'}</span>
@@ -929,7 +929,7 @@ export default function ConflictPage() {
                                 <div className="flex flex-col items-center">
                                     <div className="flex items-center gap-2">
                                         <Gavel className="w-4 h-4 text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
-                                        <span className="text-sm font-bold text-white tracking-wide">
+                                        <span className={`text-sm font-bold tracking-wide ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                                             {language === 'ar' ? 'المستشار' : 'CONSULTANT'}
                                         </span>
                                     </div>
@@ -985,21 +985,21 @@ export default function ConflictPage() {
                                             {msg.role === 'assistant' && idx === 0 ? (
                                                 // First AI response - Hero Verdict Card
                                                 <div className="flex-1 max-w-[90%]">
-                                                    <div className="relative overflow-hidden rounded-2xl backdrop-blur-md bg-surface-800/80 border border-white/10 shadow-xl group hover:border-purple-500/30 transition-colors duration-500">
+                                                    <div className={`relative overflow-hidden rounded-2xl backdrop-blur-md shadow-xl group hover:border-purple-500/30 transition-colors duration-500 border ${theme === 'light' ? 'bg-white/90 border-slate-200' : 'bg-surface-800/80 border-white/10'}`}>
                                                         {/* Card Glow */}
                                                         <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/20 rounded-full blur-[50px] group-hover:bg-purple-500/30 transition-all duration-500" />
 
                                                         {/* Header */}
-                                                        <div className="relative p-5 border-b border-white/5 bg-gradient-to-r from-purple-500/10 to-transparent">
+                                                        <div className={`relative p-5 border-b bg-gradient-to-r from-purple-500/10 to-transparent ${theme === 'light' ? 'border-slate-100' : 'border-white/5'}`}>
                                                             <div className="flex items-center gap-3">
                                                                 <div className="p-2 rounded-lg bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/30">
                                                                     <Scale className="w-5 h-5" />
                                                                 </div>
                                                                 <div>
-                                                                    <h3 className="text-base font-bold text-white tracking-wide">
+                                                                    <h3 className={`text-base font-bold tracking-wide ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                                                         {language === 'ar' ? 'حكم المستشار' : 'Official Verdict'}
                                                                     </h3>
-                                                                    <p className="text-[10px] text-purple-200/60 uppercase tracking-wider font-semibold">
+                                                                    <p className={`text-[10px] uppercase tracking-wider font-semibold ${theme === 'light' ? 'text-purple-600/60' : 'text-purple-200/60'}`}>
                                                                         {language === 'ar' ? 'تحليل محايد' : 'Neutral Analysis'}
                                                                     </p>
                                                                 </div>
@@ -1007,8 +1007,9 @@ export default function ConflictPage() {
                                                         </div>
 
                                                         {/* Content */}
-                                                        <div className="relative p-5 text-surface-200 text-sm leading-relaxed">
-                                                            {renderFormattedText(msg.content)}
+                                                        {/* Content */}
+                                                        <div className={`relative p-5 text-sm leading-relaxed ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
+                                                            {renderFormattedText(msg.content, theme)}
                                                         </div>
 
                                                         {/* Action Buttons */}
@@ -1021,7 +1022,7 @@ export default function ConflictPage() {
                                                                     setStep('intro');
                                                                     setShowConfetti(true);
                                                                 }}
-                                                                className="flex-1 py-3 bg-gradient-to-r from-emerald-600/20 to-emerald-500/20 hover:from-emerald-600/30 hover:to-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                                                className={`flex-1 py-3 border rounded-xl text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] ${theme === 'light' ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200' : 'bg-gradient-to-r from-emerald-600/20 to-emerald-500/20 hover:from-emerald-600/30 hover:to-emerald-500/30 text-emerald-300 border-emerald-500/30'}`}
                                                             >
                                                                 <ThumbsUp className="w-3.5 h-3.5" />
                                                                 {language === 'ar' ? 'حل عادل' : 'Fair Solution'}
@@ -1030,7 +1031,7 @@ export default function ConflictPage() {
                                                                 onClick={() => {
                                                                     setNewMessage(language === 'ar' ? 'أحتاج توضيح أكثر...' : 'I need more clarification...');
                                                                 }}
-                                                                className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-surface-300 border border-white/10 rounded-xl text-xs font-bold uppercase tracking-wide transition-all hover:text-white hover:scale-[1.02] active:scale-[0.98]"
+                                                                className={`flex-1 py-3 text-xs font-bold uppercase tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] border rounded-xl ${theme === 'light' ? 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200' : 'bg-white/5 hover:bg-white/10 text-surface-300 border-white/10 hover:text-white'}`}
                                                             >
                                                                 {language === 'ar' ? 'توضيح' : 'Clarification'}
                                                             </button>
@@ -1040,31 +1041,32 @@ export default function ConflictPage() {
                                             ) : msg.role === 'assistant' ? (
                                                 // Follow-up AI responses - Same styled card as first
                                                 <div className="flex-1 max-w-[90%]">
-                                                    <div className="relative overflow-hidden rounded-2xl backdrop-blur-md bg-surface-800/80 border border-white/10 shadow-xl">
+                                                    <div className={`relative overflow-hidden rounded-2xl backdrop-blur-md shadow-xl border ${theme === 'light' ? 'bg-white/90 border-slate-200' : 'bg-surface-800/80 border-white/10'}`}>
                                                         {/* Card Glow */}
                                                         <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/15 rounded-full blur-[50px]" />
 
                                                         {/* Header */}
-                                                        <div className="relative p-4 border-b border-white/5 bg-gradient-to-r from-purple-500/10 to-transparent">
+                                                        <div className={`relative p-4 border-b bg-gradient-to-r from-purple-500/10 to-transparent ${theme === 'light' ? 'border-slate-100' : 'border-white/5'}`}>
                                                             <div className="flex items-center gap-2">
                                                                 <div className="p-1.5 rounded-lg bg-purple-500/20 text-purple-300">
                                                                     <MessageCircle className="w-4 h-4" />
                                                                 </div>
-                                                                <span className="text-sm font-semibold text-white">
+                                                                <span className={`text-sm font-semibold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                                                     {language === 'ar' ? 'رد المستشار' : 'Consultant Reply'}
                                                                 </span>
                                                             </div>
                                                         </div>
 
                                                         {/* Content */}
-                                                        <div className="relative p-5 text-surface-200 text-sm leading-relaxed">
-                                                            {renderFormattedText(msg.content)}
+                                                        {/* Content */}
+                                                        <div className={`relative p-5 text-sm leading-relaxed ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
+                                                            {renderFormattedText(msg.content, theme)}
                                                         </div>
                                                     </div>
                                                 </div>
                                             ) : (
                                                 // User messages - Simple bubble
-                                                <div className="relative max-w-[85%] px-5 py-3.5 rounded-2xl rounded-tr-none text-sm leading-relaxed shadow-lg bg-gradient-to-br from-indigo-600 to-blue-600 text-white">
+                                                <div className={`relative max-w-[85%] px-5 py-3.5 rounded-2xl rounded-tr-none text-sm leading-relaxed shadow-lg ${theme === 'light' ? 'bg-gradient-to-br from-indigo-500 to-blue-600 text-white' : 'bg-gradient-to-br from-indigo-600 to-blue-600 text-white'}`}>
                                                     {msg.content}
                                                 </div>
                                             )}
@@ -1077,7 +1079,7 @@ export default function ConflictPage() {
                                             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-600 to-fuchsia-700 flex items-center justify-center shadow-lg shadow-purple-500/20">
                                                 <Gavel className="w-5 h-5 text-white" />
                                             </div>
-                                            <div className="px-5 py-4 rounded-2xl rounded-tl-none bg-surface-800/80 backdrop-blur-sm border border-white/5 flex gap-2 items-center">
+                                            <div className={`px-5 py-4 rounded-2xl rounded-tl-none backdrop-blur-sm border flex gap-2 items-center ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-800/80 border-white/5'}`}>
                                                 <div className="w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                                                 <div className="w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '150ms' }} />
                                                 <div className="w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -1090,7 +1092,7 @@ export default function ConflictPage() {
                             </div>
 
                             {/* Input Bar - Premium Float Effect */}
-                            <div className="relative shrink-0 p-5 bg-gradient-to-t from-surface-950 via-surface-950/95 to-transparent z-10">
+                            <div className={`relative shrink-0 p-5 z-10 ${theme === 'light' ? 'bg-gradient-to-t from-white via-white/95 to-transparent' : 'bg-gradient-to-t from-surface-950 via-surface-950/95 to-transparent'}`}>
                                 <div className="max-w-2xl mx-auto flex gap-3 relative">
                                     <div className="absolute inset-0 bg-purple-500/5 blur-xl rounded-full transform scale-x-110 translate-y-2 pointer-events-none" />
                                     <input
@@ -1101,7 +1103,7 @@ export default function ConflictPage() {
                                             if (e.key === 'Enter' && !isTyping && newMessage.trim()) handleSendMessage();
                                         }}
                                         placeholder={language === 'ar' ? 'اكتب رسالتك...' : 'Type your message...'}
-                                        className="relative flex-1 bg-surface-800/60 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-surface-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:bg-surface-800 transition-all shadow-xl"
+                                        className={`relative flex-1 backdrop-blur-xl border rounded-2xl px-5 py-4 text-sm transition-all shadow-xl focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 ${theme === 'light' ? 'bg-white/80 border-slate-200 text-slate-800 placeholder:text-slate-400 focus:bg-white' : 'bg-surface-800/60 border-white/10 text-white placeholder:text-surface-500 focus:bg-surface-800'}`}
                                         disabled={isTyping}
                                     />
                                     <button
@@ -1117,7 +1119,7 @@ export default function ConflictPage() {
                     )}
                 </AnimatePresence>
                 <div ref={messagesEndRef} />
-            </div>
-        </main>
+            </div >
+        </main >
     );
 }

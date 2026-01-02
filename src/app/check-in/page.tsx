@@ -18,6 +18,9 @@ import {
     Moon
 } from 'lucide-react';
 import Confetti from '@/components/Confetti';
+import { createClient } from '@/lib/supabase/client';
+import { useSettingsStore } from '@/stores/settings-store';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useSound } from '@/hooks/useSound';
 import { useCheckIn, CheckIn } from '@/hooks/useCheckIn';
 import { analyzeMood } from '@/lib/ai';
@@ -108,6 +111,7 @@ interface AiResponse {
 }
 
 export default function CheckInPage() {
+    const { theme } = useSettingsStore();
     const [qIndex, setQIndex] = useState(0);
     const [scores, setScores] = useState<Scores>({});
     const [isComplete, setIsComplete] = useState(false);
@@ -238,7 +242,7 @@ export default function CheckInPage() {
         }
     };
 
-    return <main className="min-h-screen p-4 pb-44 relative overflow-hidden font-sans bg-surface-900">
+    return <main className={`min-h-screen p-4 pb-44 relative overflow-hidden font-sans ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900'}`}>
         <Confetti isActive={showConfetti && isComplete} onComplete={() => setShowConfetti(false)} />
 
         {/* Back Link - Only in Survey Mode */}
@@ -256,7 +260,7 @@ export default function CheckInPage() {
             {/* SURVEY MODE */}
             {!isComplete && loadingState === 'idle' && (
                 <div className="min-h-[60vh] flex flex-col justify-center">
-                    <div className="w-full h-1 bg-surface-800 rounded-full mb-12 relative overflow-hidden">
+                    <div className={`w-full h-1 rounded-full mb-12 relative overflow-hidden ${theme === 'light' ? 'bg-slate-200' : 'bg-surface-800'}`}>
                         <motion.div
                             className="absolute top-0 right-0 h-full bg-primary-500"
                             initial={{ width: 0 }}
@@ -275,18 +279,21 @@ export default function CheckInPage() {
                             <div className={`inline-flex p-4 rounded-2xl ${currentQ.bgColor}/20 mb-6`}>
                                 <currentQ.icon className={`w-12 h-12 ${currentQ.color}`} />
                             </div>
-                            <h2 className="text-3xl font-bold text-white mb-8">{currentQ.label}</h2>
+                            <h2 className={`text-3xl font-bold mb-8 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{currentQ.label}</h2>
 
                             <div className="grid gap-3">
                                 {currentQ.options.map((opt) => (
                                     <button
                                         key={opt.val}
                                         onClick={() => handleAnswer(opt.val)}
-                                        className="w-full p-4 rounded-xl bg-surface-800 hover:bg-surface-700 border border-white/5 hover:border-primary-500/50 transition-all flex items-center justify-between group"
+                                        className={`w-full p-4 rounded-xl border transition-all flex items-center justify-between group ${theme === 'light'
+                                            ? 'bg-white hover:bg-slate-50 border-slate-200 hover:border-primary-300 shadow-sm'
+                                            : 'bg-surface-800 hover:bg-surface-700 border-white/5 hover:border-primary-500/50'
+                                            }`}
                                     >
                                         <span className="text-xl group-hover:scale-125 transition-transform">{opt.emoji}</span>
-                                        <span className="font-bold text-surface-200">{opt.label}</span>
-                                        <div className="w-6 h-6 rounded-full border-2 border-surface-600 group-hover:border-primary-500 group-hover:bg-primary-500/20" />
+                                        <span className={`font-bold ${theme === 'light' ? 'text-slate-700' : 'text-surface-200'}`}>{opt.label}</span>
+                                        <div className={`w-6 h-6 rounded-full border-2 ${theme === 'light' ? 'border-slat-300 group-hover:border-primary-500' : 'border-surface-600 group-hover:border-primary-500'} group-hover:bg-primary-500/20`} />
                                     </button>
                                 ))}
                             </div>
@@ -301,7 +308,7 @@ export default function CheckInPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 bg-gradient-to-b from-surface-900 to-black flex flex-col items-center justify-center p-8 text-center"
+                    className={`fixed inset-0 z-50 flex flex-col items-center justify-center p-8 text-center ${theme === 'light' ? 'bg-gradient-to-b from-slate-50 to-white' : 'bg-gradient-to-b from-surface-900 to-black'}`}
                 >
                     {/* Fluid Orb */}
                     <div className="relative w-64 h-64 mb-8">
@@ -323,10 +330,10 @@ export default function CheckInPage() {
                         </motion.div>
                     </div>
 
-                    <h2 className="text-2xl font-bold text-white mb-2 animate-pulse">
+                    <h2 className={`text-2xl font-bold mb-2 animate-pulse ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                         جاري استشعار الحالة...
                     </h2>
-                    <p className="text-surface-400">تواصل مع ذاتك بينما نحلل البيانات</p>
+                    <p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>تواصل مع ذاتك بينما نحلل البيانات</p>
                 </motion.div>
             )}
 
@@ -339,48 +346,51 @@ export default function CheckInPage() {
                 >
                     {/* Header */}
                     <div className="text-center pt-8">
-                        <div className="inline-block p-1 rounded-full border border-surface-700 bg-surface-800/50 backdrop-blur-sm mb-4">
+                        <div className={`inline-block p-1 rounded-full border backdrop-blur-sm mb-4 ${theme === 'light'
+                            ? 'bg-primary-50 border-primary-100'
+                            : 'bg-surface-800/50 border-surface-700'
+                            }`}>
                             <span className="px-3 py-1 text-xs font-semibold text-primary-300">تم الحفظ بنجاح</span>
                         </div>
-                        <h2 className="text-3xl font-bold text-white mb-2">ملخص يومك</h2>
+                        <h2 className={`text-3xl font-bold mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>ملخص يومك</h2>
                     </div>
 
                     {/* 1. TOP SECTION: STATS GRID */}
                     <div className="flex flex-wrap gap-2 justify-center">
-                        <div className="glass-card p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center bg-amber-500/5 border-amber-500/20">
+                        <div className={`p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center rounded-2xl border ${theme === 'light' ? 'bg-amber-50 border-amber-100' : 'bg-amber-500/5 border-amber-500/20'}`}>
                             <Sun className="w-5 h-5 text-amber-400 mb-1" />
-                            <span className="text-xl font-bold text-white">{scores.mood}/5</span>
-                            <span className="text-[10px] text-surface-400">المزاج</span>
+                            <span className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{scores.mood}/5</span>
+                            <span className={`text-[10px] ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>المزاج</span>
                         </div>
-                        <div className="glass-card p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center bg-blue-500/5 border-blue-500/20">
+                        <div className={`p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center rounded-2xl border ${theme === 'light' ? 'bg-blue-50 border-blue-100' : 'bg-blue-500/5 border-blue-500/20'}`}>
                             <Zap className="w-5 h-5 text-blue-400 mb-1" />
-                            <span className="text-xl font-bold text-white">{scores.energy}/5</span>
-                            <span className="text-[10px] text-surface-400">الطاقة</span>
+                            <span className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{scores.energy}/5</span>
+                            <span className={`text-[10px] ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>الطاقة</span>
                         </div>
-                        <div className="glass-card p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center bg-rose-500/5 border-rose-500/20">
+                        <div className={`p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center rounded-2xl border ${theme === 'light' ? 'bg-rose-50 border-rose-100' : 'bg-rose-500/5 border-rose-500/20'}`}>
                             <Brain className="w-5 h-5 text-rose-400 mb-1" />
-                            <span className="text-xl font-bold text-white">{scores.stress}/5</span>
-                            <span className="text-[10px] text-surface-400">الراحة</span>
+                            <span className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{scores.stress}/5</span>
+                            <span className={`text-[10px] ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>الراحة</span>
                         </div>
                         <div className="w-full flex gap-2">
-                            <div className="glass-card p-3 flex-1 flex flex-col items-center justify-center bg-indigo-500/5 border-indigo-500/20">
+                            <div className={`p-3 flex-1 flex flex-col items-center justify-center rounded-2xl border ${theme === 'light' ? 'bg-indigo-50 border-indigo-100' : 'bg-indigo-500/5 border-indigo-500/20'}`}>
                                 <Moon className="w-5 h-5 text-indigo-400 mb-1" />
-                                <span className="text-xl font-bold text-white">{scores.sleep}/5</span>
-                                <span className="text-[10px] text-surface-400">النوم</span>
+                                <span className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{scores.sleep}/5</span>
+                                <span className={`text-[10px] ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>النوم</span>
                             </div>
-                            <div className="glass-card p-3 flex-1 flex flex-col items-center justify-center bg-pink-500/5 border-pink-500/20">
+                            <div className={`p-3 flex-1 flex flex-col items-center justify-center rounded-2xl border ${theme === 'light' ? 'bg-pink-50 border-pink-100' : 'bg-pink-500/5 border-pink-500/20'}`}>
                                 <Heart className="w-5 h-5 text-pink-400 mb-1" />
-                                <span className="text-xl font-bold text-white">{scores.connection}/5</span>
-                                <span className="text-[10px] text-surface-400">التواصل</span>
+                                <span className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{scores.connection}/5</span>
+                                <span className={`text-[10px] ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>التواصل</span>
                             </div>
                         </div>
                     </div>
 
                     {/* 2. MIDDLE SECTION: TODAY'S BARS */}
-                    <div className="glass-card p-6">
+                    <div className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
                         <div className="flex items-center gap-2 mb-4">
                             <BarChart3 className="w-4 h-4 text-surface-400" />
-                            <h3 className="text-sm font-bold text-surface-300">مؤشرات اليوم</h3>
+                            <h3 className={`text-sm font-bold ${theme === 'light' ? 'text-slate-700' : 'text-surface-300'}`}>مؤشرات اليوم</h3>
                         </div>
                         <div className="space-y-3">
                             {QUESTIONS.map((q) => {
@@ -399,8 +409,8 @@ export default function CheckInPage() {
                                 };
                                 return (
                                     <div key={q.id} className="flex items-center gap-3">
-                                        <span className="text-xs text-surface-400 w-16 whitespace-nowrap">{getShortLabel(q.label)}</span>
-                                        <div className="h-2 flex-1 bg-surface-800 rounded-full overflow-hidden">
+                                        <span className={`text-xs w-16 whitespace-nowrap ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>{getShortLabel(q.label)}</span>
+                                        <div className={`h-2 flex-1 rounded-full overflow-hidden ${theme === 'light' ? 'bg-slate-100' : 'bg-surface-800'}`}>
                                             <motion.div
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${pct}%` }}
@@ -416,10 +426,10 @@ export default function CheckInPage() {
 
                     {/* WEEKLY TREND GRAPH */}
                     {weeklyData.length > 1 && (
-                        <div className="glass-card p-6">
+                        <div className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
                             <div className="flex items-center gap-2 mb-4">
                                 <BarChart3 className="w-4 h-4 text-primary-400" />
-                                <h3 className="text-sm font-bold text-white">تطور الأسبوع</h3>
+                                <h3 className={`text-sm font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>تطور الأسبوع</h3>
                             </div>
                             <div className="space-y-3">
                                 {['mood', 'energy', 'stress', 'sleep', 'connection'].map((metric) => {
@@ -433,7 +443,7 @@ export default function CheckInPage() {
                                                 <div className={`p-1.5 rounded-lg ${question.bgColor}/10`}>
                                                     <question.icon className={`w-3.5 h-3.5 ${question.color}`} />
                                                 </div>
-                                                <span className="text-xs font-medium text-surface-200">{question.label.split(' ').slice(1).join(' ')}</span>
+                                                <span className={`text-xs font-medium ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>{question.label.split(' ').slice(1).join(' ')}</span>
                                             </div>
 
                                             {/* Sparkline Bars */}
@@ -464,8 +474,8 @@ export default function CheckInPage() {
                                 })}
                             </div>
                             <div className="flex justify-between mt-3 px-1">
-                                <span className="text-xs text-surface-500">قبل 7 أيام</span>
-                                <span className="text-xs text-surface-500">اليوم</span>
+                                <span className={`text-xs ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>قبل 7 أيام</span>
+                                <span className={`text-xs ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>اليوم</span>
                             </div>
                         </div>
                     )}
@@ -474,34 +484,34 @@ export default function CheckInPage() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 px-2">
                             <Sparkles className="w-5 h-5 text-primary-400" />
-                            <h3 className="text-lg font-bold text-white">رؤية (Roya)</h3>
+                            <h3 className={`text-lg font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>رؤية (Roya)</h3>
                         </div>
 
                         {/* Card 1: The Insight (Jawhar) */}
-                        <div className="glass-card p-5 border-l-4 border-l-primary-500 bg-gradient-to-r from-surface-800 to-surface-800/50">
+                        <div className={`p-5 border-l-4 border-l-primary-500 rounded-2xl ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card bg-gradient-to-r from-surface-800 to-surface-800/50'}`}>
                             <h4 className="text-sm font-bold text-primary-300 mb-2">الرؤية</h4>
-                            <p className="text-white leading-relaxed">
+                            <p className={theme === 'light' ? 'text-slate-700 leading-relaxed' : 'text-white leading-relaxed'}>
                                 {aiData?.insight || <Loader2 className="w-4 h-4 animate-spin inline" />}
                             </p>
                         </div>
 
                         {/* Card 2: The Action (Khutwa) */}
-                        <div className="glass-card p-5 border-l-4 border-l-blue-500 bg-gradient-to-r from-surface-800 to-surface-800/50">
+                        <div className={`p-5 border-l-4 border-l-blue-500 rounded-2xl ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card bg-gradient-to-r from-surface-800 to-surface-800/50'}`}>
                             <h4 className="text-sm font-bold text-blue-300 mb-2">خطوة اليوم</h4>
                             <div className="flex items-start gap-3">
                                 <CheckCircle className="w-5 h-5 text-blue-400 mt-0.5" />
-                                <p className="text-white">
+                                <p className={theme === 'light' ? 'text-slate-700' : 'text-white'}>
                                     {aiData?.action || "..."}
                                 </p>
                             </div>
                         </div>
 
                         {/* Card 3: The Quote (Hamsa) */}
-                        <div className="glass-card p-5 border-l-4 border-l-rose-500 bg-gradient-to-r from-surface-800 to-surface-800/50 italic">
+                        <div className={`p-5 border-l-4 border-l-rose-500 rounded-2xl italic ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card bg-gradient-to-r from-surface-800 to-surface-800/50'}`}>
                             <h4 className="text-sm font-bold text-rose-300 mb-2">همسة</h4>
                             <div className="flex gap-2">
                                 <Quote className="w-4 h-4 text-rose-400 transform rotate-180" />
-                                <p className="text-surface-200">
+                                <p className={theme === 'light' ? 'text-slate-600' : 'text-surface-200'}>
                                     {aiData?.quote || "..."}
                                 </p>
                             </div>
@@ -510,7 +520,7 @@ export default function CheckInPage() {
 
                     {/* Actions */}
                     <div className="flex gap-4 pt-4">
-                        <Link href="/dashboard" className="flex-1 py-4 bg-surface-800 hover:bg-surface-700 rounded-xl font-bold text-white text-center transition-colors">
+                        <Link href="/dashboard" className={`flex-1 py-4 rounded-xl font-bold text-center transition-colors ${theme === 'light' ? 'bg-slate-200 hover:bg-slate-300 text-slate-700' : 'bg-surface-800 hover:bg-surface-700 text-white'}`}>
                             الرئيسية
                         </Link>
                         <button

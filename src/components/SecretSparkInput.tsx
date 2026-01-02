@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useSettingsStore } from '@/stores/settings-store';
 
 export default function SecretSparkInput() {
-    const { language } = useSettingsStore();
+    const { language, theme } = useSettingsStore();
     const isRTL = language === 'ar';
 
     const [isOpen, setIsOpen] = useState(false);
@@ -68,14 +68,14 @@ export default function SecretSparkInput() {
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className={`border backdrop-blur-md rounded-2xl p-6 max-w-md w-full shadow-2xl relative ${useSettingsStore.getState().theme === 'light'
-                                    ? 'bg-white/90 border-white/20 shadow-primary-500/10'
-                                    : 'bg-slate-900/90 border-white/10'
+                            className={`border backdrop-blur-md rounded-2xl p-6 max-w-md w-full shadow-2xl relative ${theme === 'light'
+                                ? 'bg-white/90 border-white/20 shadow-primary-500/10'
+                                : 'bg-slate-900/90 border-white/10'
                                 }`}
                         >
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className={`absolute top-4 right-4 hover:text-primary-500 transition-colors ${useSettingsStore.getState().theme === 'light' ? 'text-slate-400' : 'text-slate-500'
+                                className={`absolute top-4 right-4 hover:text-primary-500 transition-colors ${theme === 'light' ? 'text-slate-400' : 'text-slate-500'
                                     }`}
                             >
                                 ✕
@@ -85,10 +85,10 @@ export default function SecretSparkInput() {
                                 <div className="w-12 h-12 rounded-full bg-primary-500/10 flex items-center justify-center mx-auto mb-3">
                                     <Lock className="w-6 h-6 text-primary-500" />
                                 </div>
-                                <h3 className={`text-xl font-bold ${useSettingsStore.getState().theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                <h3 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                     {isRTL ? 'رغبة سرية' : 'Secret Spark'}
                                 </h3>
-                                <p className={`text-sm mt-2 ${useSettingsStore.getState().theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
+                                <p className={`text-sm mt-2 ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
                                     {isRTL
                                         ? 'سيقوم الذكاء الاصطناعي باستكشاف رأي شريكك بطريقة غير مباشرة. لن يتم كشف السر إلا إذا أبدى اهتماماً!'
                                         : 'AI will subtly probe your partner\'s interest. Your secret is only revealed if they match your vibe!'
@@ -101,14 +101,14 @@ export default function SecretSparkInput() {
                                     <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <Sparkles className="w-8 h-8 text-green-500" />
                                     </div>
-                                    <p className={`font-bold ${useSettingsStore.getState().theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                    <p className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                         {isRTL ? 'تم إرسال المهمة للـ AI!' : 'AI is on the case!'}
                                     </p>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className={`text-xs font-medium ${useSettingsStore.getState().theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
+                                        <label className={`text-xs font-medium ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
                                             {isRTL ? 'الفئة' : 'Category'}
                                         </label>
                                         <div className="flex gap-2 text-sm overflow-x-auto pb-2">
@@ -123,7 +123,7 @@ export default function SecretSparkInput() {
                                                     onClick={() => setCategory(cat.id)}
                                                     className={`px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap ${category === cat.id
                                                         ? 'bg-primary-500 border-primary-500 text-white'
-                                                        : useSettingsStore.getState().theme === 'light'
+                                                        : theme === 'light'
                                                             ? 'border-slate-200 text-slate-600 hover:bg-slate-50'
                                                             : 'border-white/10 text-slate-400 hover:bg-white/5'
                                                         }`}
@@ -135,16 +135,16 @@ export default function SecretSparkInput() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className={`text-xs font-medium ${useSettingsStore.getState().theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
+                                        <label className={`text-xs font-medium ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
                                             {isRTL ? 'ما هي رغبتك؟' : 'What is your desire?'}
                                         </label>
                                         <textarea
                                             value={secret}
                                             onChange={(e) => setSecret(e.target.value)}
                                             placeholder={isRTL ? 'مثلاً: أريد تجربة رقص السالسا...' : 'e.g., I want to try salsa dancing...'}
-                                            className={`flex min-h-[100px] w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${useSettingsStore.getState().theme === 'light'
-                                                    ? 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400'
-                                                    : 'bg-slate-950/50 border-white/10 text-white placeholder:text-slate-500'
+                                            className={`flex min-h-[100px] w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${theme === 'light'
+                                                ? 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400'
+                                                : 'bg-slate-950/50 border-white/10 text-white placeholder:text-slate-500'
                                                 }`}
                                         />
                                     </div>

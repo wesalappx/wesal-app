@@ -15,6 +15,7 @@ import {
 import Link from 'next/link';
 import { useSound } from '@/hooks/useSound';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useSettingsStore } from '@/stores/settings-store';
 
 const iconMap: Record<string, any> = {
     message: MessageCircle,
@@ -56,6 +57,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 export default function NotificationsPage() {
     const { playSound } = useSound();
     const { notifications, isLoading, markAsRead, markAllAsRead, unreadCount } = useNotifications();
+    const { theme } = useSettingsStore();
     const { t } = useTranslation();
 
     const handleMarkAsRead = (id: string) => {
@@ -72,13 +74,13 @@ export default function NotificationsPage() {
     }
 
     return (
-        <main className="min-h-screen pb-44 p-4">
+        <main className={`min-h-screen pb-44 p-4 ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900'}`}>
             {/* Header */}
             <div className="flex items-center justify-between mb-6 pt-4">
-                <Link href="/dashboard" className="p-2 -ml-2 text-surface-400 hover:text-white">
+                <Link href="/dashboard" className={`p-2 -ml-2 transition-colors ${theme === 'light' ? 'text-slate-500 hover:text-slate-900' : 'text-surface-400 hover:text-white'}`}>
                     <ArrowRight className="w-6 h-6 transform rotate-180" />
                 </Link>
-                <h1 className="text-xl font-bold">{t('notifications.title')}</h1>
+                <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{t('notifications.title')}</h1>
                 {unreadCount > 0 && (
                     <button
                         onClick={() => {
@@ -94,11 +96,11 @@ export default function NotificationsPage() {
 
             {notifications.length === 0 ? (
                 <div className="text-center py-12">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-surface-800 flex items-center justify-center">
-                        <Bell className="w-10 h-10 text-surface-600" />
+                    <div className={`w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-slate-200' : 'bg-surface-800'}`}>
+                        <Bell className={`w-10 h-10 ${theme === 'light' ? 'text-slate-400' : 'text-surface-600'}`} />
                     </div>
-                    <h3 className="text-lg font-medium text-surface-400 mb-2">{t('notifications.empty')}</h3>
-                    <p className="text-sm text-surface-500">{t('notifications.emptyDesc')}</p>
+                    <h3 className={`text-lg font-medium mb-2 ${theme === 'light' ? 'text-slate-600' : 'text-surface-400'}`}>{t('notifications.empty')}</h3>
+                    <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-500'}`}>{t('notifications.emptyDesc')}</p>
                 </div>
             ) : (
                 <div className="space-y-3">
@@ -113,20 +115,22 @@ export default function NotificationsPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.05 }}
                                 onClick={() => !notification.is_read && handleMarkAsRead(notification.id)}
-                                className={`glass-card p-4 flex gap-4 cursor-pointer transition-colors ${notification.is_read ? 'opacity-60' : 'hover:bg-white/5'
-                                    }`}
+                                className={`p-4 flex gap-4 cursor-pointer transition-colors ${theme === 'light'
+                                    ? 'bg-white border border-slate-200 shadow-sm rounded-2xl hover:bg-slate-50'
+                                    : 'glass-card hover:bg-white/5'
+                                    } ${notification.is_read ? 'opacity-60' : ''}`}
                             >
                                 <div className={`w-12 h-12 rounded-xl ${bgColor} flex items-center justify-center flex-shrink-0`}>
                                     <Icon className="w-6 h-6 text-white" />
                                 </div>
                                 <div className="flex-1 text-right">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs text-surface-400">
+                                        <span className={`text-xs ${theme === 'light' ? 'text-slate-400' : 'text-surface-400'}`}>
                                             {formatTime(notification.created_at)}
                                         </span>
-                                        <h3 className="font-semibold">{notification.title_ar}</h3>
+                                        <h3 className={`font-semibold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{notification.title_ar}</h3>
                                     </div>
-                                    <p className="text-sm text-surface-400 mt-1">{notification.body_ar}</p>
+                                    <p className={`text-sm mt-1 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>{notification.body_ar}</p>
                                 </div>
                                 {!notification.is_read && (
                                     <div className="w-2 h-2 rounded-full bg-primary-500 flex-shrink-0 mt-2" />

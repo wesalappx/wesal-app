@@ -273,14 +273,14 @@ export default function CalendarPage() {
     const monthNames = isRTL ? arabicMonths : englishMonths;
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900 font-sans">
+        <div className={`min-h-screen font-sans ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}>
             <div className="max-w-md mx-auto p-4 pb-32">
 
                 <header className="flex items-center justify-between mb-6 pt-4">
-                    <Link href="/dashboard" className="p-2 -ml-2 text-surface-400 hover:text-white transition-colors">
+                    <Link href="/dashboard" className={`p-2 -ml-2 transition-colors ${theme === 'light' ? 'text-slate-500 hover:text-slate-800' : 'text-surface-400 hover:text-white'}`}>
                         <ArrowRight className={`w-6 h-6 ${isRTL ? '' : 'rotate-180'}`} />
                     </Link>
-                    <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                    <h1 className={`text-xl font-bold flex items-center gap-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                         <CalendarIcon className="w-5 h-5 text-primary-400" />
                         {isRTL ? 'التقويم' : 'Calendar'}
                     </h1>
@@ -293,7 +293,7 @@ export default function CalendarPage() {
                         </button>
                         <button
                             onClick={() => setShowCycleSettings(true)}
-                            className="p-2 text-surface-400 hover:text-white transition-colors"
+                            className={`p-2 transition-colors ${theme === 'light' ? 'text-slate-500 hover:text-slate-800' : 'text-surface-400 hover:text-white'}`}
                         >
                             <Settings2 className="w-5 h-5" />
                         </button>
@@ -306,7 +306,7 @@ export default function CalendarPage() {
                         onClick={() => setViewMode('month')}
                         className={`flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${viewMode === 'month'
                             ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
-                            : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700'
+                            : theme === 'light' ? 'bg-white text-slate-500 hover:bg-slate-50' : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700'
                             }`}
                     >
                         <LayoutGrid className="w-4 h-4" />
@@ -316,7 +316,7 @@ export default function CalendarPage() {
                         onClick={() => setViewMode('year')}
                         className={`flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${viewMode === 'year'
                             ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
-                            : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700'
+                            : theme === 'light' ? 'bg-white text-slate-500 hover:bg-slate-50' : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700'
                             }`}
                     >
                         <Grid3X3 className="w-4 h-4" />
@@ -330,7 +330,9 @@ export default function CalendarPage() {
                         onClick={() => setShowPeriodTracking(!showPeriodTracking)}
                         className={`w-full py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${showPeriodTracking
                             ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                            : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700 border border-white/5'
+                            : theme === 'light'
+                                ? 'bg-white text-slate-400 hover:bg-slate-50 border border-slate-200'
+                                : 'bg-surface-800/50 text-surface-400 hover:bg-surface-700 border border-white/5'
                             }`}
                     >
                         {showPeriodTracking ? (
@@ -340,7 +342,7 @@ export default function CalendarPage() {
                             </>
                         ) : (
                             <>
-                                <span className="w-2 h-2 rounded-full bg-surface-500"></span>
+                                <span className={`w-2 h-2 rounded-full ${theme === 'light' ? 'bg-slate-300' : 'bg-surface-500'}`}></span>
                                 {isRTL ? 'إظهار متابعة الدورة' : 'Show Period Tracking'}
                             </>
                         )}
@@ -357,26 +359,26 @@ export default function CalendarPage() {
                             exit={{ opacity: 0, y: -20 }}
                         >
                             {/* Month Navigation */}
-                            <div className="glass-card p-4 mb-4">
+                            <div className={`${theme === 'light' ? 'bg-white shadow-sm border border-slate-100' : 'glass-card'} p-4 mb-4 rounded-2xl`}>
                                 <div className="flex items-center justify-between">
-                                    <button onClick={prevMonth} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                                        <ChevronRight className={`w-5 h-5 text-surface-400 ${isRTL ? '' : 'rotate-180'}`} />
+                                    <button onClick={prevMonth} className={`p-2 rounded-lg transition-colors ${theme === 'light' ? 'hover:bg-slate-50' : 'hover:bg-white/5'}`}>
+                                        <ChevronRight className={`w-5 h-5 ${isRTL ? '' : 'rotate-180'} ${theme === 'light' ? 'text-slate-400' : 'text-surface-400'}`} />
                                     </button>
-                                    <h2 className="text-lg font-bold text-white">
+                                    <h2 className={`text-lg font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                         {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
                                     </h2>
-                                    <button onClick={nextMonth} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                                        <ChevronLeft className={`w-5 h-5 text-surface-400 ${isRTL ? '' : 'rotate-180'}`} />
+                                    <button onClick={nextMonth} className={`p-2 rounded-lg transition-colors ${theme === 'light' ? 'hover:bg-slate-50' : 'hover:bg-white/5'}`}>
+                                        <ChevronLeft className={`w-5 h-5 ${isRTL ? '' : 'rotate-180'} ${theme === 'light' ? 'text-slate-400' : 'text-surface-400'}`} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Calendar Grid */}
-                            <div className="glass-card p-4 mb-4">
+                            <div className={`${theme === 'light' ? 'bg-white shadow-sm border border-slate-100' : 'glass-card'} p-4 mb-4 rounded-2xl`}>
                                 {/* Day Headers */}
                                 <div className="grid grid-cols-7 gap-1 mb-2">
                                     {dayNames.map(day => (
-                                        <div key={day} className="text-center text-xs text-surface-500 font-medium py-2">
+                                        <div key={day} className={`text-center text-xs font-medium py-2 ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>
                                             {day}
                                         </div>
                                     ))}
@@ -402,12 +404,12 @@ export default function CalendarPage() {
                                                 onClick={() => setSelectedDate(date)}
                                                 whileTap={{ scale: 0.95 }}
                                                 className={`aspect-square rounded-xl relative flex flex-col items-center justify-center transition-all border
-                                                    ${cyclePhase ? `${cyclePhase.bgColor} ${cyclePhase.borderColor}` : 'border-transparent hover:bg-white/5'}
-                                                    ${isSelected ? 'ring-2 ring-primary-500 bg-primary-500/20' : ''}
+                                                    ${cyclePhase ? `${cyclePhase.bgColor} ${cyclePhase.borderColor}` : theme === 'light' ? 'border-transparent hover:bg-slate-50' : 'border-transparent hover:bg-white/5'}
+                                                    ${isSelected ? 'ring-2 ring-primary-500 !bg-primary-500/20' : ''}
                                                     ${today ? 'ring-2 ring-amber-500' : ''}
                                                 `}
                                             >
-                                                <span className={`text-sm font-medium ${today ? 'text-amber-400' : cyclePhase ? cyclePhase.color : 'text-white'}`}>
+                                                <span className={`text-sm font-medium ${today ? 'text-amber-500' : cyclePhase ? cyclePhase.color : theme === 'light' ? 'text-slate-700' : 'text-white'}`}>
                                                     {date.getDate()}
                                                 </span>
 
@@ -444,19 +446,19 @@ export default function CalendarPage() {
                             </div>
 
                             {/* Legend */}
-                            <div className="glass-card p-3 mb-4">
+                            <div className={`${theme === 'light' ? 'bg-white shadow-sm border border-slate-100' : 'glass-card'} p-3 mb-4 rounded-2xl`}>
                                 <div className="flex flex-wrap gap-3 justify-center text-xs">
                                     <div className="flex items-center gap-1.5">
                                         <div className="w-3 h-3 rounded bg-rose-500/30 border border-rose-500/50" />
-                                        <span className="text-surface-400">{isRTL ? 'الدورة' : 'Period'}</span>
+                                        <span className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>{isRTL ? 'الدورة' : 'Period'}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                         <div className="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500/50" />
-                                        <span className="text-surface-400">{isRTL ? 'خصوبة' : 'Fertile'}</span>
+                                        <span className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>{isRTL ? 'خصوبة' : 'Fertile'}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                         <div className="w-3 h-3 rounded ring-2 ring-amber-500" />
-                                        <span className="text-surface-400">{isRTL ? 'اليوم' : 'Today'}</span>
+                                        <span className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>{isRTL ? 'اليوم' : 'Today'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -466,14 +468,14 @@ export default function CalendarPage() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="glass-card p-4"
+                                    className={`${theme === 'light' ? 'bg-white shadow-sm border border-slate-100' : 'glass-card'} p-4 rounded-2xl`}
                                 >
                                     <div className="flex items-center justify-between mb-4">
                                         <div>
-                                            <h3 className="text-lg font-bold text-white">
+                                            <h3 className={`text-lg font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                                 {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]}
                                             </h3>
-                                            <p className="text-sm text-surface-400">
+                                            <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                                                 {dayNames[selectedDate.getDay()]}
                                             </p>
                                         </div>
@@ -495,15 +497,15 @@ export default function CalendarPage() {
                                                 const cfg = typeConfig[event.type] || typeConfig.special;
                                                 const Icon = cfg.icon;
                                                 return (
-                                                    <div key={event.id} className="flex items-center justify-between p-3 bg-surface-800/50 rounded-xl">
+                                                    <div key={event.id} className={`flex items-center justify-between p-3 rounded-xl ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-800/50'}`}>
                                                         <div className="flex items-center gap-3">
                                                             <div className={`p-2 rounded-lg ${cfg.bgColor}/20`}>
                                                                 <Icon className={`w-4 h-4 ${cfg.color}`} />
                                                             </div>
                                                             <div>
-                                                                <p className="text-sm font-medium text-white">{event.title}</p>
+                                                                <p className={`text-sm font-medium ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{event.title}</p>
                                                                 {event.time && (
-                                                                    <p className="text-xs text-surface-400 flex items-center gap-1">
+                                                                    <p className={`text-xs flex items-center gap-1 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                                                                         <Clock className="w-3 h-3" />
                                                                         {event.time}
                                                                     </p>
@@ -516,13 +518,13 @@ export default function CalendarPage() {
                                                                     setEditingEvent(event);
                                                                     setShowAddModal(true);
                                                                 }}
-                                                                className="p-2 text-surface-500 hover:text-white transition-colors"
+                                                                className={`p-2 transition-colors ${theme === 'light' ? 'text-slate-400 hover:text-slate-700' : 'text-surface-500 hover:text-white'}`}
                                                             >
                                                                 <Edit3 className="w-4 h-4" />
                                                             </button>
                                                             <button
                                                                 onClick={() => handleDeleteEvent(event.id)}
-                                                                className="p-2 text-surface-500 hover:text-red-400 transition-colors"
+                                                                className={`p-2 transition-colors ${theme === 'light' ? 'text-slate-400 hover:text-red-500' : 'text-surface-500 hover:text-red-400'}`}
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
                                                             </button>
@@ -532,7 +534,7 @@ export default function CalendarPage() {
                                             })}
                                         </div>
                                     ) : (
-                                        <p className="text-center text-surface-500 py-4">
+                                        <p className={`text-center py-4 ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>
                                             {isRTL ? 'لا توجد أحداث' : 'No events'}
                                         </p>
                                     )}
@@ -559,16 +561,16 @@ export default function CalendarPage() {
                             exit={{ opacity: 0, y: -20 }}
                         >
                             {/* Year Navigation */}
-                            <div className="glass-card p-4 mb-4">
+                            <div className={`${theme === 'light' ? 'bg-white shadow-sm border border-slate-100' : 'glass-card'} p-4 mb-4 rounded-2xl`}>
                                 <div className="flex items-center justify-between">
-                                    <button onClick={prevYear} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                                        <ChevronRight className={`w-5 h-5 text-surface-400 ${isRTL ? '' : 'rotate-180'}`} />
+                                    <button onClick={prevYear} className={`p-2 rounded-lg transition-colors ${theme === 'light' ? 'hover:bg-slate-50' : 'hover:bg-white/5'}`}>
+                                        <ChevronRight className={`w-5 h-5 ${isRTL ? '' : 'rotate-180'} ${theme === 'light' ? 'text-slate-400' : 'text-surface-400'}`} />
                                     </button>
-                                    <h2 className="text-2xl font-bold text-white">
+                                    <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                         {currentMonth.getFullYear()}
                                     </h2>
-                                    <button onClick={nextYear} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                                        <ChevronLeft className={`w-5 h-5 text-surface-400 ${isRTL ? '' : 'rotate-180'}`} />
+                                    <button onClick={nextYear} className={`p-2 rounded-lg transition-colors ${theme === 'light' ? 'hover:bg-slate-50' : 'hover:bg-white/5'}`}>
+                                        <ChevronLeft className={`w-5 h-5 ${isRTL ? '' : 'rotate-180'} ${theme === 'light' ? 'text-slate-400' : 'text-surface-400'}`} />
                                     </button>
                                 </div>
                             </div>
@@ -588,10 +590,10 @@ export default function CalendarPage() {
                                             }}
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
-                                            className={`glass-card p-3 text-center transition-all ${isCurrentMonth ? 'ring-2 ring-primary-500 bg-primary-500/10' : ''
-                                                }`}
+                                            className={`${theme === 'light' ? 'bg-white shadow-sm hover:shadow-md' : 'glass-card'} p-3 text-center transition-all ${isCurrentMonth ? 'ring-2 ring-primary-500 !bg-primary-500/10' : ''
+                                                } rounded-2xl`}
                                         >
-                                            <p className={`text-sm font-bold ${isCurrentMonth ? 'text-primary-400' : 'text-white'}`}>
+                                            <p className={`text-sm font-bold ${isCurrentMonth ? 'text-primary-500' : theme === 'light' ? 'text-slate-700' : 'text-white'}`}>
                                                 {monthNames[i]}
                                             </p>
                                         </motion.button>

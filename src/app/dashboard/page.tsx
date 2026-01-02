@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import AIProbeCard from '@/components/AIProbeCard';
 import {
     Heart,
     Gamepad2,
@@ -112,6 +113,8 @@ export default function Dashboard() {
         }
     }
 
+    const [pendingSparks, setPendingSparks] = useState<any[]>([]);
+
     const greeting = getGreeting();
 
     useEffect(() => {
@@ -125,7 +128,7 @@ export default function Dashboard() {
 
             if (partner?.id) {
                 setPartnerId(partner.id);
-                setPartnerName(partner.display_name || partner.username || '');
+                setPartnerName(partner.display_name || partner.email?.split('@')[0] || '');
             }
 
             // Fetch subscription status
@@ -137,8 +140,21 @@ export default function Dashboard() {
                     .eq('status', 'active')
                     .single();
                 setIsPremium(!!sub);
+
+                // Fetch pending sparks for partner (AI_PROPOSING)
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { data: sparks } = await supabase
+                        .from('secret_sparks')
+                        .select('*')
+                        .eq('partner_id', user.id)
+                        .eq('status', 'AI_PROPOSING');
+
+                    if (sparks) setPendingSparks(sparks);
+                }
             }
 
+            // Fetch Partner Mood (Check-in)
             if (paired && partner?.id) {
                 const { data: checkIn } = await supabase
                     .from('check_ins')
@@ -151,12 +167,8 @@ export default function Dashboard() {
 
                 if (checkIn) setPartnerMood(checkIn);
             }
-        };
 
-        fetchData();
-
-        // Fetch Daily Whisper
-        const fetchWhisper = async () => {
+            // Fetch Daily Whisper
             try {
                 const mod = await import('@/lib/ai');
                 const whisper = await Promise.race([
@@ -170,9 +182,9 @@ export default function Dashboard() {
                     : '"Love is finding in another what completes you" 💕');
             }
         };
-        fetchWhisper();
 
-    }, [language, user?.id]);
+        fetchData();
+    }, [supabase, language]);
 
     // Real-time Presence
     useEffect(() => {
@@ -243,16 +255,16 @@ export default function Dashboard() {
             {/* Background Gradient & Brand Blobs */}
             <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
                 <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] blur-3xl opacity-60 rounded-full mix-blend-multiply filter transition-all duration-1000 ${theme === 'light'
-                        ? 'bg-gradient-radial from-primary-200/60 via-primary-100/20 to-transparent'
-                        : 'bg-gradient-radial from-primary-500/10 via-transparent to-transparent'
+                    ? 'bg-gradient-radial from-primary-200/60 via-primary-100/20 to-transparent'
+                    : 'bg-gradient-radial from-primary-500/10 via-transparent to-transparent'
                     }`} />
                 <div className={`absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-60 mix-blend-multiply filter transition-all duration-1000 ${theme === 'light'
-                        ? 'bg-accent-200/60'
-                        : 'bg-accent-500/5'
+                    ? 'bg-accent-200/60'
+                    : 'bg-accent-500/5'
                     }`} />
                 <div className={`absolute top-1/3 left-0 w-72 h-72 rounded-full blur-3xl opacity-40 mix-blend-multiply filter transition-all duration-1000 ${theme === 'light'
-                        ? 'bg-rose-200/50'
-                        : 'bg-rose-500/5'
+                    ? 'bg-rose-200/50'
+                    : 'bg-rose-500/5'
                     }`} />
             </div>
 
@@ -467,10 +479,26 @@ export default function Dashboard() {
                     </Link>
                 </div>
 
-                {/* Secret Sparks */}
-                <div className="mt-4 flex justify-center">
+                {/* Secret Spark Button */}
+                <div className="flex justify-end mb-6">
                     <SecretSparkInput />
                 </div>
+
+                {/* AI Probes (Questions from Partner) */}
+                <AnimatePresence>
+                    {pendingSparks.map(spark => (
+                        <div key={spark.id} className="mb-6">
+                            <AIProbeCard
+                                sparkId={spark.id}
+                                question={spark.ai_probe_question}
+                                category={spark.category}
+                                onRespond={() => {
+                                    setPendingSparks(prev => prev.filter(p => p.id !== spark.id));
+                                }}
+                            />
+                        </div>
+                    ))}
+                </AnimatePresence>
 
                 {/* Daily Whisper - Static */}
                 <div className={`rounded-2xl p-5 mt-4 backdrop-blur-xl border ${theme === 'light' ? 'bg-white/60 border-amber-100 shadow-lg shadow-amber-500/5' : 'bg-surface-800/50 border-surface-700/30'}`}>

@@ -23,7 +23,7 @@ export default function WhisperPage() {
     const supabase = createClient();
     const { user, isLoading: authLoading } = useAuth();
     const { getStatus } = usePairing();
-    const { language } = useSettingsStore();
+    const { language, theme } = useSettingsStore();
     const { playSound } = useSound();
     const isRTL = language === 'ar';
 
@@ -124,24 +124,24 @@ export default function WhisperPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-[#12121a] to-[#1a1025]">
+        <div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-[#12121a] to-[#1a1025]'}`}>
             {/* Background Decoration */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-20 left-10 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-40 right-10 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl" />
+                <div className={`absolute top-20 left-10 w-40 h-40 rounded-full blur-3xl ${theme === 'light' ? 'bg-pink-200/40' : 'bg-pink-500/10'}`} />
+                <div className={`absolute bottom-40 right-10 w-60 h-60 rounded-full blur-3xl ${theme === 'light' ? 'bg-purple-200/40' : 'bg-purple-500/10'}`} />
             </div>
 
             {/* Header */}
             <header className="relative z-10 flex items-center px-4 py-4">
-                <Link href="/dashboard" className="p-2 text-white/50 hover:text-white">
+                <Link href="/dashboard" className={`p-2 transition-colors ${theme === 'light' ? 'text-slate-500 hover:text-slate-800' : 'text-white/50 hover:text-white'}`}>
                     {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
                 </Link>
-                <h1 className="flex-1 text-center text-lg font-semibold text-white">{isRTL ? 'همسة' : 'Whisper'}</h1>
+                <h1 className={`flex-1 text-center text-lg font-semibold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{isRTL ? 'همسة' : 'Whisper'}</h1>
                 {/* Usage Counter */}
                 {whisperUsage && whisperUsage.limit > 0 && (
                     <div className={`px-2.5 py-1 rounded-full text-xs font-medium ${whisperUsage.remaining <= 1
-                            ? 'bg-orange-500/20 text-orange-400'
-                            : 'bg-white/10 text-white/60'
+                        ? 'bg-orange-500/20 text-orange-400'
+                        : theme === 'light' ? 'bg-slate-200 text-slate-600' : 'bg-white/10 text-white/60'
                         }`}>
                         {whisperUsage.remaining}/{whisperUsage.limit}
                     </div>
@@ -164,15 +164,15 @@ export default function WhisperPage() {
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-surface-800 rounded-3xl p-6 max-w-sm w-full text-center border border-white/10"
+                            className={`rounded-3xl p-6 max-w-sm w-full text-center border ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-surface-800 border-white/10'}`}
                         >
                             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-pink-400 to-purple-600 flex items-center justify-center">
                                 <Sparkles className="w-8 h-8 text-white" />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">
+                            <h3 className={`text-xl font-bold mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                                 {isRTL ? 'انتهت همسات الأسبوع' : 'Weekly Whispers Used'}
                             </h3>
-                            <p className="text-white/60 mb-6">
+                            <p className={`mb-6 ${theme === 'light' ? 'text-slate-500' : 'text-white/60'}`}>
                                 {isRTL
                                     ? 'اشترك في Premium للهمسات غير المحدودة'
                                     : 'Upgrade to Premium for unlimited whispers'}
@@ -185,7 +185,7 @@ export default function WhisperPage() {
                             </Link>
                             <button
                                 onClick={() => setShowUpgradePrompt(false)}
-                                className="text-white/40 text-sm"
+                                className={`text-sm ${theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60'}`}
                             >
                                 {isRTL ? 'لاحقاً' : 'Maybe Later'}
                             </button>
@@ -203,8 +203,8 @@ export default function WhisperPage() {
                 ) : !isPaired ? (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
                         <div className="text-5xl mb-4">💔</div>
-                        <h2 className="text-xl font-bold text-white mb-2">{isRTL ? 'اربط مع شريكك' : 'Pair first'}</h2>
-                        <p className="text-white/40 text-sm mb-6">{isRTL ? 'لازم تربط حسابك' : 'Connect your accounts'}</p>
+                        <h2 className={`text-xl font-bold mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{isRTL ? 'اربط مع شريكك' : 'Pair first'}</h2>
+                        <p className={`text-sm mb-6 ${theme === 'light' ? 'text-slate-500' : 'text-white/40'}`}>{isRTL ? 'لازم تربط حسابك' : 'Connect your accounts'}</p>
                         <Link href="/pairing" className="inline-flex items-center gap-2 px-6 py-3 bg-pink-600 rounded-xl text-white font-medium">
                             <Link2 className="w-4 h-4" />{isRTL ? 'اربط' : 'Pair'}
                         </Link>
@@ -217,8 +217,8 @@ export default function WhisperPage() {
                             transition={{ duration: 0.5 }}
                             className="text-7xl mb-4"
                         >💕</motion.div>
-                        <h2 className="text-2xl font-bold text-white">{isRTL ? 'وصلت!' : 'Sent!'}</h2>
-                        <p className="text-white/40 mt-1">{isRTL ? `${partnerName} راح يشوفها` : `${partnerName} will see it`}</p>
+                        <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{isRTL ? 'وصلت!' : 'Sent!'}</h2>
+                        <p className={`mt-1 ${theme === 'light' ? 'text-slate-500' : 'text-white/40'}`}>{isRTL ? `${partnerName} راح يشوفها` : `${partnerName} will see it`}</p>
                     </motion.div>
                 ) : (
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
@@ -229,8 +229,8 @@ export default function WhisperPage() {
                                 transition={{ repeat: Infinity, duration: 2 }}
                                 className="text-4xl mb-2"
                             >💌</motion.div>
-                            <h2 className="text-lg font-bold text-white">{isRTL ? 'اختر همستك' : 'Pick your whisper'}</h2>
-                            <p className="text-white/30 text-sm">{isRTL ? `إلى ${partnerName}` : `To ${partnerName}`}</p>
+                            <h2 className={`text-lg font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{isRTL ? 'اختر همستك' : 'Pick your whisper'}</h2>
+                            <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-white/30'}`}>{isRTL ? `إلى ${partnerName}` : `To ${partnerName}`}</p>
                         </div>
 
                         {/* Message Cards */}
@@ -246,13 +246,15 @@ export default function WhisperPage() {
                                         onClick={() => { playSound('click'); setSelectedId(msg.id); }}
                                         className={`relative flex items-center gap-3 p-4 rounded-2xl border transition-all duration-200 ${isSelected
                                             ? 'bg-gradient-to-r from-pink-600/20 to-purple-600/20 border-pink-500/50'
-                                            : 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]'
+                                            : theme === 'light'
+                                                ? 'bg-white border-slate-200 shadow-sm hover:border-pink-200 hover:shadow-md'
+                                                : 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]'
                                             }`}
                                     >
                                         <span className={`text-2xl transition-transform duration-200 ${isSelected ? 'scale-110' : ''}`}>
                                             {msg.emoji}
                                         </span>
-                                        <span className={`flex-1 text-base ${isRTL ? 'text-right' : 'text-left'} ${isSelected ? 'text-white' : 'text-white/60'}`}>
+                                        <span className={`flex-1 text-base ${isRTL ? 'text-right' : 'text-left'} ${isSelected ? (theme === 'light' ? 'text-pink-600 font-medium' : 'text-white') : (theme === 'light' ? 'text-slate-700' : 'text-white/60')}`}>
                                             {isRTL ? msg.ar : msg.en}
                                         </span>
                                         <AnimatePresence>
@@ -281,7 +283,7 @@ export default function WhisperPage() {
                             disabled={!selectedId || sending}
                             className={`w-full py-4 rounded-2xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-200 ${selectedId
                                 ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/20'
-                                : 'bg-white/5 text-white/25'
+                                : theme === 'light' ? 'bg-slate-100 text-slate-300' : 'bg-white/5 text-white/25'
                                 }`}
                         >
                             {sending ? (
@@ -295,7 +297,7 @@ export default function WhisperPage() {
                         </motion.button>
 
                         {/* Footer */}
-                        <p className="text-center text-white/15 text-xs pt-2">
+                        <p className={`text-center text-xs pt-2 ${theme === 'light' ? 'text-slate-400' : 'text-white/15'}`}>
                             {isRTL ? '🔒 خاص بينكم' : '🔒 Private'}
                         </p>
                     </motion.div>

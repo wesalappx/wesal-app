@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Heart, Mic, Zap, DollarSign, Smile, Sparkles } from 'lucide-react';
+import { useSettingsStore } from '@/stores/settings-store';
 
 interface MarriageAdviceModalProps {
     isOpen: boolean;
@@ -125,6 +126,8 @@ export default function MarriageAdviceModal({ isOpen, onClose }: MarriageAdviceM
     const [topic, setTopic] = useState<string | null>(null);
     const [advice, setAdvice] = useState<string>("");
 
+    const { theme } = useSettingsStore();
+
     if (!isOpen) return null;
 
     const handleGenderSelect = (g: 'HE' | 'SHE') => {
@@ -183,10 +186,19 @@ export default function MarriageAdviceModal({ isOpen, onClose }: MarriageAdviceM
                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                    className="relative w-full max-w-md bg-surface-900 border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
+                    className={`relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border transition-colors ${theme === 'light'
+                        ? 'bg-white/95 border-white/40 shadow-xl shadow-primary-500/10'
+                        : 'bg-surface-900 border-white/10'
+                        }`}
                 >
                     {/* Close Button */}
-                    <button onClick={handleClose} className="absolute top-4 left-4 p-2 bg-surface-800/50 rounded-full text-surface-400 hover:text-white z-10">
+                    <button
+                        onClick={handleClose}
+                        className={`absolute top-4 left-4 p-2 rounded-full z-10 transition-colors ${theme === 'light'
+                            ? 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800'
+                            : 'bg-surface-800/50 text-surface-400 hover:text-white'
+                            }`}
+                    >
                         <X className="w-5 h-5" />
                     </button>
 
@@ -195,19 +207,25 @@ export default function MarriageAdviceModal({ isOpen, onClose }: MarriageAdviceM
                         {/* STEP 1: GENDER */}
                         {step === 'gender' && (
                             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="w-full space-y-8">
-                                <h2 className="text-2xl font-bold text-white">لمن النصيحة؟</h2>
+                                <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>لمن النصيحة؟</h2>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <button onClick={() => handleGenderSelect('HE')} className="p-6 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-2xl flex flex-col items-center gap-3 transition-all group">
-                                        <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <button onClick={() => handleGenderSelect('HE')} className={`p-6 rounded-2xl flex flex-col items-center gap-3 transition-all group border ${theme === 'light'
+                                        ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300'
+                                        : 'bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20'
+                                        }`}>
+                                        <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/30">
                                             <User className="w-8 h-8 text-white" />
                                         </div>
-                                        <span className="text-lg font-bold text-blue-300">له (الزوج)</span>
+                                        <span className={`text-lg font-bold ${theme === 'light' ? 'text-blue-600' : 'text-blue-300'}`}>له (الزوج)</span>
                                     </button>
-                                    <button onClick={() => handleGenderSelect('SHE')} className="p-6 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-2xl flex flex-col items-center gap-3 transition-all group">
-                                        <div className="w-16 h-16 bg-rose-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <button onClick={() => handleGenderSelect('SHE')} className={`p-6 rounded-2xl flex flex-col items-center gap-3 transition-all group border ${theme === 'light'
+                                        ? 'bg-rose-50 border-rose-200 hover:bg-rose-100 hover:border-rose-300'
+                                        : 'bg-rose-500/10 border-rose-500/30 hover:bg-rose-500/20'
+                                        }`}>
+                                        <div className="w-16 h-16 bg-rose-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-rose-500/30">
                                             <User className="w-8 h-8 text-white" />
                                         </div>
-                                        <span className="text-lg font-bold text-rose-300">لها (الزوجة)</span>
+                                        <span className={`text-lg font-bold ${theme === 'light' ? 'text-rose-600' : 'text-rose-300'}`}>لها (الزوجة)</span>
                                     </button>
                                 </div>
                             </motion.div>
@@ -216,22 +234,25 @@ export default function MarriageAdviceModal({ isOpen, onClose }: MarriageAdviceM
                         {/* STEP 2: TOPIC */}
                         {step === 'topic' && (
                             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="w-full space-y-6">
-                                <h2 className="text-2xl font-bold text-white">عن أي جانب؟</h2>
+                                <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>عن أي جانب؟</h2>
                                 <div className="grid grid-cols-1 gap-3">
                                     {TOPICS.map((t) => (
                                         <button
                                             key={t.id}
                                             onClick={() => handleTopicSelect(t.id)}
-                                            className="w-full p-4 bg-surface-800 hover:bg-surface-700 rounded-xl flex items-center gap-4 transition-colors group"
+                                            className={`w-full p-4 rounded-xl flex items-center gap-4 transition-colors group ${theme === 'light'
+                                                ? 'bg-slate-50 hover:bg-slate-100 border border-slate-200 shadow-sm'
+                                                : 'bg-surface-800 hover:bg-surface-700'
+                                                }`}
                                         >
-                                            <div className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center text-white`}>
+                                            <div className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center text-white shadow-md`}>
                                                 <t.icon className="w-5 h-5" />
                                             </div>
-                                            <span className="font-bold text-surface-200 text-lg">{t.label}</span>
+                                            <span className={`font-bold text-lg ${theme === 'light' ? 'text-slate-700' : 'text-surface-200'}`}>{t.label}</span>
                                         </button>
                                     ))}
                                 </div>
-                                <button onClick={() => setStep('gender')} className="text-sm text-surface-500 hover:text-surface-300 mt-4">
+                                <button onClick={() => setStep('gender')} className={`text-sm mt-4 hover:underline ${theme === 'light' ? 'text-slate-500' : 'text-surface-500 hover:text-surface-300'}`}>
                                     العودة للخلف
                                 </button>
                             </motion.div>
@@ -245,23 +266,32 @@ export default function MarriageAdviceModal({ isOpen, onClose }: MarriageAdviceM
                                 </div>
 
                                 <div className="space-y-4">
-                                    <h3 className="text-xl font-bold text-amber-400">نصيحة ذهبية</h3>
-                                    <div className="p-6 bg-surface-800/50 rounded-2xl border border-white/5 relative">
-                                        <p className="text-xl text-white leading-relaxed font-serif">
+                                    <h3 className="text-xl font-bold text-amber-500">نصيحة ذهبية</h3>
+                                    <div className={`p-6 rounded-2xl border relative ${theme === 'light'
+                                        ? 'bg-amber-50 border-amber-100 text-slate-800'
+                                        : 'bg-surface-800/50 border-white/5 text-white'
+                                        }`}>
+                                        <p className={`text-xl leading-relaxed font-serif ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                             "{advice}"
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="flex gap-3">
-                                    <button onClick={handleClose} className="flex-1 py-3 bg-surface-700 hover:bg-surface-600 rounded-xl font-bold text-white transition-colors">
+                                    <button
+                                        onClick={handleClose}
+                                        className={`flex-1 py-3 rounded-xl font-bold transition-colors ${theme === 'light'
+                                            ? 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            : 'bg-surface-700 hover:bg-surface-600 text-white'
+                                            }`}
+                                    >
                                         إغلاق
                                     </button>
-                                    <button onClick={handleNextAdvice} className="flex-1 py-3 bg-primary-600 hover:bg-primary-500 rounded-xl font-bold text-white transition-colors">
+                                    <button onClick={handleNextAdvice} className="flex-1 py-3 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 rounded-xl font-bold text-white transition-colors shadow-lg shadow-primary-500/25">
                                         نصيحة أخرى
                                     </button>
                                 </div>
-                                <button onClick={reset} className="text-sm text-surface-500 hover:text-surface-300">
+                                <button onClick={reset} className={`text-sm hover:underline ${theme === 'light' ? 'text-slate-500' : 'text-surface-500 hover:text-surface-300'}`}>
                                     البدء من جديد
                                 </button>
                             </motion.div>
