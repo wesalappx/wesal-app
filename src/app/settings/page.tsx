@@ -275,6 +275,32 @@ export default function SettingsPage() {
                     </h2>
 
                     <div className="space-y-2">
+
+                        {/* Appearance / Theme */}
+                        <div className="p-4 rounded-2xl flex items-center justify-between glass-card">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                                    {useSettingsStore.getState().theme === 'dark' ? (
+                                        <div className="w-5 h-5 text-orange-400">🌙</div>
+                                    ) : (
+                                        <div className="w-5 h-5 text-yellow-500">☀️</div>
+                                    )}
+                                </div>
+                                <div className={isRTL ? 'text-right' : 'text-left'}>
+                                    <p className="font-medium">{t('settings.appearance') || (isRTL ? 'المظهر' : 'Appearance')}</p>
+                                    <p className="text-sm text-surface-400">
+                                        {useSettingsStore.getState().theme === 'dark'
+                                            ? (isRTL ? 'الوضع الليلي' : 'Dark Mode')
+                                            : (isRTL ? 'الوضع النهاري' : 'Light Mode')}
+                                    </p>
+                                </div>
+                            </div>
+                            <ToggleSwitch
+                                enabled={useSettingsStore.getState().theme === 'dark'}
+                                onChange={(isDark) => useSettingsStore.getState().setTheme(isDark ? 'dark' : 'light')}
+                            />
+                        </div>
+
                         {/* Notifications */}
                         <div className="p-4 rounded-2xl flex items-center justify-between glass-card">
                             <div className="flex items-center gap-3">

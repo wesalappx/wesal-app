@@ -108,16 +108,21 @@ export default function SecretSparkInput() {
                                             {isRTL ? 'الفئة' : 'Category'}
                                         </label>
                                         <div className="flex gap-2 text-sm overflow-x-auto pb-2">
-                                            {['Adventure', 'Romance', 'Intimacy', 'Lifestyle'].map(cat => (
+                                            {[
+                                                { id: 'Adventure', ar: 'مغامرة', en: 'Adventure' },
+                                                { id: 'Romance', ar: 'رومانسية', en: 'Romance' },
+                                                { id: 'Intimacy', ar: 'حميمية', en: 'Intimacy' },
+                                                { id: 'Lifestyle', ar: 'أسلوب حياة', en: 'Lifestyle' }
+                                            ].map(cat => (
                                                 <button
-                                                    key={cat}
-                                                    onClick={() => setCategory(cat)}
-                                                    className={`px-3 py-1.5 rounded-full border transition-colors ${category === cat
+                                                    key={cat.id}
+                                                    onClick={() => setCategory(cat.id)}
+                                                    className={`px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap ${category === cat.id
                                                         ? 'bg-primary-500 border-primary-500 text-white'
                                                         : 'border-white/10 text-slate-400 hover:bg-white/5'
                                                         }`}
                                                 >
-                                                    {cat}
+                                                    {isRTL ? cat.ar : cat.en}
                                                 </button>
                                             ))}
                                         </div>

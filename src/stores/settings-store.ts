@@ -23,8 +23,15 @@ export const useSettingsStore = create<SettingsState>()(
     persist(
         (set) => ({
             // Theme
-            theme: 'dark' as const,
-            setTheme: (theme: 'dark' | 'light') => set({ theme }),
+            theme: 'dark',
+            setTheme: (theme: 'dark' | 'light') => {
+                if (typeof window !== 'undefined') {
+                    const root = document.documentElement;
+                    root.classList.remove('light', 'dark');
+                    root.classList.add(theme);
+                }
+                set({ theme });
+            },
 
             // Language - PERMANENTLY LOCKED TO ARABIC
             language: 'ar' as const,
@@ -39,8 +46,8 @@ export const useSettingsStore = create<SettingsState>()(
         }),
         {
             name: 'wesal-settings',
-            // Only persist these fields (theme and language locked, no need to persist)
             partialize: (state) => ({
+                theme: state.theme,
                 notificationsEnabled: state.notificationsEnabled,
                 soundEnabled: state.soundEnabled,
             }),
@@ -50,11 +57,16 @@ export const useSettingsStore = create<SettingsState>()(
 
 // Initialize settings on load
 export function initializeSettings() {
-    // Apply dark theme (locked) and Arabic language (locked)
     if (typeof window !== 'undefined') {
-        document.documentElement.classList.remove('light');
-        document.documentElement.classList.add('dark');
-        document.documentElement.lang = 'ar';
-        document.documentElement.dir = 'rtl';
+        const state = useSettingsStore.getState();
+        const root = document.documentElement;
+
+        // Apply saved theme
+        root.classList.remove('light', 'dark');
+        root.classList.add(state.theme);
+
+        // Ensure Arabic
+        root.lang = 'ar';
+        root.dir = 'rtl';
     }
 }
