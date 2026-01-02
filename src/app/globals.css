@@ -100,6 +100,21 @@
   }
 }
 
+/* Theme Utilities */
+@layer utilities {
+  .bg-background {
+    background-color: rgb(var(--background-start-rgb));
+  }
+
+  .text-foreground {
+    color: rgb(var(--text-primary));
+  }
+
+  .text-surface-400-mixed {
+    color: var(--text-secondary);
+  }
+}
+
 @layer components {
 
   /* Glass morphism card - Dark theme */

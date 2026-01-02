@@ -239,11 +239,21 @@ export default function Dashboard() {
     if (!mounted) return null;
 
     return (
-        <main className={`min-h-screen pb-8 relative overflow-hidden font-sans ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900'}`}>
-            {/* Background Gradient */}
-            <div className="fixed inset-0 overflow-hidden -z-10">
-                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] ${theme === 'light' ? 'bg-gradient-radial from-primary-200/40 via-transparent to-transparent' : 'bg-gradient-radial from-primary-500/10 via-transparent to-transparent'}`} />
-                <div className={`absolute bottom-0 left-0 w-96 h-96 rounded-full blur-3xl ${theme === 'light' ? 'bg-accent-200/40' : 'bg-accent-500/5'}`} />
+        <main className={`min-h-screen pb-8 relative overflow-hidden font-sans transition-colors duration-500 ${theme === 'light' ? 'bg-transparent text-slate-800' : 'bg-surface-900 text-white'}`}>
+            {/* Background Gradient & Brand Blobs */}
+            <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] blur-3xl opacity-60 rounded-full mix-blend-multiply filter transition-all duration-1000 ${theme === 'light'
+                        ? 'bg-gradient-radial from-primary-200/60 via-primary-100/20 to-transparent'
+                        : 'bg-gradient-radial from-primary-500/10 via-transparent to-transparent'
+                    }`} />
+                <div className={`absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-60 mix-blend-multiply filter transition-all duration-1000 ${theme === 'light'
+                        ? 'bg-accent-200/60'
+                        : 'bg-accent-500/5'
+                    }`} />
+                <div className={`absolute top-1/3 left-0 w-72 h-72 rounded-full blur-3xl opacity-40 mix-blend-multiply filter transition-all duration-1000 ${theme === 'light'
+                        ? 'bg-rose-200/50'
+                        : 'bg-rose-500/5'
+                    }`} />
             </div>
 
             {/* Header */}
@@ -266,13 +276,13 @@ export default function Dashboard() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Link href="/notes" className={`w-10 h-10 rounded-2xl flex items-center justify-center backdrop-blur-md border transition-all ${theme === 'light' ? 'bg-white/60 border-slate-200 hover:bg-white' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}>
+                        <Link href="/notes" className={`w-10 h-10 rounded-2xl flex items-center justify-center backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/50 border-white/40 hover:bg-white/80' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}>
                             <StickyNote className="w-5 h-5 text-amber-500" />
                         </Link>
-                        <Link href="/calendar" className={`w-10 h-10 rounded-2xl flex items-center justify-center backdrop-blur-md border transition-all ${theme === 'light' ? 'bg-white/60 border-slate-200 hover:bg-white' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}>
+                        <Link href="/calendar" className={`w-10 h-10 rounded-2xl flex items-center justify-center backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/50 border-white/40 hover:bg-white/80' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}>
                             <Calendar className="w-5 h-5 text-blue-500" />
                         </Link>
-                        <Link href="/notifications" className={`w-10 h-10 rounded-2xl flex items-center justify-center relative backdrop-blur-md border transition-all ${theme === 'light' ? 'bg-white/60 border-slate-200 hover:bg-white' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}>
+                        <Link href="/notifications" className={`w-10 h-10 rounded-2xl flex items-center justify-center relative backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/50 border-white/40 hover:bg-white/80' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}>
                             {unreadCount > 0 && (
                                 <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full" />
                             )}
@@ -290,7 +300,7 @@ export default function Dashboard() {
                     <h1 className={`text-3xl font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{userName}</h1>
 
                     {isPaired && (
-                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border ${theme === 'light' ? 'bg-white/60 border-slate-200' : 'bg-surface-800/60 border-surface-700/50'}`}>
+                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border ${theme === 'light' ? 'bg-white/40 border-white/40 shadow-sm' : 'bg-surface-800/60 border-surface-700/50'}`}>
                             <div className={`w-2 h-2 rounded-full ${partnerStatus === 'online' ? 'bg-green-400' : 'bg-surface-600'}`} />
                             <span className={`text-xs ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>
                                 {partnerStatus === 'online'
@@ -306,7 +316,7 @@ export default function Dashboard() {
             <div className="px-5 mt-4 space-y-6">
                 {/* Partner Mood */}
                 {partnerMood && (
-                    <div className={`rounded-2xl p-5 backdrop-blur-md border ${theme === 'light' ? 'bg-white/70 border-indigo-100' : 'bg-surface-800/50 border-surface-700/30'}`}>
+                    <div className={`rounded-2xl p-5 backdrop-blur-xl border transition-all ${theme === 'light' ? 'bg-white/60 border-white/50 shadow-lg shadow-indigo-100/50' : 'bg-surface-800/50 border-surface-700/30'}`}>
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400/20 to-purple-500/20 flex items-center justify-center">
                                 <span className="text-3xl">
@@ -334,8 +344,8 @@ export default function Dashboard() {
                     <motion.div
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
-                        className={`rounded-2xl p-4 backdrop-blur-md border transition-all cursor-pointer ${theme === 'light'
-                            ? 'bg-gradient-to-r from-primary-50 to-accent-50 border-primary-200 hover:border-primary-300'
+                        className={`rounded-2xl p-4 backdrop-blur-xl border transition-all cursor-pointer ${theme === 'light'
+                            ? 'bg-gradient-to-r from-primary-50/80 to-accent-50/80 border-primary-100 shadow-lg shadow-primary-500/5'
                             : 'bg-gradient-to-r from-primary-500/10 to-accent-500/10 border-primary-500/30 hover:border-primary-500/50'}`}
                     >
                         <div className="flex items-center gap-3">
@@ -357,7 +367,7 @@ export default function Dashboard() {
 
                 {/* Check-in CTA */}
                 <Link href="/check-in">
-                    <div className={`rounded-2xl p-4 relative overflow-hidden group backdrop-blur-md border transition-all ${theme === 'light' ? 'bg-white/70 border-slate-200 hover:border-primary-300' : 'bg-surface-800/50 border-surface-700/30 hover:border-primary-500/30'}`}>
+                    <div className={`rounded-2xl p-4 relative overflow-hidden group backdrop-blur-xl border transition-all ${theme === 'light' ? 'bg-white/60 border-white/50 shadow-md hover:shadow-lg' : 'bg-surface-800/50 border-surface-700/30 hover:border-primary-500/30'}`}>
                         <div className="flex justify-between items-center">
                             <div>
                                 <h3 className={`font-bold mb-1 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
@@ -387,7 +397,7 @@ export default function Dashboard() {
                                 transition={{ delay: idx * 0.1 }}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                className={`rounded-2xl p-5 h-full backdrop-blur-md border transition-all cursor-pointer ${theme === 'light' ? 'bg-white/70 border-slate-200 hover:border-primary-300' : 'bg-surface-800/50 border-surface-700/30 hover:border-primary-500/30'}`}
+                                className={`rounded-2xl p-5 h-full backdrop-blur-xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${theme === 'light' ? 'bg-white/60 border-white/50 hover:bg-white/80' : 'bg-surface-800/50 border-surface-700/30 hover:border-primary-500/30'}`}
                                 onClick={() => {
                                     playSound('pop');
                                     if (action.action) action.action();
@@ -421,7 +431,7 @@ export default function Dashboard() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setShowCoolDown(true)}
-                        className={`rounded-2xl p-4 flex items-center gap-3 backdrop-blur-md border transition-all cursor-pointer ${theme === 'light' ? 'bg-white/70 border-slate-200' : 'bg-surface-800/50 border-surface-700/30'}`}
+                        className={`rounded-2xl p-4 flex items-center gap-3 backdrop-blur-xl border transition-all cursor-pointer shadow-sm ${theme === 'light' ? 'bg-white/60 border-white/50 hover:bg-white/80' : 'bg-surface-800/50 border-surface-700/30'}`}
                     >
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg">
                             <Snowflake className="w-5 h-5 text-white" />
@@ -440,7 +450,7 @@ export default function Dashboard() {
                         <motion.div
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className={`rounded-2xl p-4 flex items-center gap-3 backdrop-blur-md border transition-all ${theme === 'light' ? 'bg-white/70 border-slate-200' : 'bg-surface-800/50 border-surface-700/30'}`}
+                            className={`rounded-2xl p-4 flex items-center gap-3 backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/60 border-white/50 hover:bg-white/80' : 'bg-surface-800/50 border-surface-700/30'}`}
                         >
                             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
                                 <MessageCircleHeart className="w-5 h-5 text-white" />
@@ -463,7 +473,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Daily Whisper - Static */}
-                <div className={`rounded-2xl p-5 mt-4 backdrop-blur-md border ${theme === 'light' ? 'bg-white/70 border-amber-100' : 'bg-surface-800/50 border-surface-700/30'}`}>
+                <div className={`rounded-2xl p-5 mt-4 backdrop-blur-xl border ${theme === 'light' ? 'bg-white/60 border-amber-100 shadow-lg shadow-amber-500/5' : 'bg-surface-800/50 border-surface-700/30'}`}>
                     <div className="flex items-start gap-3">
                         <Sparkles className="w-5 h-5 text-amber-400 shrink-0 mt-1" />
                         <div>
