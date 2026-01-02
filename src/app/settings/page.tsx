@@ -259,7 +259,7 @@ export default function SettingsPage() {
 
                         {!subscription?.isPremium && (
                             <Link
-                                href="/premium"
+                                href="/settings/upgrade"
                                 className="mt-4 block w-full py-3 text-center rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-600 hover:to-orange-600 transition-all"
                             >
                                 {isRTL ? 'ترقية الآن ✨' : 'Upgrade Now ✨'}
