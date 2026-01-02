@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +11,9 @@ import {
     User,
     Heart,
     MessageSquare,
-    MoreVertical
+    MoreVertical,
+    Shield,
+    RefreshCw
 } from 'lucide-react';
 
 interface UserData {
@@ -73,147 +74,176 @@ export default function AdminUsersPage() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Page Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white">Users</h1>
-                    <p className="text-slate-400 mt-1">Manage all registered users</p>
+                    <h1 className="text-3xl font-bold text-white tracking-tight mb-1">User Management</h1>
+                    <p className="text-slate-400 flex items-center gap-2 text-sm">
+                        <Shield className="w-4 h-4 text-primary-400" />
+                        Administrator Access • Total Users: {pagination.total.toLocaleString()}
+                    </p>
                 </div>
-                <Badge variant="outline" className="text-slate-400 border-slate-700">
-                    {pagination.total} total users
-                </Badge>
+                <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fetchUsers()}
+                        className="border-white/10 hover:bg-white/5 text-slate-300"
+                    >
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Refresh
+                    </Button>
+                </div>
             </div>
 
-            {/* Search */}
-            <Card className="bg-slate-900/50 border-slate-800">
-                <CardContent className="pt-6">
-                    <form onSubmit={handleSearch} className="flex gap-4">
+            {/* Search Bar - Glass */}
+            <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-500/20 to-purple-500/20 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="relative rounded-2xl bg-slate-900/40 border border-white/5 backdrop-blur-xl p-1">
+                    <form onSubmit={handleSearch} className="flex gap-2">
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                            <Input
-                                placeholder="Search by name..."
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary-400 transition-colors" />
+                            <input
+                                placeholder="Search by name, email or ID..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="pl-10 bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                                className="w-full bg-transparent border-none text-white placeholder:text-slate-500 focus:ring-0 pl-12 h-12 rounded-xl text-base"
                             />
                         </div>
-                        <Button type="submit" variant="secondary" className="bg-slate-800 hover:bg-slate-700 text-white">
+                        <Button type="submit" className="h-12 px-8 rounded-xl bg-primary-600 hover:bg-primary-500 text-white shadow-lg shadow-primary-500/20">
                             Search
                         </Button>
                     </form>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
-            {/* Users Table */}
-            <Card className="bg-slate-900/50 border-slate-800 overflow-hidden">
-                <CardContent className="p-0">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-slate-800/50">
+            {/* Users Table - Glass Container */}
+            <div className="relative rounded-3xl border border-white/5 bg-slate-900/40 backdrop-blur-xl overflow-hidden shadow-2xl shadow-black/20">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
+
+                <div className="overflow-x-auto relative z-10">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b border-white/5 bg-white/[0.02]">
+                                <th className="px-6 py-5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">User Profile</th>
+                                <th className="px-6 py-5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Relationship</th>
+                                <th className="px-6 py-5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Engagement</th>
+                                <th className="px-6 py-5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Joined</th>
+                                <th className="px-6 py-5 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {loading ? (
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">User</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Check-ins</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Joined</th>
-                                    <th className="px-6 py-4 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
+                                    <td colSpan={5} className="px-6 py-20 text-center">
+                                        <div className="flex flex-col items-center justify-center">
+                                            <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin mb-4" />
+                                            <p className="text-slate-500 text-sm">Loading users...</p>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-800">
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={5} className="px-6 py-12 text-center">
-                                            <div className="animate-spin w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full mx-auto" />
+                            ) : users.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-20 text-center text-slate-500">
+                                        <div className="flex flex-col items-center justify-center">
+                                            <div className="w-12 h-12 rounded-full bg-slate-800/50 flex items-center justify-center mb-4">
+                                                <Search className="w-6 h-6 text-slate-600" />
+                                            </div>
+                                            <p>No users found matching your search</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                users.map((user) => (
+                                    <tr key={user.id} className="group hover:bg-white/[0.02] transition-colors duration-200">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/5 flex items-center justify-center text-white font-bold text-lg shadow-inner group-hover:scale-105 transition-transform duration-300">
+                                                    {user.display_name?.charAt(0).toUpperCase() || <User className="w-5 h-5 text-slate-600" />}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-white text-base group-hover:text-primary-400 transition-colors">{user.display_name || 'Anonymous User'}</p>
+                                                    <p className="text-xs text-slate-500 font-mono mt-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                                                        ID: {user.id.slice(0, 8)}...
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {user.isPaired ? (
+                                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-300 text-sm">
+                                                    <Heart className="w-3 h-3 fill-pink-500/20" />
+                                                    <span className="font-medium">Coupled</span>
+                                                </div>
+                                            ) : (
+                                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-500/10 border border-slate-500/20 text-slate-400 text-sm">
+                                                    <User className="w-3 h-3" />
+                                                    <span className="font-medium">Single</span>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-2 text-slate-300 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-white/5">
+                                                    <MessageSquare className="w-4 h-4 text-emerald-400" />
+                                                    <span className="font-mono">{user.checkinCount}</span>
+                                                    <span className="text-xs text-slate-500">Check-ins</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="text-slate-400 text-sm">
+                                                {new Date(user.created_at).toLocaleDateString(undefined, {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    year: 'numeric'
+                                                })}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-white/5 rounded-xl">
+                                                <MoreVertical className="w-4 h-4" />
+                                            </Button>
                                         </td>
                                     </tr>
-                                ) : users.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
-                                            No users found
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    users.map((user) => (
-                                        <tr key={user.id} className="hover:bg-slate-800/30 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center text-white font-bold">
-                                                        {user.display_name?.charAt(0).toUpperCase() || 'U'}
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-medium text-white">{user.display_name || 'Unknown'}</p>
-                                                        <p className="text-xs text-slate-500">{user.id.slice(0, 8)}...</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    {user.isPaired ? (
-                                                        <Badge variant="success" className="flex items-center gap-1">
-                                                            <Heart className="w-3 h-3" />
-                                                            Paired
-                                                        </Badge>
-                                                    ) : (
-                                                        <Badge variant="secondary" className="flex items-center gap-1">
-                                                            <User className="w-3 h-3" />
-                                                            Single
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2 text-slate-300">
-                                                    <MessageSquare className="w-4 h-4 text-slate-500" />
-                                                    {user.checkinCount}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-slate-400 text-sm">
-                                                {new Date(user.created_at).toLocaleDateString()}
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
-                                                    <MoreVertical className="w-4 h-4" />
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
-                    {/* Pagination */}
-                    {pagination.totalPages > 1 && (
-                        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800">
-                            <p className="text-sm text-slate-400">
-                                Page {pagination.page} of {pagination.totalPages}
-                            </p>
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-                                    disabled={pagination.page === 1}
-                                    className="border-slate-700 text-slate-400 hover:bg-slate-800"
-                                >
-                                    <ChevronLeft className="w-4 h-4 mr-1" />
-                                    Previous
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-                                    disabled={pagination.page === pagination.totalPages}
-                                    className="border-slate-700 text-slate-400 hover:bg-slate-800"
-                                >
-                                    Next
-                                    <ChevronRight className="w-4 h-4 ml-1" />
-                                </Button>
-                            </div>
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-white/5 bg-white/[0.01]">
+                        <p className="text-sm text-slate-500">
+                            Page <span className="text-white font-medium">{pagination.page}</span> of <span className="text-white font-medium">{pagination.totalPages}</span>
+                        </p>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                                disabled={pagination.page === 1}
+                                className="border-white/10 hover:bg-white/5 text-slate-300 hover:text-white"
+                            >
+                                <ChevronLeft className="w-4 h-4 mr-1" />
+                                Previous
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                                disabled={pagination.page === pagination.totalPages}
+                                className="border-white/10 hover:bg-white/5 text-slate-300 hover:text-white"
+                            >
+                                Next
+                                <ChevronRight className="w-4 h-4 ml-1" />
+                            </Button>
                         </div>
-                    )}
-                </CardContent>
-            </Card>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

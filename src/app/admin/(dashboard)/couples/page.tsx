@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -10,7 +9,10 @@ import {
     ChevronLeft,
     ChevronRight,
     Users,
-    Calendar
+    Calendar,
+    RefreshCw,
+    Sparkles,
+    User
 } from 'lucide-react';
 
 interface CoupleData {
@@ -46,6 +48,7 @@ export default function AdminCouplesPage() {
             const params = new URLSearchParams({
                 page: pagination.page.toString(),
                 limit: pagination.limit.toString(),
+                search: '',
             });
             if (statusFilter) params.set('status', statusFilter);
 
@@ -64,167 +67,172 @@ export default function AdminCouplesPage() {
         }
     };
 
-    const getStatusBadge = (status: string) => {
+    const getStatusStyle = (status: string) => {
         switch (status) {
             case 'ACTIVE':
-                return <Badge variant="success">Active</Badge>;
+                return 'bg-green-500/10 text-green-400 border-green-500/20';
             case 'PAUSED':
-                return <Badge variant="warning">Paused</Badge>;
+                return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
             case 'UNPAIRED':
-                return <Badge variant="destructive">Unpaired</Badge>;
+                return 'bg-red-500/10 text-red-400 border-red-500/20';
             default:
-                return <Badge variant="secondary">{status}</Badge>;
+                return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
         }
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Page Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white">Couples</h1>
-                    <p className="text-slate-400 mt-1">Manage paired couples and their relationships</p>
+                    <h1 className="text-3xl font-bold text-white tracking-tight mb-1">Active Relationships</h1>
+                    <p className="text-slate-400 flex items-center gap-2 text-sm">
+                        <Heart className="w-4 h-4 text-pink-400" />
+                        Tracking {pagination.total.toLocaleString()} couples across the platform
+                    </p>
                 </div>
-                <Badge variant="outline" className="text-slate-400 border-slate-700">
-                    {pagination.total} total couples
-                </Badge>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fetchCouples()}
+                    className="border-white/10 hover:bg-white/5 text-slate-300"
+                >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Refresh
+                </Button>
             </div>
 
-            {/* Filters */}
-            <Card className="bg-slate-900/50 border-slate-800">
-                <CardContent className="pt-6">
-                    <div className="flex gap-2">
-                        <Button
-                            variant={statusFilter === '' ? 'default' : 'outline'}
-                            onClick={() => setStatusFilter('')}
-                            className={statusFilter === '' ? 'bg-primary-600 text-white' : 'border-slate-700 text-slate-400'}
-                            size="sm"
-                        >
-                            All
-                        </Button>
-                        <Button
-                            variant={statusFilter === 'ACTIVE' ? 'default' : 'outline'}
-                            onClick={() => setStatusFilter('ACTIVE')}
-                            className={statusFilter === 'ACTIVE' ? 'bg-green-600 text-white' : 'border-slate-700 text-slate-400'}
-                            size="sm"
-                        >
-                            Active
-                        </Button>
-                        <Button
-                            variant={statusFilter === 'PAUSED' ? 'default' : 'outline'}
-                            onClick={() => setStatusFilter('PAUSED')}
-                            className={statusFilter === 'PAUSED' ? 'bg-yellow-600 text-white' : 'border-slate-700 text-slate-400'}
-                            size="sm"
-                        >
-                            Paused
-                        </Button>
-                        <Button
-                            variant={statusFilter === 'UNPAIRED' ? 'default' : 'outline'}
-                            onClick={() => setStatusFilter('UNPAIRED')}
-                            className={statusFilter === 'UNPAIRED' ? 'bg-red-600 text-white' : 'border-slate-700 text-slate-400'}
-                            size="sm"
-                        >
-                            Unpaired
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+            {/* Filter Pills */}
+            <div className="flex gap-2 p-1 bg-slate-900/40 backdrop-blur-md rounded-xl border border-white/5 w-fit">
+                {['', 'ACTIVE', 'PAUSED', 'UNPAIRED'].map((filter) => (
+                    <button
+                        key={filter}
+                        onClick={() => setStatusFilter(filter)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${statusFilter === filter
+                                ? 'bg-primary-500 shadow-lg shadow-primary-500/25 text-white'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            }`}
+                    >
+                        {filter === '' ? 'All Couples' : filter.charAt(0) + filter.slice(1).toLowerCase()}
+                    </button>
+                ))}
+            </div>
 
             {/* Couples Grid */}
             {loading ? (
-                <div className="flex items-center justify-center h-64">
-                    <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div key={i} className="h-64 rounded-3xl bg-slate-900/40 border border-white/5 animate-pulse" />
+                    ))}
                 </div>
             ) : couples.length === 0 ? (
-                <Card className="bg-slate-900/50 border-slate-800">
-                    <CardContent className="py-12 text-center text-slate-500">
-                        No couples found
-                    </CardContent>
-                </Card>
+                <div className="rounded-3xl border border-white/5 bg-slate-900/40 backdrop-blur-xl p-12 text-center">
+                    <div className="w-16 h-16 rounded-full bg-slate-800/50 flex items-center justify-center mx-auto mb-4">
+                        <Heart className="w-8 h-8 text-slate-600" />
+                    </div>
+                    <p className="text-slate-500">No couples found matching your criteria</p>
+                </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {couples.map((couple) => (
-                        <Card key={couple.id} className="bg-slate-900/50 border-slate-800 overflow-hidden hover:border-slate-700 transition-colors">
-                            <CardContent className="p-6">
-                                {/* Partners */}
-                                <div className="flex items-center justify-center gap-4 mb-6">
-                                    <div className="text-center">
-                                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white font-bold text-lg mx-auto mb-2">
-                                            {couple.partner1?.display_name?.charAt(0).toUpperCase() || '?'}
-                                        </div>
-                                        <p className="text-sm text-white font-medium truncate max-w-[100px]">
-                                            {couple.partner1?.display_name || 'Unknown'}
-                                        </p>
+                        <div
+                            key={couple.id}
+                            className="group relative rounded-3xl border border-white/5 bg-slate-900/40 backdrop-blur-xl overflow-hidden hover:border-primary-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary-500/5 hover:-translate-y-1"
+                        >
+                            {/* Gradient Background */}
+                            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
+
+                            <div className="p-6 relative z-10">
+                                {/* Partner Avatars */}
+                                <div className="flex items-center justify-center mb-8 relative">
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-0.5 bg-gradient-to-r from-pink-500/50 to-blue-500/50 z-0" />
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-1.5 rounded-full bg-slate-950 border border-white/10 z-20">
+                                        <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />
                                     </div>
 
-                                    <Heart className="w-6 h-6 text-pink-500 shrink-0" />
-
-                                    <div className="text-center">
-                                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-lg mx-auto mb-2">
-                                            {couple.partner2?.display_name?.charAt(0).toUpperCase() || '?'}
+                                    {/* Partner 1 */}
+                                    <div className="relative z-10 flex flex-col items-center mr-6 group-hover:translate-x-1 transition-transform">
+                                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 border border-pink-500/30 flex items-center justify-center mb-3 shadow-lg shadow-pink-500/10">
+                                            {couple.partner1?.avatar_url ? (
+                                                <img src={couple.partner1.avatar_url} alt="" className="w-full h-full rounded-2xl object-cover" />
+                                            ) : (
+                                                <span className="text-xl font-bold text-pink-200">{couple.partner1?.display_name?.charAt(0).toUpperCase() || '?'}</span>
+                                            )}
                                         </div>
-                                        <p className="text-sm text-white font-medium truncate max-w-[100px]">
-                                            {couple.partner2?.display_name || 'Unknown'}
-                                        </p>
+                                        <p className="text-sm font-medium text-white max-w-[80px] truncate">{couple.partner1?.display_name || 'Partner 1'}</p>
+                                    </div>
+
+                                    {/* Partner 2 */}
+                                    <div className="relative z-10 flex flex-col items-center ml-6 group-hover:-translate-x-1 transition-transform">
+                                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/30 flex items-center justify-center mb-3 shadow-lg shadow-blue-500/10">
+                                            {couple.partner2?.avatar_url ? (
+                                                <img src={couple.partner2.avatar_url} alt="" className="w-full h-full rounded-2xl object-cover" />
+                                            ) : (
+                                                <span className="text-xl font-bold text-blue-200">{couple.partner2?.display_name?.charAt(0).toUpperCase() || '?'}</span>
+                                            )}
+                                        </div>
+                                        <p className="text-sm font-medium text-white max-w-[80px] truncate">{couple.partner2?.display_name || 'Partner 2'}</p>
                                     </div>
                                 </div>
 
-                                {/* Stats */}
-                                <div className="grid grid-cols-2 gap-4 mb-4">
-                                    <div className="bg-slate-800/50 rounded-lg p-3 text-center">
-                                        <Flame className="w-5 h-5 text-orange-400 mx-auto mb-1" />
-                                        <p className="text-lg font-bold text-white">{couple.currentStreak}</p>
-                                        <p className="text-xs text-slate-400">Current Streak</p>
+                                {/* Stats Bar */}
+                                <div className="grid grid-cols-2 gap-3 mb-6">
+                                    <div className="bg-slate-800/50 rounded-xl p-3 text-center border border-white/5 relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-orange-500/5" />
+                                        <div className="relative z-10 flex flex-col items-center">
+                                            <Flame className="w-5 h-5 text-orange-400 mb-1 fill-orange-500/20" />
+                                            <span className="text-xl font-bold text-white leading-none">{couple.currentStreak}</span>
+                                            <span className="text-[10px] uppercase tracking-wider text-orange-400/80 font-bold mt-1">Current</span>
+                                        </div>
                                     </div>
-                                    <div className="bg-slate-800/50 rounded-lg p-3 text-center">
-                                        <Flame className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
-                                        <p className="text-lg font-bold text-white">{couple.longestStreak}</p>
-                                        <p className="text-xs text-slate-400">Best Streak</p>
+                                    <div className="bg-slate-800/50 rounded-xl p-3 text-center border border-white/5 relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-yellow-500/5" />
+                                        <div className="relative z-10 flex flex-col items-center">
+                                            <Sparkles className="w-5 h-5 text-yellow-400 mb-1" />
+                                            <span className="text-xl font-bold text-white leading-none">{couple.longestStreak}</span>
+                                            <span className="text-[10px] uppercase tracking-wider text-yellow-400/80 font-bold mt-1">Best</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Footer */}
-                                <div className="flex items-center justify-between pt-4 border-t border-slate-800">
-                                    {getStatusBadge(couple.status)}
-                                    <div className="flex items-center gap-1 text-xs text-slate-500">
+                                {/* Footer Info */}
+                                <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                                    <div className={`px-2.5 py-1 rounded-md border text-xs font-bold ${getStatusStyle(couple.status)}`}>
+                                        {couple.status}
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
                                         <Calendar className="w-3 h-3" />
                                         {new Date(couple.paired_at).toLocaleDateString()}
                                     </div>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
                     ))}
                 </div>
             )}
 
-            {/* Pagination */}
+            {/* Pagination Controls */}
             {pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between">
-                    <p className="text-sm text-slate-400">
-                        Page {pagination.page} of {pagination.totalPages}
-                    </p>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-                            disabled={pagination.page === 1}
-                            className="border-slate-700 text-slate-400 hover:bg-slate-800"
-                        >
-                            <ChevronLeft className="w-4 h-4 mr-1" />
-                            Previous
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-                            disabled={pagination.page === pagination.totalPages}
-                            className="border-slate-700 text-slate-400 hover:bg-slate-800"
-                        >
-                            Next
-                            <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
-                    </div>
+                <div className="flex items-center justify-center gap-4 py-8">
+                    <Button
+                        variant="outline"
+                        onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                        disabled={pagination.page === 1}
+                        className="rounded-full w-10 h-10 p-0 border-white/10 hover:bg-white/10 hover:text-white bg-transparent"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </Button>
+                    <span className="text-sm font-medium text-slate-400">
+                        Page <span className="text-white">{pagination.page}</span> / {pagination.totalPages}
+                    </span>
+                    <Button
+                        variant="outline"
+                        onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                        disabled={pagination.page === pagination.totalPages}
+                        className="rounded-full w-10 h-10 p-0 border-white/10 hover:bg-white/10 hover:text-white bg-transparent"
+                    >
+                        <ChevronRight className="w-5 h-5" />
+                    </Button>
                 </div>
             )}
         </div>

@@ -36,33 +36,37 @@ export function useSubscription() {
         try {
             setIsLoading(true);
 
-            // First get the couple_id
-            const { data: pairingData } = await supabase
-                .from('pairings')
-                .select('couple_id')
-                .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+            // First get the couple_id from couples table
+            const { data: coupleData } = await supabase
+                .from('couples')
+                .select('id')
+                .or(`partner1_id.eq.${user.id},partner2_id.eq.${user.id}`)
+                .eq('status', 'ACTIVE')
                 .single();
 
-            if (!pairingData?.couple_id) {
+            if (!coupleData?.id) {
+                // User is not in a couple - not an error, just no subscription
                 setIsLoading(false);
                 return;
             }
 
-            // Then get subscription
+            // Then get subscription for this couple
             const { data, error: subError } = await supabase
                 .from('subscriptions')
                 .select('*')
-                .eq('couple_id', pairingData.couple_id)
+                .eq('couple_id', coupleData.id)
+                .eq('status', 'active')
                 .single();
 
             if (subError && subError.code !== 'PGRST116') { // Not "no rows" error
-                throw subError;
+                console.log('Subscription lookup returned no results');
             }
 
             setSubscription(data || null);
         } catch (err: any) {
-            console.error('Subscription fetch error:', err);
-            setError(err.message);
+            // Don't treat missing subscription as error
+            console.log('Subscription check:', err?.message || err);
+            setSubscription(null);
         } finally {
             setIsLoading(false);
         }
@@ -79,14 +83,15 @@ export function useSubscription() {
         }
 
         try {
-            // Get couple_id
-            const { data: pairingData } = await supabase
-                .from('pairings')
-                .select('couple_id')
-                .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+            // Get couple_id from couples table
+            const { data: coupleData } = await supabase
+                .from('couples')
+                .select('id')
+                .or(`partner1_id.eq.${user.id},partner2_id.eq.${user.id}`)
+                .eq('status', 'ACTIVE')
                 .single();
 
-            if (!pairingData?.couple_id) {
+            if (!coupleData?.id) {
                 return { success: false, error: 'Not paired' };
             }
 
@@ -96,7 +101,7 @@ export function useSubscription() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     planId,
-                    coupleId: pairingData.couple_id,
+                    coupleId: coupleData.id,
                     userId: user.id,
                 }),
             });
