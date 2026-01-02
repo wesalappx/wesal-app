@@ -335,7 +335,7 @@ export default function UpgradePage() {
                                 <Sparkles className="w-6 h-6" />
                                 {isRTL ? 'اشترك الآن' : 'Subscribe Now'}
                                 <span className="opacity-80">
-                                    - {formatPrice(selectedPlan === 'premium_monthly' ? monthlyPlan.price : annualPlan.price)}
+                                    - {formatPrice(selectedPlan === 'premium_monthly' ? monthlyPrice : annualPrice)}
                                 </span>
                             </>
                         )}
