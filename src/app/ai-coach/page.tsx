@@ -194,15 +194,30 @@ export default function AICoachPage() {
         const fetchGamesData = async () => {
             if (!user) return;
             try {
+                // First get the couple_id
+                const { data: coupleData } = await supabase
+                    .from('couples')
+                    .select('id')
+                    .or(`partner1_id.eq.${user.id},partner2_id.eq.${user.id}`)
+                    .eq('status', 'ACTIVE')
+                    .maybeSingle();
+
+                if (!coupleData?.id) return;
+
                 const { data, error } = await supabase
                     .from('game_sessions')
-                    .select('id, game_type, created_at, scores')
-                    .eq('user_id', user.id)
+                    .select('id, game_type, created_at, current_state')
+                    .eq('couple_id', coupleData.id)
                     .order('created_at', { ascending: false })
                     .limit(50);
 
                 if (!error && data) {
-                    setGamesData(data);
+                    // Transform current_state to include scores for compatibility
+                    const transformed = data.map(item => ({
+                        ...item,
+                        scores: item.current_state?.scores || {}
+                    }));
+                    setGamesData(transformed);
                 }
             } catch (error) {
                 console.error('Error fetching games data:', error);
