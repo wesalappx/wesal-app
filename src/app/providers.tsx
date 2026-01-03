@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import WhisperNotification from '@/components/WhisperNotification';
 import { AuthProvider } from '@/hooks/useAuth';
 import { useSettingsStore, initializeSettings } from '@/stores/settings-store';
+import { usePresence } from '@/hooks/usePresence';
 
 function SettingsInitializer() {
     const { theme, language } = useSettingsStore();
@@ -28,6 +29,12 @@ function GlobalWhisperListener() {
     return <WhisperNotification language={language as 'ar' | 'en'} />;
 }
 
+// Global presence tracker - tracks user online status across all pages
+function PresenceTracker() {
+    usePresence(); // This hook handles everything internally
+    return null;
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
     const [queryClient] = useState(
         () =>
@@ -46,6 +53,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <AuthProvider>
                 <SettingsInitializer />
                 <GlobalWhisperListener />
+                <PresenceTracker />
                 {children}
             </AuthProvider>
         </QueryClientProvider>

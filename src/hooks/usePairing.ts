@@ -10,6 +10,7 @@ export interface Partner {
     email?: string;
     avatar_url?: string;
     is_online?: boolean;
+    last_seen_at?: string;
 }
 
 export interface Couple {

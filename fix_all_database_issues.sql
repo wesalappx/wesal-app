@@ -295,5 +295,33 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.active_sessions;
 CREATE INDEX IF NOT EXISTS idx_active_sessions_couple_id ON public.active_sessions(couple_id);
 
 -- ============================================
+-- 9. ADD PRESENCE COLUMNS TO PROFILES
+-- ============================================
+DO $$ BEGIN
+    ALTER TABLE public.profiles ADD COLUMN is_online BOOLEAN DEFAULT FALSE;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE public.profiles ADD COLUMN last_seen_at TIMESTAMPTZ DEFAULT NOW();
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+-- Allow partners to view each other's online status
+DROP POLICY IF EXISTS "Partners can view each other" ON public.profiles;
+CREATE POLICY "Partners can view each other" ON public.profiles
+    FOR SELECT USING (
+        auth.uid() = id
+        OR EXISTS (
+            SELECT 1 FROM public.couples
+            WHERE status = 'ACTIVE'
+            AND (
+                (partner1_id = auth.uid() AND partner2_id = id)
+                OR (partner2_id = auth.uid() AND partner1_id = id)
+            )
+        )
+    );
+
+-- ============================================
 -- DONE! All tables and constraints should now be fixed.
 -- ============================================
