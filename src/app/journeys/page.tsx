@@ -168,18 +168,17 @@ export default function JourneysPage() {
 
     // Handle Mode Selection
     const handleModeSelect = async (mode: 'local' | 'remote') => {
-        if (!pendingExercise) return;
         setShowModeModal(false);
         playSound('success');
 
-        const { journeyId, stepIndex } = pendingExercise;
-
-        if (mode === 'remote') {
-            router.push(`/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=remote`);
-        } else {
-            router.push(`/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=local`);
+        // If there's a pending exercise, navigate to it
+        if (pendingExercise) {
+            const { journeyId, stepIndex } = pendingExercise;
+            router.push(`/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=${mode}`);
+            setPendingExercise(null);
         }
-        setPendingExercise(null);
+        // Otherwise, this was a "gateway" selection - preference is saved by the modal itself
+        // User can now click on exercises and use the saved preferred mode
     };
 
     // Join existing session
