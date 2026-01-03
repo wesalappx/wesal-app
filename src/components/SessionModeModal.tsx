@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Smartphone, Globe, Users, Wifi } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -12,7 +13,15 @@ interface SessionModeModalProps {
 
 export default function SessionModeModal({ isOpen, onSelectMode, onClose, isSharedAvailable = true }: SessionModeModalProps) {
     const { t, language } = useTranslation();
-    const { theme } = useSettingsStore();
+    const { theme, setPreferredSessionMode } = useSettingsStore();
+    const [rememberChoice, setRememberChoice] = React.useState(false);
+
+    const handleSelect = (mode: 'local' | 'remote') => {
+        if (rememberChoice) {
+            setPreferredSessionMode(mode);
+        }
+        onSelectMode(mode);
+    };
 
     if (!isOpen) return null;
 
@@ -29,8 +38,8 @@ export default function SessionModeModal({ isOpen, onSelectMode, onClose, isShar
                     exit={{ opacity: 0, scale: 0.95 }}
                     onClick={(e) => e.stopPropagation()}
                     className={`w-full max-w-lg overflow-hidden relative rounded-3xl border shadow-2xl ${theme === 'light'
-                            ? 'bg-white border-slate-100 shadow-slate-200/50'
-                            : 'glass-card bg-surface-900/95 border-surface-700'
+                        ? 'bg-white border-slate-100 shadow-slate-200/50'
+                        : 'glass-card bg-surface-900/95 border-surface-700'
                         }`}
                 >
                     <div className="p-8 text-center">
@@ -48,13 +57,13 @@ export default function SessionModeModal({ isOpen, onSelectMode, onClose, isShar
                                 : 'Choose the mode that suits you best right now'}
                         </p>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             {/* Local Mode */}
                             <button
-                                onClick={() => onSelectMode('local')}
+                                onClick={() => handleSelect('local')}
                                 className={`group relative p-6 rounded-2xl border transition-all text-left ${theme === 'light'
-                                        ? 'bg-slate-50 border-slate-200 hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200'
-                                        : 'bg-surface-800/50 border-white/5 hover:bg-surface-800 hover:border-primary-500/30'
+                                    ? 'bg-slate-50 border-slate-200 hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200'
+                                    : 'bg-surface-800/50 border-white/5 hover:bg-surface-800 hover:border-primary-500/30'
                                     }`}
                             >
                                 <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity ${theme === 'light' ? 'bg-gradient-to-br from-indigo-500/5 to-transparent' : 'bg-gradient-to-br from-primary-500/5 to-transparent'
@@ -78,15 +87,15 @@ export default function SessionModeModal({ isOpen, onSelectMode, onClose, isShar
 
                             {/* Remote Mode */}
                             <button
-                                onClick={() => isSharedAvailable && onSelectMode('remote')}
+                                onClick={() => isSharedAvailable && handleSelect('remote')}
                                 disabled={!isSharedAvailable}
                                 className={`group relative p-6 rounded-2xl border transition-all text-left ${!isSharedAvailable
-                                        ? theme === 'light'
-                                            ? 'bg-slate-50 border-slate-100 opacity-60 cursor-not-allowed'
-                                            : 'bg-surface-900/30 border-white/5 opacity-50 cursor-not-allowed'
-                                        : theme === 'light'
-                                            ? 'bg-slate-50 border-slate-200 hover:bg-white hover:shadow-xl hover:shadow-pink-500/5 hover:border-pink-200'
-                                            : 'bg-surface-800/50 border-white/5 hover:bg-surface-800 hover:border-accent-500/30'
+                                    ? theme === 'light'
+                                        ? 'bg-slate-50 border-slate-100 opacity-60 cursor-not-allowed'
+                                        : 'bg-surface-900/30 border-white/5 opacity-50 cursor-not-allowed'
+                                    : theme === 'light'
+                                        ? 'bg-slate-50 border-slate-200 hover:bg-white hover:shadow-xl hover:shadow-pink-500/5 hover:border-pink-200'
+                                        : 'bg-surface-800/50 border-white/5 hover:bg-surface-800 hover:border-accent-500/30'
                                     }`}
                             >
                                 {isSharedAvailable && (
@@ -97,8 +106,8 @@ export default function SessionModeModal({ isOpen, onSelectMode, onClose, isShar
                                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-transform ${isSharedAvailable ? 'group-hover:scale-110' : ''} ${theme === 'light' ? 'bg-white shadow-sm' : 'bg-surface-700'
                                         }`}>
                                         <Globe className={`w-6 h-6 ${theme === 'light'
-                                                ? isSharedAvailable ? 'text-slate-400 group-hover:text-pink-500' : 'text-slate-300'
-                                                : isSharedAvailable ? 'text-surface-300 group-hover:text-accent-400' : 'text-surface-600'
+                                            ? isSharedAvailable ? 'text-slate-400 group-hover:text-pink-500' : 'text-slate-300'
+                                            : isSharedAvailable ? 'text-surface-300 group-hover:text-accent-400' : 'text-surface-600'
                                             }`} />
                                     </div>
                                     <div>
@@ -124,6 +133,28 @@ export default function SessionModeModal({ isOpen, onSelectMode, onClose, isShar
                                     )}
                                 </div>
                             </button>
+                        </div>
+
+                        {/* Remember Choice Checkbox */}
+                        <div className="flex items-center justify-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="remember-mode"
+                                checked={rememberChoice}
+                                onChange={(e) => setRememberChoice(e.target.checked)}
+                                className={`w-4 h-4 rounded border ${theme === 'light'
+                                    ? 'border-slate-300 text-indigo-500 focus:ring-indigo-500'
+                                    : 'border-surface-600 bg-surface-800 text-primary-500 focus:ring-primary-500'
+                                    }`}
+                            />
+                            <label
+                                htmlFor="remember-mode"
+                                className={`text-sm cursor-pointer ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}
+                            >
+                                {language === 'ar'
+                                    ? 'تذكر خياري للمرات القادمة'
+                                    : 'Remember my choice for future sessions'}
+                            </label>
                         </div>
                     </div>
                 </motion.div>

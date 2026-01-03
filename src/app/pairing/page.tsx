@@ -199,15 +199,15 @@ export default function PairingPage() {
                     {/* Add language toggle or other controls here if needed */}
                 </div>
 
-                {/* Header */}\
-                <div className="text-center mb-8">\
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-500/20 flex items-center justify-center">\
-                        <Users className="w-10 h-10 text-primary-500" />\
-                    </div>\
-                    <h1 className="text-2xl font-bold mb-2">{t('pairing.title')}</h1>\
-                    <p className="text-surface-400">\
-                        {t('pairing.desc')}\
-                    </p>\
+                {/* Header */}
+                <div className="text-center mb-8">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-500/20 flex items-center justify-center">
+                        <Users className="w-10 h-10 text-primary-500" />
+                    </div>
+                    <h1 className="text-2xl font-bold mb-2">{t('pairing.title')}</h1>
+                    <p className="text-surface-400">
+                        {t('pairing.desc')}
+                    </p>
                 </div>
 
                 {error && (
@@ -264,7 +264,7 @@ export default function PairingPage() {
                         <p className="text-surface-400 mb-6 font-medium">{t('pairing.shareCode')}</p>
 
                         <div className="relative mb-8 group">
-                            <div className="flex gap-2 justify-center direction-ltr">
+                            <div className="flex gap-2 justify-center" dir="ltr">
                                 {pairingCode.split('').map((digit, i) => (
                                     <div
                                         key={i}
@@ -318,7 +318,7 @@ export default function PairingPage() {
                             {t('pairing.inputPlaceholder')}
                         </p>
 
-                        <div className="relative mb-8 dir-ltr">
+                        <div className="relative mb-8" dir="ltr">
                             {/* Ghost Input */}
                             <input
                                 type="text"

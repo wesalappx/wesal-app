@@ -17,6 +17,10 @@ interface SettingsState {
     // Sound
     soundEnabled: boolean;
     setSoundEnabled: (enabled: boolean) => void;
+
+    // Session Mode Preference
+    preferredSessionMode: 'local' | 'remote' | null;
+    setPreferredSessionMode: (mode: 'local' | 'remote' | null) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -43,6 +47,10 @@ export const useSettingsStore = create<SettingsState>()(
             // Sound
             soundEnabled: true,
             setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
+
+            // Session Mode Preference (Persistent)
+            preferredSessionMode: null,
+            setPreferredSessionMode: (mode) => set({ preferredSessionMode: mode }),
         }),
         {
             name: 'wesal-settings',
@@ -50,6 +58,7 @@ export const useSettingsStore = create<SettingsState>()(
                 theme: state.theme,
                 notificationsEnabled: state.notificationsEnabled,
                 soundEnabled: state.soundEnabled,
+                preferredSessionMode: state.preferredSessionMode,
             }),
         }
     )

@@ -33,6 +33,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import MarriageAdviceModal from '@/components/MarriageAdviceModal';
 import CoolDownModal from '@/components/CoolDownModal';
 import SecretSparkInput from '@/components/SecretSparkInput';
+import DashboardChat from '@/components/DashboardChat';
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -54,6 +55,7 @@ export default function Dashboard() {
     const [mounted, setMounted] = useState(false);
     const [showAdviceModal, setShowAdviceModal] = useState(false);
     const [showCoolDown, setShowCoolDown] = useState(false);
+    const [showChat, setShowChat] = useState(false);
     const { playSound } = useSound();
     const [isPremium, setIsPremium] = useState(false);
 
@@ -291,6 +293,12 @@ export default function Dashboard() {
                         <Link href="/notes" className={`w-10 h-10 rounded-2xl flex items-center justify-center backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/50 border-white/40 hover:bg-white/80' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}>
                             <StickyNote className="w-5 h-5 text-amber-500" />
                         </Link>
+                        <button
+                            onClick={() => setShowChat(true)}
+                            className={`w-10 h-10 rounded-2xl flex items-center justify-center backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/50 border-white/40 hover:bg-white/80' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}
+                        >
+                            <MessageCircleHeart className="w-5 h-5 text-pink-500" />
+                        </button>
                         <Link href="/calendar" className={`w-10 h-10 rounded-2xl flex items-center justify-center backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/50 border-white/40 hover:bg-white/80' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}>
                             <Calendar className="w-5 h-5 text-blue-500" />
                         </Link>
@@ -517,6 +525,12 @@ export default function Dashboard() {
             </div >
 
             {/* Modals */}
+            <DashboardChat
+                coupleId={coupleId || ''}
+                partnerName={partnerName}
+                isOpen={showChat}
+                onClose={() => setShowChat(false)}
+            />
             < MarriageAdviceModal isOpen={showAdviceModal} onClose={() => setShowAdviceModal(false)} />
             < CoolDownModal isOpen={showCoolDown} onClose={() => setShowCoolDown(false)} />
         </main >

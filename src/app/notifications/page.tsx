@@ -10,17 +10,22 @@ import {
     ArrowRight,
     Check,
     Loader2,
-    Trash2
+    Trash2,
+    Scale
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSound } from '@/hooks/useSound';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useRouter } from 'next/navigation';
+import { useNotifications, Notification } from '@/hooks/useNotifications';
 import { useSettingsStore } from '@/stores/settings-store';
 
 const iconMap: Record<string, any> = {
     message: MessageCircle,
     play: Star,
     'check-in': Heart,
+    CHECK_IN_SHARED: Heart,
+    game_invite: Star,
+    conflict_invite: Scale,
     system: Calendar,
     default: Bell,
 };
@@ -29,6 +34,9 @@ const colorMap: Record<string, string> = {
     message: 'bg-purple-500',
     play: 'bg-amber-500',
     'check-in': 'bg-rose-500',
+    CHECK_IN_SHARED: 'bg-rose-500',
+    game_invite: 'bg-amber-500',
+    conflict_invite: 'bg-purple-600',
     system: 'bg-blue-500',
     default: 'bg-surface-500',
 };
@@ -60,9 +68,19 @@ export default function NotificationsPage() {
     const { theme } = useSettingsStore();
     const { t } = useTranslation();
 
-    const handleMarkAsRead = (id: string) => {
+    const router = useRouter(); // Import useRouter
+
+    const handleNotificationClick = (notification: Notification) => {
         playSound('click');
-        markAsRead(id);
+
+        if (!notification.is_read) {
+            markAsRead(notification.id);
+        }
+
+        // Deep linking
+        if (notification.data?.url) {
+            router.push(notification.data.url);
+        }
     };
 
     if (isLoading) {
@@ -114,7 +132,7 @@ export default function NotificationsPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.05 }}
-                                onClick={() => !notification.is_read && handleMarkAsRead(notification.id)}
+                                onClick={() => handleNotificationClick(notification)}
                                 className={`p-4 flex gap-4 cursor-pointer transition-colors ${theme === 'light'
                                     ? 'bg-white border border-slate-200 shadow-sm rounded-2xl hover:bg-slate-50'
                                     : 'glass-card hover:bg-white/5'

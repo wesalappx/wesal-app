@@ -132,13 +132,22 @@ export default function JourneysPage() {
 
     // Initiate Exercise Flow
     const initiateExercise = (journeyId: string, stepIndex: number) => {
-        if (isPaired) {
-            setPendingExercise({ journeyId, stepIndex });
-            setShowModeModal(true);
-        } else {
-            // Solo user directly goes to local mode
+        // If solo or no preference, default logic
+        if (!isPaired) {
             playSound('success');
             router.push(`/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=local`);
+            return;
+        }
+
+        const { preferredSessionMode } = useSettingsStore.getState();
+
+        if (preferredSessionMode) {
+            // If remote is preferred but not paired/available might need check, but isPaired is true here
+            playSound('success');
+            router.push(`/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=${preferredSessionMode}`);
+        } else {
+            setPendingExercise({ journeyId, stepIndex });
+            setShowModeModal(true);
         }
     };
 

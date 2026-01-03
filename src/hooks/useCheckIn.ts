@@ -81,6 +81,7 @@ export function useCheckIn() {
                                 body_ar: `${userName} شارك حالته معك`,
                                 body_en: `${userName} shared their mood with you`,
                                 is_read: false,
+                                data: { url: '/dashboard' }
                             });
 
                         // 2. Update Streak

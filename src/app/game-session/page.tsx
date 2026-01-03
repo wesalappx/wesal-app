@@ -168,6 +168,24 @@ function GameSessionContent() {
         setShowModeModal(false);
     };
 
+    // Auto-select mode based on preference or active session
+    useEffect(() => {
+        if (sessionLoading) return;
+
+        // If session exists (e.g. joined via invite), hide modal
+        if (session) {
+            setShowModeModal(false);
+            return;
+        }
+
+        // If no session but we have a preference, use it
+        const { preferredSessionMode } = useSettingsStore.getState();
+        if (showModeModal && preferredSessionMode) {
+            initGameSession(preferredSessionMode);
+            setShowModeModal(false);
+        }
+    }, [sessionLoading, session, showModeModal]);
+
     // Send Notification on Session Create
     useEffect(() => {
         const sendInvite = async () => {
