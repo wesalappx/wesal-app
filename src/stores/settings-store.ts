@@ -21,6 +21,10 @@ interface SettingsState {
     // Session Mode Preference
     preferredSessionMode: 'local' | 'remote' | null;
     setPreferredSessionMode: (mode: 'local' | 'remote' | null) => void;
+
+    // Privacy: Show/Hide Last Seen
+    showLastSeen: boolean;
+    setShowLastSeen: (show: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -51,6 +55,10 @@ export const useSettingsStore = create<SettingsState>()(
             // Session Mode Preference (Persistent)
             preferredSessionMode: null,
             setPreferredSessionMode: (mode) => set({ preferredSessionMode: mode }),
+
+            // Privacy: Show Last Seen (default: true)
+            showLastSeen: true,
+            setShowLastSeen: (show) => set({ showLastSeen: show }),
         }),
         {
             name: 'wesal-settings',
@@ -59,6 +67,7 @@ export const useSettingsStore = create<SettingsState>()(
                 notificationsEnabled: state.notificationsEnabled,
                 soundEnabled: state.soundEnabled,
                 preferredSessionMode: state.preferredSessionMode,
+                showLastSeen: state.showLastSeen,
             }),
         }
     )

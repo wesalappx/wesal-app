@@ -417,6 +417,33 @@ export default function SettingsPage() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Last Seen Privacy */}
+                        <div className={`p-4 rounded-2xl flex items-center justify-between border transition-all ${theme === 'light'
+                            ? 'bg-white border-slate-100 shadow-sm'
+                            : 'glass-card border-surface-700/50'
+                            }`}>
+                            <div className="flex items-center gap-3">
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${theme === 'light' ? 'bg-green-50' : 'bg-green-500/20'
+                                    }`}>
+                                    <Shield className={`w-5 h-5 ${theme === 'light' ? 'text-green-500' : 'text-green-400'}`} />
+                                </div>
+                                <div className={isRTL ? 'text-right' : 'text-left'}>
+                                    <p className={`font-medium ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
+                                        {isRTL ? 'إظهار آخر ظهور' : 'Show Last Seen'}
+                                    </p>
+                                    <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
+                                        {useSettingsStore.getState().showLastSeen
+                                            ? (isRTL ? 'شريكك يرى آخر ظهور' : 'Partner sees your last seen')
+                                            : (isRTL ? 'مخفي عن الشريك' : 'Hidden from partner')}
+                                    </p>
+                                </div>
+                            </div>
+                            <ToggleSwitch
+                                enabled={useSettingsStore.getState().showLastSeen}
+                                onChange={(show) => useSettingsStore.getState().setShowLastSeen(show)}
+                            />
+                        </div>
                     </div>
                 </motion.section>
 
