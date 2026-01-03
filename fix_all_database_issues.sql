@@ -232,5 +232,68 @@ CREATE INDEX IF NOT EXISTS idx_messages_couple_id ON public.messages(couple_id);
 CREATE INDEX IF NOT EXISTS idx_messages_created_at ON public.messages(created_at DESC);
 
 -- ============================================
+-- 8. ACTIVE_SESSIONS TABLE (For Remote Play Invites)
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.active_sessions (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    couple_id UUID REFERENCES public.couples(id) ON DELETE CASCADE NOT NULL,
+    activity_type TEXT NOT NULL CHECK (activity_type IN ('game', 'journey')),
+    activity_id TEXT NOT NULL, -- game type or journey id
+    state JSONB DEFAULT '{}'::JSONB,
+    created_by UUID REFERENCES public.profiles(id),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.active_sessions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Couple members can view active sessions" ON public.active_sessions;
+DROP POLICY IF EXISTS "Couple members can insert active sessions" ON public.active_sessions;
+DROP POLICY IF EXISTS "Couple members can update active sessions" ON public.active_sessions;
+DROP POLICY IF EXISTS "Couple members can delete active sessions" ON public.active_sessions;
+
+CREATE POLICY "Couple members can view active sessions" ON public.active_sessions
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.couples
+            WHERE id = couple_id
+            AND (partner1_id = auth.uid() OR partner2_id = auth.uid())
+        )
+    );
+
+CREATE POLICY "Couple members can insert active sessions" ON public.active_sessions
+    FOR INSERT WITH CHECK (
+        auth.uid() = created_by
+        AND EXISTS (
+            SELECT 1 FROM public.couples
+            WHERE id = couple_id
+            AND (partner1_id = auth.uid() OR partner2_id = auth.uid())
+        )
+    );
+
+CREATE POLICY "Couple members can update active sessions" ON public.active_sessions
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.couples
+            WHERE id = couple_id
+            AND (partner1_id = auth.uid() OR partner2_id = auth.uid())
+        )
+    );
+
+CREATE POLICY "Couple members can delete active sessions" ON public.active_sessions
+    FOR DELETE USING (
+        EXISTS (
+            SELECT 1 FROM public.couples
+            WHERE id = couple_id
+            AND (partner1_id = auth.uid() OR partner2_id = auth.uid())
+        )
+    );
+
+-- Enable realtime for active_sessions
+ALTER PUBLICATION supabase_realtime ADD TABLE public.active_sessions;
+
+CREATE INDEX IF NOT EXISTS idx_active_sessions_couple_id ON public.active_sessions(couple_id);
+
+-- ============================================
 -- DONE! All tables and constraints should now be fixed.
 -- ============================================

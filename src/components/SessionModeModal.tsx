@@ -13,11 +13,23 @@ interface SessionModeModalProps {
 
 export default function SessionModeModal({ isOpen, onSelectMode, onClose, isSharedAvailable = true }: SessionModeModalProps) {
     const { t, language } = useTranslation();
-    const { theme, setPreferredSessionMode } = useSettingsStore();
-    const [rememberChoice, setRememberChoice] = React.useState(false);
+    const { theme, setPreferredSessionMode, preferredSessionMode } = useSettingsStore();
+    // Default to checked if user already has a preference (they're changing it)
+    const [rememberChoice, setRememberChoice] = React.useState(true);
+
+    // Reset remember choice when modal opens
+    React.useEffect(() => {
+        if (isOpen) {
+            // If user already has a preference, they're clicking to change it - so always save
+            // If no preference (first time), let them choose whether to remember
+            setRememberChoice(!!preferredSessionMode);
+        }
+    }, [isOpen, preferredSessionMode]);
 
     const handleSelect = (mode: 'local' | 'remote') => {
-        if (rememberChoice) {
+        // Always save preference when explicitly selecting
+        // This ensures changing mode actually changes it
+        if (rememberChoice || preferredSessionMode) {
             setPreferredSessionMode(mode);
         }
         onSelectMode(mode);

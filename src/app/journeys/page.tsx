@@ -94,19 +94,20 @@ export default function JourneysPage() {
         checkStatus();
     }, []);
 
-    // Gateway Logic: Check Preference
+    // Gateway Logic: Check Preference (only after loading completes)
     const { preferredSessionMode, setPreferredSessionMode } = useSettingsStore();
     useEffect(() => {
-        if (!preferredSessionMode && !activeSession) {
-            // Only show if no active session (invite) logic is pending?
-            // Actually user implies invite check first.
-            // If activeSession exists (fetched above), we shouldn't prompt yet?
-            // But activeSession fetch is async.
-            // Let's rely on the user to click "Join" if there is one.
-            // But valid point: if they just landed, prompt them.
+        // Wait for loading to complete before showing modal
+        if (isLoading) return;
+
+        // Only show modal if:
+        // 1. No preference is saved
+        // 2. No active session invite exists
+        // 3. User is paired (otherwise local-only makes more sense)
+        if (!preferredSessionMode && !activeSession && isPaired) {
             setShowModeModal(true);
         }
-    }, [preferredSessionMode, activeSession]);
+    }, [preferredSessionMode, activeSession, isPaired, isLoading]);
 
     // Toggle journey expansion
     const toggleJourney = (journeyId: string) => {
