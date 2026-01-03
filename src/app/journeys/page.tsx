@@ -45,6 +45,7 @@ export default function JourneysPage() {
 
     // Pairing & Session State
     const [isPaired, setIsPaired] = useState(false);
+    const [pairingChecked, setPairingChecked] = useState(false); // Track when async check is done
     const [activeSession, setActiveSession] = useState<any | null>(null);
     const [showModeModal, setShowModeModal] = useState(false);
     const [pendingExercise, setPendingExercise] = useState<{ journeyId: string; stepIndex: number } | null>(null);
@@ -90,15 +91,16 @@ export default function JourneysPage() {
                     supabase.removeChannel(channel);
                 };
             }
+            setPairingChecked(true); // Mark pairing check as complete
         };
         checkStatus();
     }, []);
 
-    // Gateway Logic: Check Preference (only after loading completes)
+    // Gateway Logic: Check Preference (only after ALL loading completes)
     const { preferredSessionMode, setPreferredSessionMode } = useSettingsStore();
     useEffect(() => {
-        // Wait for loading to complete before showing modal
-        if (isLoading) return;
+        // Wait for BOTH journey loading AND pairing check to complete
+        if (isLoading || !pairingChecked) return;
 
         // Only show modal if:
         // 1. No preference is saved
@@ -107,7 +109,7 @@ export default function JourneysPage() {
         if (!preferredSessionMode && !activeSession && isPaired) {
             setShowModeModal(true);
         }
-    }, [preferredSessionMode, activeSession, isPaired, isLoading]);
+    }, [preferredSessionMode, activeSession, isPaired, isLoading, pairingChecked]);
 
     // Toggle journey expansion
     const toggleJourney = (journeyId: string) => {
