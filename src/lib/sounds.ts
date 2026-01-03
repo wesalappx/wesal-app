@@ -16,12 +16,13 @@ class SoundManager {
 
     private loadSounds() {
         // Sound files to be added to /public/sounds/
+        // Note: Add these files to your project or use web audio API
         const soundFiles = {
             click: '/sounds/click.mp3',
             success: '/sounds/success.mp3',
             error: '/sounds/error.mp3',
             swipe: '/sounds/swipe.mp3',
-            notification: '/sounds/notification.mp3'
+            pop: '/sounds/pop.mp3'
         };
 
         Object.entries(soundFiles).forEach(([name, url]) => {
