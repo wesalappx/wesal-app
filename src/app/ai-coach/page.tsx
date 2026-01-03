@@ -668,30 +668,36 @@ export default function AICoachPage() {
             const context = buildContext();
             const actionInstructions = `
 === ACTION SYSTEM ===
-RULE 1: ONLY add actions when user EXPLICITLY asks to save/record/add using words like: "سجل", "احفظ", "أضف", "ذكرني", "save", "add", "record", "remember"
-When the user explicitly asks you to DO something (add note, schedule event, save budget):
+**CRITICAL RULE: NEVER add [ACTION:...] unless you have ALL required information!**
 
-**IMPORTANT - Ask for Confirmation First:**
-1. Describe what you will do in detail
-2. Ask: "هل تريد مني [action description]?" (Arabic) or "Would you like me to [action description]?" (English)
-3. Add the action at the END of your response: [ACTION:type|param1=value1|param2=value2]
-4. The user will see "Yes" and "No" buttons to confirm
-5. DO NOT say "Done!" or "✅" - just ask for confirmation
+When user wants to add something (note, date, budget), follow this EXACT process:
 
-**Available Actions:**
-- [ACTION:add_note|title=Note Title|content=Note content|category=personal]
+**STEP 1: Gather Information First**
+- If user says "أريد إضافة ملاحظة" but doesn't provide title/content → ASK them: "ما عنوان الملاحظة ومحتواها؟"
+- If user says generic request → ASK for specific details
+- DO NOT add any [ACTION:...] tag until you have the actual data
+
+**STEP 2: Only After User Provides Details**
+- Once user gives you specific title/content → THEN add [ACTION:...]
+- Example flow:
+  User: "أريد إضافة ملاحظة"
+  AI: "بالتأكيد! ما عنوان الملاحظة ومحتواها؟"
+  User: "عنوانها ذكرى زفافنا ومحتواها كان يوم رائع"
+  AI: "هل تريد مني إضافة ملاحظة بعنوان 'ذكرى زفافنا' ومحتوى 'كان يوم رائع'؟ [ACTION:add_note|title=ذكرى زفافنا|content=كان يوم رائع|category=personal]"
+
+**Available Actions (only use when you have REAL data):**
+- [ACTION:add_note|title=ACTUAL_TITLE|content=ACTUAL_CONTENT|category=personal]
 - [ACTION:add_special_date|title=Event Name|date=YYYY-MM-DD]
 - [ACTION:add_budget|title=Goal Name|target=5000|current=0]
 - [ACTION:add_calendar|title=Event|date=YYYY-MM-DD|type=date]
 
-**Example:**
-User: "أضف ملاحظة عن ذكرى زواجنا"
-AI: "هل تريد مني إضافة ملاحظة بعنوان 'ذكرى الزواج' في الملاحظات الشخصية؟ [ACTION:add_note|title=ذكرى الزواج|content=|category=personal]"
+**WRONG ❌:**
+User: "أريد إضافة ملاحظة"
+AI: "هل تريد مني إضافة ملاحظة؟ [ACTION:add_note|title=ملاحظة جديدة|content=|category=personal]"
 
-**Rules:**
-✅ DO: Ask for confirmation → Add [ACTION:...]
-❌ DON'T: Execute and say "Done!"
-❌ DON'T: Add actions for simple questions like "How is my partner?"
+**CORRECT ✅:**
+User: "أريد إضافة ملاحظة"
+AI: "بالتأكيد! ما عنوان الملاحظة ومحتواها؟"
 `;
 
             const systemPrompt = mode === 'intimate'
@@ -1178,7 +1184,7 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && sendMessage(inputValue)}
                             placeholder={isRTL ? 'اكتب رسالتك هنا...' : 'Type your message here...'}
-                            className={`w-full bg-transparent border-none focus:ring-0 text-sm py-2 ${theme === 'light' ? 'text-slate-800 placeholder:text-slate-400' : 'text-white placeholder:text-surface-400'
+                            className={`w-full bg-transparent border-none outline-none focus:ring-0 focus:outline-none text-sm py-2 ${theme === 'light' ? 'text-slate-800 placeholder:text-slate-400' : 'text-white placeholder:text-surface-400'
                                 }`}
                             disabled={isLoading}
                         />
