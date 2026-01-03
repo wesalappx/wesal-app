@@ -43,37 +43,37 @@ const quickActions: QuickAction[] = [
         id: 'partner-mood',
         icon: Heart,
         label: { ar: 'حالة الشريك', en: 'Partner' },
-        prompt: { ar: 'كيف حال شريكي اليوم؟', en: 'How is my partner feeling today?' }
+        prompt: { ar: 'أخبرني عن حالة شريكي اليوم بناءً على آخر تسجيل للمشاعر. هل هو سعيد؟ متوتر؟ ما نصيحتك؟', en: 'Tell me about my partner mood today based on their latest check-in. Are they happy? Stressed? What do you advise?' }
     },
     {
         id: 'add-note',
         icon: StickyNote,
         label: { ar: 'ملاحظة', en: 'Note' },
-        prompt: { ar: 'أريد إضافة ملاحظة', en: 'I want to add a note' }
+        prompt: { ar: 'أريد إضافة ملاحظة جديدة. اسألني عن العنوان والمحتوى ثم احفظها لي.', en: 'I want to add a new note. Ask me for the title and content then save it.' }
     },
     {
         id: 'advice',
         icon: MessageCircle,
         label: { ar: 'نصيحة', en: 'Advice' },
-        prompt: { ar: 'أحتاج نصيحة للعلاقة', en: 'I need relationship advice' }
+        prompt: { ar: 'أعطني نصيحة مخصصة لتحسين علاقتي بناءً على بياناتي الحالية (حالتي المزاجية، النشاطات، السلسلة).', en: 'Give me personalized advice to improve my relationship based on my current data (mood, activities, streak).' }
     },
     {
         id: 'romantic-ideas',
         icon: Flower2,
         label: { ar: 'رومانسية', en: 'Romance' },
-        prompt: { ar: 'أعطني أفكار رومانسية', en: 'Give me romantic ideas' }
+        prompt: { ar: 'أعطني 3 أفكار رومانسية مفاجئة يمكنني تنفيذها اليوم أو هذا الأسبوع.', en: 'Give me 3 surprise romantic ideas I can do today or this week.' }
     },
     {
         id: 'budget',
         icon: Wallet,
         label: { ar: 'ميزانية', en: 'Budget' },
-        prompt: { ar: 'ساعدني في الميزانية', en: 'Help with budget' }
+        prompt: { ar: 'راجع أهدافي المالية الحالية وأخبرني عن تقدمي. هل لدي أهداف؟ ما اقترحاتك؟', en: 'Review my current budget goals and tell me about my progress. Do I have goals? What are your suggestions?' }
     },
     {
         id: 'intimate-wellness',
         icon: Lock,
         label: { ar: 'الصحة الخاصة', en: 'Private Health' },
-        prompt: { ar: 'أحتاج نصائح خاصة', en: 'I need private advice' }
+        prompt: { ar: 'أحتاج نصائح للعلاقة الحميمية والتواصل الجسدي مع شريكي.', en: 'I need advice about intimacy and physical connection with my partner.' }
     },
 ];
 
@@ -785,7 +785,12 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
             if (!response.ok) throw new Error('AI request failed');
 
             const data = await response.json();
-            const rawContent = data.content || data.message || 'Sorry, I could not process that.';
+
+            // API returns OpenAI format: data.choices[0].message.content
+            const rawContent = data.choices?.[0]?.message?.content
+                || data.content
+                || data.message
+                || 'عذراً، لم أتمكن من معالجة طلبك. حاول مرة أخرى.';
 
             // Parse actions
             const actions = parseActions(rawContent);
