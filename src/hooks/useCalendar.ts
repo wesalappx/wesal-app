@@ -16,6 +16,7 @@ export interface ScheduledSession {
     notes?: string;
     created_by: string;
     created_at: string;
+    is_recurring?: boolean;
 }
 
 export function useCalendar() {

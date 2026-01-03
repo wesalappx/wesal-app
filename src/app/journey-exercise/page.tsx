@@ -23,6 +23,7 @@ import SessionChat from '@/components/SessionChat';
 import SessionModeModal from '@/components/SessionModeModal';
 import { journeysData, getJourneySteps } from '@/data/journeys';
 import { sessionData } from '@/app/game-session/data/gameContent';
+import { useSettingsStore } from '@/stores/settings-store';
 
 function JourneyExerciseContent() {
     const searchParams = useSearchParams();
@@ -30,6 +31,7 @@ function JourneyExerciseContent() {
     const { progressMap, updateProgress } = useJourneys();
     const { user } = useAuth();
     const { getStatus } = usePairing();
+    const { theme } = useSettingsStore();
 
     const journeyId = searchParams.get('journey') || 'basics';
     const stepParam = searchParams.get('step');
@@ -201,17 +203,17 @@ function JourneyExerciseContent() {
 
     if (!journey || !currentStep) {
         return (
-            <main className="min-h-screen flex items-center justify-center bg-surface-900">
-                <p className="text-surface-400">خطأ في تحميل التمرين</p>
+            <main className={`min-h-screen flex items-center justify-center ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900'}`}>
+                <p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>خطأ في تحميل التمرين</p>
             </main>
         );
     }
 
     if (!question) {
         return (
-            <main className="min-h-screen flex items-center justify-center bg-surface-900">
+            <main className={`min-h-screen flex items-center justify-center ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900'}`}>
                 <div className="text-center">
-                    <p className="text-surface-400 mb-4">لا توجد أسئلة لهذه الخطوة</p>
+                    <p className={`mb-4 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>لا توجد أسئلة لهذه الخطوة</p>
                     <button
                         onClick={() => router.push('/journeys')}
                         className="px-6 py-3 bg-primary-500 rounded-xl text-white"
@@ -226,7 +228,7 @@ function JourneyExerciseContent() {
     // Completion Screen
     if (isFinished) {
         return (
-            <main className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+            <main className={`min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950'}`}>
                 {/* Celebration Background */}
                 <div className="absolute inset-0 pointer-events-none">
                     <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]" />
@@ -275,7 +277,7 @@ function JourneyExerciseContent() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="text-4xl font-bold text-white mb-3"
+                        className={`text-4xl font-bold mb-3 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}
                     >
                         أحسنتم! 🎊
                     </motion.h1>
@@ -284,9 +286,9 @@ function JourneyExerciseContent() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="text-surface-300 text-lg mb-8"
+                        className={`text-lg mb-8 ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}
                     >
-                        أكملتم "<span className="text-primary-400 font-semibold">{currentStep.title}</span>" بنجاح
+                        أكملتم "<span className="text-primary-400 font-semibold">{currentStep?.title}</span>" بنجاح
                     </motion.p>
 
                     <motion.div
@@ -305,7 +307,7 @@ function JourneyExerciseContent() {
                         )}
                         <button
                             onClick={() => router.push('/journeys')}
-                            className="w-full py-4 bg-white/5 backdrop-blur-sm rounded-2xl font-bold text-white border border-white/10 hover:bg-white/10 transition-all"
+                            className={`w-full py-4 backdrop-blur-sm rounded-2xl font-bold border transition-all ${theme === 'light' ? 'bg-white/50 border-slate-200 text-slate-700 hover:bg-white' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
                         >
                             العودة للرحلات
                         </button>
@@ -318,9 +320,9 @@ function JourneyExerciseContent() {
     const isWaiting = isRemote && !isConnected;
 
     return (
-        <main className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950 flex flex-col relative overflow-hidden">
+        <main className={`min-h-screen flex flex-col relative overflow-hidden ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950'}`}>
             {/* Premium Background Effects */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className={`absolute inset-0 pointer-events-none overflow-hidden ${theme === 'light' ? 'opacity-30' : ''}`}>
                 <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-radial from-primary-500/20 via-primary-500/5 to-transparent rounded-full blur-3xl" />
                 <div className="absolute -bottom-20 -right-20 w-[500px] h-[500px] bg-gradient-radial from-accent-500/15 via-transparent to-transparent rounded-full blur-3xl" />
                 <div className="absolute top-1/2 -left-20 w-[300px] h-[300px] bg-gradient-radial from-rose-500/10 via-transparent to-transparent rounded-full blur-3xl" />
@@ -331,8 +333,10 @@ function JourneyExerciseContent() {
                 <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => router.push('/journeys')}
-                    className="w-11 h-11 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-surface-400 hover:text-white hover:bg-white/10 transition-all shadow-lg"
+                    className={`w-11 h-11 rounded-full backdrop-blur-xl border flex items-center justify-center transition-all shadow-lg ${theme === 'light' ? 'bg-white/80 border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-white' : 'bg-white/5 border-white/10 text-surface-400 hover:text-white hover:bg-white/10'}`}
                 >
                     <X className="w-5 h-5" />
                 </motion.button>
@@ -341,10 +345,10 @@ function JourneyExerciseContent() {
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg"
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full backdrop-blur-xl border shadow-lg ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-white/5 border-white/10'}`}
                 >
-                    <journey.icon className={`w-4 h-4 ${journey.color}`} />
-                    <span className="text-white font-semibold text-sm">{journey.title}</span>
+                    <journey.icon className={`w-4 h-4 ${journey?.color}`} />
+                    <span className={`font-semibold text-sm ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{journey?.title}</span>
                 </motion.div>
 
                 <div className="w-11" />
@@ -358,18 +362,18 @@ function JourneyExerciseContent() {
             >
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary-500/20 to-accent-500/20 border border-primary-500/30 text-primary-300 text-sm font-medium mb-3 shadow-lg shadow-primary-500/10">
                     <Sparkles className="w-4 h-4" />
-                    الخطوة {stepIndex + 1} من {journey.totalSteps}
+                    الخطوة {stepIndex + 1} من {journey?.totalSteps}
                 </div>
-                <h2 className="text-xl font-bold text-white">{currentStep.title}</h2>
+                <h2 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{currentStep?.title}</h2>
             </motion.div>
 
             {/* Progress Bar */}
             <div className="px-6 pb-6 z-10">
                 <div className="flex items-center justify-between text-xs mb-3">
-                    <span className="text-surface-400 font-medium">السؤال {currentQuestionIndex + 1} من {questions.length}</span>
+                    <span className={`font-medium ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>السؤال {currentQuestionIndex + 1} من {questions.length}</span>
                     <span className="px-2 py-1 rounded-full bg-primary-500/20 text-primary-300 font-bold">{Math.round(progress)}%</span>
                 </div>
-                <div className="h-2 bg-surface-800/80 rounded-full overflow-hidden shadow-inner">
+                <div className={`h-2 rounded-full overflow-hidden shadow-inner ${theme === 'light' ? 'bg-slate-200' : 'bg-surface-800/80'}`}>
                     <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
@@ -395,8 +399,8 @@ function JourneyExerciseContent() {
                         >
                             {/* Question Card */}
                             <div className="relative">
-                                <div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 via-accent-500/20 to-rose-500/20 rounded-[2rem] blur-xl opacity-50" />
-                                <div className="relative bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-2xl rounded-3xl border border-white/20 p-7 shadow-2xl">
+                                {theme !== 'light' && <div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 via-accent-500/20 to-rose-500/20 rounded-[2rem] blur-xl opacity-50" />}
+                                <div className={`relative backdrop-blur-2xl rounded-3xl border p-7 shadow-2xl ${theme === 'light' ? 'bg-white border-slate-100' : 'bg-gradient-to-b from-white/10 to-white/5 border-white/20'}`}>
                                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full" />
                                     {question.phase && (
                                         <motion.div
@@ -410,10 +414,10 @@ function JourneyExerciseContent() {
                                             </span>
                                         </motion.div>
                                     )}
-                                    <h3 className="text-xl md:text-2xl font-bold text-white text-center leading-relaxed mb-5" dir="rtl">
+                                    <h3 className={`text-xl md:text-2xl font-bold text-center leading-relaxed mb-5 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} dir="rtl">
                                         {question.text}
                                     </h3>
-                                    <p className="text-surface-300 text-sm text-center px-4 py-3 bg-surface-800/30 rounded-2xl border border-surface-700/50">
+                                    <p className={`text-sm text-center px-4 py-3 rounded-2xl border ${theme === 'light' ? 'bg-slate-50 text-slate-600 border-slate-200' : 'text-surface-300 bg-surface-800/30 border-surface-700/50'}`}>
                                         💡 {question.hint}
                                     </p>
                                 </div>
@@ -436,14 +440,14 @@ function JourneyExerciseContent() {
                 <SessionChat
                     sessionId={session.id}
                     userId={user.id}
-                    partnerName={session.partner_id ? 'Partner' : undefined}
+                    partnerName={(session as any).partner_id ? 'Partner' : undefined}
                 />
             )}
 
             {/* Bottom Navigation */}
             {!isWaiting && (
                 <div className={`fixed bottom-0 left-0 right-0 z-20 ${isRemote ? 'mb-[70px]' : ''}`}>
-                    <div className="h-24 bg-gradient-to-t from-surface-950 via-surface-950/95 to-transparent pointer-events-none" />
+                    <div className={`h-24 pointer-events-none ${theme === 'light' ? 'bg-gradient-to-t from-slate-50 via-slate-50/95 to-transparent' : 'bg-gradient-to-t from-surface-950 via-surface-950/95 to-transparent'}`} />
                     <div className="absolute bottom-0 left-0 right-0 p-6 pb-8">
                         <div className="max-w-lg mx-auto flex items-center gap-4">
                             <motion.button

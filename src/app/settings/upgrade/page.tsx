@@ -256,7 +256,7 @@ export default function UpgradePage() {
                             }`}
                     >
                         <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-emerald-500 text-white text-xs font-bold">
-                            {isRTL ? `وفر ${pricing.savings} ريال` : `Save ${pricing.savings} SAR`}
+                            {isRTL ? `وفر ${pricing.savings || 99} ريال` : `Save ${pricing.savings || 99} SAR`}
                         </span>
                         <p className="text-surface-400 text-sm mb-1">
                             {isRTL ? 'سنوي' : 'Annual'}

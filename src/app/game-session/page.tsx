@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useJourneys } from '@/hooks/useJourneys';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useSettingsStore } from '@/stores/settings-store';
 import { useSessionSync } from '@/hooks/useSessionSync';
 import { usePairing } from '@/hooks/usePairing';
 import SessionChat from '@/components/SessionChat';
@@ -45,6 +46,7 @@ function GameSessionContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { t } = useTranslation();
+    const { theme } = useSettingsStore();
     const mode = searchParams.get('mode') || 'values';
 
     const getModeTitle = () => {
@@ -295,23 +297,23 @@ function GameSessionContent() {
         const nextStep = stepNumber + 1;
 
         return (
-            <main className="min-h-screen bg-surface-900 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-rose-900/20 to-transparent opacity-50 pointer-events-none" />
-                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-surface-800/80 backdrop-blur-xl p-8 rounded-3xl border border-white/10 max-w-md w-full">
+            <main className={`min-h-screen flex flex-col items-center justify-center p-6 text-center relative overflow-hidden ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900'}`}>
+                <div className={`absolute inset-0 opacity-50 pointer-events-none ${theme === 'light' ? 'bg-gradient-to-b from-rose-100/50 to-transparent' : 'bg-gradient-to-b from-rose-900/20 to-transparent '}`} />
+                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className={`backdrop-blur-xl p-8 rounded-3xl border max-w-md w-full ${theme === 'light' ? 'bg-white/80 border-slate-200 shadow-xl' : 'bg-surface-800/80 border-white/10'}`}>
                     <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                         <Check className="w-10 h-10 text-green-500" />
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-4">يعطيكم العافية! ✨</h2>
+                    <h2 className={`text-3xl font-bold mb-4 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>يعطيكم العافية! ✨</h2>
                     {mode === 'compliment-battle' && (
-                        <div className="mb-6 p-4 bg-surface-700/50 rounded-xl">
-                            <p className="text-surface-300 mb-2">النتيجة النهائية:</p>
+                        <div className={`mb-6 p-4 rounded-xl ${theme === 'light' ? 'bg-slate-100' : 'bg-surface-700/50'}`}>
+                            <p className={`mb-2 ${theme === 'light' ? 'text-slate-500' : 'text-surface-300'}`}>النتيجة النهائية:</p>
                             <div className="flex justify-center gap-8 text-2xl font-bold">
                                 <span className="text-rose-400">أنا: {scores.p1}</span>
                                 <span className="text-blue-400">شريكي: {scores.p2}</span>
                             </div>
                         </div>
                     )}
-                    <p className="text-surface-300 mb-8">خلصتوا تمرين اليوم. نتمنى لكم حوار مثمر وقرب أكثر.</p>
+                    <p className={`mb-8 ${theme === 'light' ? 'text-slate-500' : 'text-surface-300'}`}>خلصتوا تمرين اليوم. نتمنى لكم حوار مثمر وقرب أكثر.</p>
 
                     <div className="space-y-3">
                         {journeyId && (
@@ -328,7 +330,7 @@ function GameSessionContent() {
                             onClick={() => {
                                 window.location.href = '/journeys';
                             }}
-                            className="w-full py-4 bg-surface-700 hover:bg-surface-600 rounded-2xl font-bold text-white transition-colors"
+                            className={`w-full py-4 rounded-2xl font-bold transition-colors ${theme === 'light' ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'bg-surface-700 hover:bg-surface-600 text-white'}`}
                         >
                             العودة للرحلة
                         </button>
@@ -339,7 +341,7 @@ function GameSessionContent() {
     }
 
     if (!question) {
-        return <div className="min-h-screen bg-surface-900 flex items-center justify-center text-white">جاري التحميل...</div>;
+        return <div className={`min-h-screen flex items-center justify-center ${theme === 'light' ? 'bg-slate-50 text-slate-500' : 'bg-surface-900 text-white'}`}>جاري التحميل...</div>;
     }
 
     // --- RENDER GAME CONTENT BASED ON MODE ---
@@ -354,10 +356,14 @@ function GameSessionContent() {
                         <motion.button
                             whileTap={{ scale: 0.98 }}
                             onClick={() => { setWyrChoice('A'); }}
-                            className={`w-full p-6 rounded-2xl border-2 transition-all text-right ${wyrChoice === 'A' ? 'bg-rose-500/30 border-rose-500 ring-2 ring-rose-500/50' : 'bg-surface-800/60 border-surface-700 hover:border-rose-500/50'}`}
+                            className={`w-full p-6 rounded-2xl border-2 transition-all text-right ${wyrChoice === 'A'
+                                ? 'bg-rose-500/30 border-rose-500 ring-2 ring-rose-500/50'
+                                : theme === 'light'
+                                    ? 'bg-white border-slate-200 hover:border-rose-500/50 shadow-sm'
+                                    : 'bg-surface-800/60 border-surface-700 hover:border-rose-500/50'}`}
                             dir="rtl"
                         >
-                            <h3 className="text-xl font-bold text-white">{question.optionA}</h3>
+                            <h3 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{question.optionA}</h3>
                         </motion.button>
 
                         <div className="flex items-center justify-center">
@@ -367,10 +373,14 @@ function GameSessionContent() {
                         <motion.button
                             whileTap={{ scale: 0.98 }}
                             onClick={() => { setWyrChoice('B'); }}
-                            className={`w-full p-6 rounded-2xl border-2 transition-all text-right ${wyrChoice === 'B' ? 'bg-blue-500/30 border-blue-500 ring-2 ring-blue-500/50' : 'bg-surface-800/60 border-surface-700 hover:border-blue-500/50'}`}
+                            className={`w-full p-6 rounded-2xl border-2 transition-all text-right ${wyrChoice === 'B'
+                                ? 'bg-blue-500/30 border-blue-500 ring-2 ring-blue-500/50'
+                                : theme === 'light'
+                                    ? 'bg-white border-slate-200 hover:border-blue-500/50 shadow-sm'
+                                    : 'bg-surface-800/60 border-surface-700 hover:border-blue-500/50'}`}
                             dir="rtl"
                         >
-                            <h3 className="text-xl font-bold text-white">{question.optionB}</h3>
+                            <h3 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{question.optionB}</h3>
                         </motion.button>
 
                         {wyrChoice && (
@@ -582,13 +592,13 @@ function GameSessionContent() {
                 return (
                     <div className="text-center space-y-8">
                         {/* Scoreboard */}
-                        <div className="flex justify-between items-center p-6 bg-surface-800/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-xl relative overflow-hidden">
+                        <div className={`flex justify-between items-center p-6 backdrop-blur-xl rounded-3xl border shadow-xl relative overflow-hidden ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-800/80 border-white/10'}`}>
                             <div className="absolute inset-0 bg-gradient-to-r from-rose-500/5 to-blue-500/5" />
                             <motion.div
                                 animate={turn === 'p1' ? { scale: 1.1, opacity: 1 } : { scale: 1, opacity: 0.5 }}
                                 className="text-center relative z-10"
                             >
-                                <p className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-1">أنا</p>
+                                <p className={`text-sm font-bold uppercase tracking-wider mb-1 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>أنا</p>
                                 <p className="text-4xl font-black text-rose-400 drop-shadow-lg">{scores.p1}</p>
                             </motion.div>
 
@@ -601,7 +611,7 @@ function GameSessionContent() {
                                 animate={turn === 'p2' ? { scale: 1.1, opacity: 1 } : { scale: 1, opacity: 0.5 }}
                                 className="text-center relative z-10"
                             >
-                                <p className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-1">شريكي</p>
+                                <p className={`text-sm font-bold uppercase tracking-wider mb-1 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>شريكي</p>
                                 <p className="text-4xl font-black text-blue-400 drop-shadow-lg">{scores.p2}</p>
                             </motion.div>
                         </div>
@@ -611,8 +621,8 @@ function GameSessionContent() {
                         </div>
 
                         <div className="py-4">
-                            <h2 className="text-3xl font-bold text-white leading-relaxed mb-2" dir="rtl">{question.text}</h2>
-                            <p className="text-surface-400">{question.hint}</p>
+                            <h2 className={`text-3xl font-bold leading-relaxed mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} dir="rtl">{question.text}</h2>
+                            <p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>{question.hint}</p>
                         </div>
 
                         <div className="flex gap-4 pt-4">
@@ -672,9 +682,9 @@ function GameSessionContent() {
                                     <Heart className="w-12 h-12 text-white fill-white/20 animate-pulse" />
                                 </div>
 
-                                <div className="bg-surface-800/80 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-2xl">
-                                    <h2 className="text-3xl font-black text-white mb-3" dir="rtl">{spinResult.text}</h2>
-                                    <p className="text-surface-300 font-medium text-lg">{spinResult.hint}</p>
+                                <div className={`p-8 rounded-3xl border shadow-2xl ${theme === 'light' ? 'bg-white/90 border-slate-200' : 'bg-surface-800/80 backdrop-blur-xl border-white/10'}`}>
+                                    <h2 className={`text-3xl font-black mb-3 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} dir="rtl">{spinResult.text}</h2>
+                                    <p className={`font-medium text-lg ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>{spinResult.hint}</p>
                                 </div>
 
                                 <div className="flex gap-4">
@@ -700,9 +710,9 @@ function GameSessionContent() {
                             <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
                             <Camera className="w-16 h-16 text-blue-400 relative z-10" />
                         </div>
-                        <div className="bg-surface-800/50 p-6 rounded-3xl border border-white/5">
-                            <h2 className="text-2xl font-bold text-white leading-relaxed mb-2" dir="rtl">{question.text}</h2>
-                            <p className="text-surface-400 text-sm">{question.hint}</p>
+                        <div className={`p-6 rounded-3xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'bg-surface-800/50 border-white/5'}`}>
+                            <h2 className={`text-2xl font-bold leading-relaxed mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} dir="rtl">{question.text}</h2>
+                            <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>{question.hint}</p>
                         </div>
                         <button onClick={handleNext} className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-900/20 hover:scale-[1.02] transition-transform">
                             التالي <ChevronRight className="inline w-5 h-5 transform rotate-180" />
@@ -720,11 +730,11 @@ function GameSessionContent() {
                         <div className="flex justify-between items-center mb-6">
                             <div className="text-center">
                                 <div className="text-4xl font-bold text-primary-400">{currentIndex + 1}</div>
-                                <div className="text-sm text-surface-400">/{currentQuestions.length}</div>
+                                <div className={`text-sm ${theme === 'light' ? 'text-slate-400' : 'text-surface-400'}`}>/{currentQuestions.length}</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-3xl font-bold text-green-400">⭐ {quizScore}</div>
-                                <div className="text-sm text-surface-400">النتيجة</div>
+                                <div className={`text-sm ${theme === 'light' ? 'text-slate-400' : 'text-surface-400'}`}>النتيجة</div>
                             </div>
                         </div>
 
@@ -732,12 +742,12 @@ function GameSessionContent() {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-gradient-to-br from-surface-800/80 to-surface-800/50 p-8 rounded-3xl border border-surface-700/50"
+                            className={`p-8 rounded-3xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-xl' : 'bg-gradient-to-br from-surface-800/80 to-surface-800/50 border-surface-700/50'}`}
                         >
-                            <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-4" dir="rtl">
+                            <h2 className={`text-2xl md:text-3xl font-bold text-center mb-4 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} dir="rtl">
                                 {question.question}
                             </h2>
-                            <p className="text-surface-400 text-sm text-center mb-8">{question.hint}</p>
+                            <p className={`text-sm text-center mb-8 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>{question.hint}</p>
 
                             {/* Options */}
                             <div className="grid gap-4">
@@ -758,7 +768,9 @@ function GameSessionContent() {
                                                 ? 'border-primary-500 bg-primary-500/20 ring-2 ring-primary-500/30'
                                                 : showAnswer
                                                     ? 'border-surface-700 bg-surface-800/30 opacity-50 cursor-not-allowed'
-                                                    : 'border-surface-700 hover:border-primary-500/50 hover:bg-surface-700/50 cursor-pointer'
+                                                    : theme === 'light'
+                                                        ? 'border-slate-200 hover:border-primary-500/50 hover:bg-slate-50 cursor-pointer'
+                                                        : 'border-surface-700 hover:border-primary-500/50 hover:bg-surface-700/50 cursor-pointer'
                                             }`}
                                         dir="rtl"
                                     >

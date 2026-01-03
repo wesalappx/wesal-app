@@ -8,9 +8,12 @@ import { ToggleSwitch } from '@/components/SettingsCard';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
+import { useSettingsStore } from '@/stores/settings-store';
+
 export default function PrivacyPage() {
     const supabase = createClient();
     const { user } = useAuth();
+    const { theme } = useSettingsStore();
 
     const [shareAnalytics, setShareAnalytics] = useState(false);
     const [showOnlineStatus, setShowOnlineStatus] = useState(true);
@@ -75,14 +78,14 @@ export default function PrivacyPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900">
+        <div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}>
             {/* Header */}
-            <header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5">
+            <header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}>
                 <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
-                    <Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <ArrowRight className="w-6 h-6 text-white" />
+                    <Link href="/settings" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}>
+                        <ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} />
                     </Link>
-                    <h1 className="text-xl font-bold text-white">الخصوصية</h1>
+                    <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>الخصوصية</h1>
                 </div>
             </header>
 
@@ -97,13 +100,13 @@ export default function PrivacyPage() {
                         <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary-500/20 flex items-center justify-center">
                             <Shield className="w-8 h-8 text-primary-400" />
                         </div>
-                        <p className="text-surface-400">تحكم في كيفية استخدام بياناتك</p>
+                        <p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>تحكم في كيفية استخدام بياناتك</p>
                     </div>
 
                     {/* Privacy Settings */}
                     <div className="space-y-4">
                         {/* Online Status */}
-                        <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <div className={`p-4 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-white/5 border-white/10'}`}>
                             <div className="flex items-center gap-4">
                                 <ToggleSwitch
                                     enabled={showOnlineStatus}
@@ -111,8 +114,8 @@ export default function PrivacyPage() {
                                 />
                                 <div className="flex items-center gap-3 flex-1">
                                     <div className="flex-1 text-right">
-                                        <h3 className="font-bold text-white">إظهار حالة الاتصال</h3>
-                                        <p className="text-sm text-surface-400 mt-1">
+                                        <h3 className={`font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>إظهار حالة الاتصال</h3>
+                                        <p className={`text-sm mt-1 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                                             يساعد شريكك على معرفة أفضل وقت للتواصل معك
                                         </p>
                                     </div>
@@ -124,7 +127,7 @@ export default function PrivacyPage() {
                         </div>
 
                         {/* Save History */}
-                        <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <div className={`p-4 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-white/5 border-white/10'}`}>
                             <div className="flex items-center gap-4">
                                 <ToggleSwitch
                                     enabled={saveHistory}
@@ -132,8 +135,8 @@ export default function PrivacyPage() {
                                 />
                                 <div className="flex items-center gap-3 flex-1">
                                     <div className="flex-1 text-right">
-                                        <h3 className="font-bold text-white">حفظ سجل الألعاب</h3>
-                                        <p className="text-sm text-surface-400 mt-1">
+                                        <h3 className={`font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>حفظ سجل الألعاب</h3>
+                                        <p className={`text-sm mt-1 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                                             تتبع تقدمكم وذكرياتكم الجميلة معاً
                                         </p>
                                     </div>
@@ -145,7 +148,7 @@ export default function PrivacyPage() {
                         </div>
 
                         {/* Analytics */}
-                        <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <div className={`p-4 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-white/5 border-white/10'}`}>
                             <div className="flex items-center gap-4">
                                 <ToggleSwitch
                                     enabled={shareAnalytics}
@@ -153,8 +156,8 @@ export default function PrivacyPage() {
                                 />
                                 <div className="flex items-center gap-3 flex-1">
                                     <div className="flex-1 text-right">
-                                        <h3 className="font-bold text-white">المساهمة في التطوير</h3>
-                                        <p className="text-sm text-surface-400 mt-1">
+                                        <h3 className={`font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>المساهمة في التطوير</h3>
+                                        <p className={`text-sm mt-1 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                                             ساعدنا على تحسين التجربة (بيانات مجهولة)
                                         </p>
                                     </div>
@@ -207,7 +210,7 @@ export default function PrivacyPage() {
                         <Link href="/privacy-policy" className="block text-primary-400 hover:text-primary-300 transition-colors">
                             سياسة الخصوصية
                         </Link>
-                        <Link href="/terms" className="block text-surface-400 hover:text-white transition-colors">
+                        <Link href="/terms" className={`block transition-colors ${theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-surface-400 hover:text-white'}`}>
                             شروط الاستخدام
                         </Link>
                     </div>

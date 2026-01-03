@@ -119,8 +119,8 @@ export default function SettingsPage() {
 
     return (
         <div className={`min-h-screen font-sans transition-colors duration-500 ${theme === 'light'
-                ? 'bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 text-slate-900'
-                : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900 text-white'
+            ? 'bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 text-slate-900'
+            : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900 text-white'
             }`}>
             {/* Dynamic Background */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -132,8 +132,8 @@ export default function SettingsPage() {
 
             {/* Header */}
             <header className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors ${theme === 'light'
-                    ? 'bg-white/70 border-slate-200/60'
-                    : 'bg-surface-900/80 border-surface-700/30'
+                ? 'bg-white/70 border-slate-200/60'
+                : 'bg-surface-900/80 border-surface-700/30'
                 }`}>
                 <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
                     <Link href="/dashboard" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-white/10 text-white'
@@ -142,8 +142,8 @@ export default function SettingsPage() {
                     </Link>
                     <h1 className="text-xl font-bold">{t('settings.title')}</h1>
                     <div className={`${isRTL ? 'mr-auto' : 'ml-auto'} w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${theme === 'light'
-                            ? 'bg-white border border-slate-100 shadow-slate-200'
-                            : 'bg-gradient-to-br from-gray-500 to-gray-700'
+                        ? 'bg-white border border-slate-100 shadow-slate-200'
+                        : 'bg-gradient-to-br from-gray-500 to-gray-700'
                         }`}>
                         <Settings className={`w-5 h-5 ${theme === 'light' ? 'text-slate-600' : 'text-white'}`} />
                     </div>
@@ -163,8 +163,8 @@ export default function SettingsPage() {
                     </h2>
 
                     <div className={`p-6 rounded-3xl border transition-all ${theme === 'light'
-                            ? 'bg-white/80 border-white/50 shadow-xl shadow-indigo-100/50'
-                            : 'glass-card border-surface-700/50'
+                        ? 'bg-white/80 border-white/50 shadow-xl shadow-indigo-100/50'
+                        : 'glass-card border-surface-700/50'
                         }`}>
                         <div className="flex items-center gap-5">
                             {authUser?.user_metadata?.avatar_url ? (
@@ -177,8 +177,8 @@ export default function SettingsPage() {
                                 </div>
                             ) : (
                                 <div className={`w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold text-white shadow-xl ${theme === 'light'
-                                        ? 'bg-gradient-to-br from-indigo-500 to-purple-600 shadow-indigo-500/30'
-                                        : 'bg-gradient-to-br from-primary-400 to-accent-500'
+                                    ? 'bg-gradient-to-br from-indigo-500 to-purple-600 shadow-indigo-500/30'
+                                    : 'bg-gradient-to-br from-primary-400 to-accent-500'
                                     }`}>
                                     {user.name.charAt(0)}
                                 </div>
@@ -193,8 +193,8 @@ export default function SettingsPage() {
                             <Link
                                 href="/settings/profile"
                                 className={`block w-full py-3 text-center rounded-xl font-medium border transition-colors ${theme === 'light'
-                                        ? 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                                        : 'bg-surface-800/50 border-white/5 text-white hover:bg-surface-700/50 hover:border-white/10'
+                                    ? 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                                    : 'bg-surface-800/50 border-white/5 text-white hover:bg-surface-700/50 hover:border-white/10'
                                     }`}
                             >
                                 {t('settings.editProfile')}
@@ -226,8 +226,8 @@ export default function SettingsPage() {
                         {isRTL ? 'سلسلة التواصل' : 'Connection Streak'}
                     </h2>
                     <div className={`p-5 rounded-2xl border transition-all ${theme === 'light'
-                            ? 'bg-white/80 border-white/50 shadow-lg shadow-orange-500/5'
-                            : 'glass-card border-surface-700/50'
+                        ? 'bg-white/80 border-white/50 shadow-lg shadow-orange-500/5'
+                        : 'glass-card border-surface-700/50'
                         }`}>
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
@@ -308,8 +308,8 @@ export default function SettingsPage() {
 
                         {/* Appearance / Theme */}
                         <div className={`p-4 rounded-2xl flex items-center justify-between border transition-all ${theme === 'light'
-                                ? 'bg-white border-slate-100 shadow-sm'
-                                : 'glass-card border-surface-700/50'
+                            ? 'bg-white border-slate-100 shadow-sm'
+                            : 'glass-card border-surface-700/50'
                             }`}>
                             <div className="flex items-center gap-3">
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${theme === 'light' ? 'bg-orange-50' : 'bg-orange-500/20'
@@ -322,7 +322,7 @@ export default function SettingsPage() {
                                 </div>
                                 <div className={isRTL ? 'text-right' : 'text-left'}>
                                     <p className={`font-medium ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
-                                        {t('settings.appearance') || (isRTL ? 'المظهر' : 'Appearance')}
+                                        {t('settings.appearance') === 'settings.appearance' ? (isRTL ? 'المظهر' : 'Appearance') : t('settings.appearance')}
                                     </p>
                                     <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                                         {theme === 'dark'
@@ -339,8 +339,8 @@ export default function SettingsPage() {
 
                         {/* Notifications */}
                         <div className={`p-4 rounded-2xl flex items-center justify-between border transition-all ${theme === 'light'
-                                ? 'bg-white border-slate-100 shadow-sm'
-                                : 'glass-card border-surface-700/50'
+                            ? 'bg-white border-slate-100 shadow-sm'
+                            : 'glass-card border-surface-700/50'
                             }`}>
                             <div className="flex items-center gap-3">
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${theme === 'light' ? 'bg-blue-50' : 'bg-blue-500/20'
@@ -362,8 +362,8 @@ export default function SettingsPage() {
 
                         {/* Sound Effects */}
                         <div className={`p-4 rounded-2xl border transition-all ${theme === 'light'
-                                ? 'bg-white border-slate-100 shadow-sm'
-                                : 'glass-card border-surface-700/50'
+                            ? 'bg-white border-slate-100 shadow-sm'
+                            : 'glass-card border-surface-700/50'
                             }`}>
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-3">
@@ -428,8 +428,8 @@ export default function SettingsPage() {
 
                     <div className="space-y-2">
                         <Link href="/settings/password" className={`p-4 rounded-2xl flex items-center justify-between border transition-all ${theme === 'light'
-                                ? 'bg-white border-slate-100 shadow-sm hover:bg-slate-50'
-                                : 'glass-card border-surface-700/50 hover:bg-white/5'
+                            ? 'bg-white border-slate-100 shadow-sm hover:bg-slate-50'
+                            : 'glass-card border-surface-700/50 hover:bg-white/5'
                             }`}>
                             <div className="flex items-center gap-3">
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${theme === 'light' ? 'bg-amber-50' : 'bg-amber-500/20'
@@ -442,8 +442,8 @@ export default function SettingsPage() {
                         </Link>
 
                         <Link href="/settings/privacy" className={`p-4 rounded-2xl flex items-center justify-between border transition-all ${theme === 'light'
-                                ? 'bg-white border-slate-100 shadow-sm hover:bg-slate-50'
-                                : 'glass-card border-surface-700/50 hover:bg-white/5'
+                            ? 'bg-white border-slate-100 shadow-sm hover:bg-slate-50'
+                            : 'glass-card border-surface-700/50 hover:bg-white/5'
                             }`}>
                             <div className="flex items-center gap-3">
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${theme === 'light' ? 'bg-teal-50' : 'bg-teal-500/20'
@@ -469,8 +469,8 @@ export default function SettingsPage() {
                                 <button
                                     onClick={() => setShowUnpairConfirm(true)}
                                     className={`w-full p-4 rounded-2xl flex items-center justify-between border transition-all group ${theme === 'light'
-                                            ? 'bg-white border-slate-100 shadow-sm hover:bg-rose-50'
-                                            : 'glass-card border-surface-700/50 hover:bg-red-500/10'
+                                        ? 'bg-white border-slate-100 shadow-sm hover:bg-rose-50'
+                                        : 'glass-card border-surface-700/50 hover:bg-red-500/10'
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
@@ -483,8 +483,8 @@ export default function SettingsPage() {
                                 </button>
                             ) : (
                                 <div className={`p-4 rounded-2xl space-y-3 border ${theme === 'light'
-                                        ? 'bg-rose-50 border-rose-200'
-                                        : 'glass-card border-red-500/30 bg-red-500/5'
+                                    ? 'bg-rose-50 border-rose-200'
+                                    : 'glass-card border-red-500/30 bg-red-500/5'
                                     }`}>
                                     <p className={`text-sm text-center ${theme === 'light' ? 'text-rose-700' : 'text-red-200'}`}>
                                         {isRTL ? 'هل أنت متأكد؟ سيتم فصل الحسابين عن بعضهما.' : 'Are you sure? This will disconnect your accounts.'}
@@ -493,8 +493,8 @@ export default function SettingsPage() {
                                         <button
                                             onClick={() => setShowUnpairConfirm(false)}
                                             className={`flex-1 p-2 rounded-lg text-sm font-bold transition-colors ${theme === 'light'
-                                                    ? 'bg-white text-slate-600 hover:bg-slate-50 shadow-sm'
-                                                    : 'bg-surface-800 text-surface-300 hover:bg-surface-700'
+                                                ? 'bg-white text-slate-600 hover:bg-slate-50 shadow-sm'
+                                                : 'bg-surface-800 text-surface-300 hover:bg-surface-700'
                                                 }`}
                                         >
                                             {isRTL ? 'إلغاء' : 'Cancel'}
@@ -514,8 +514,8 @@ export default function SettingsPage() {
                         <Link
                             href="/settings/delete-account"
                             className={`w-full p-4 rounded-2xl flex items-center justify-between border transition-all group ${theme === 'light'
-                                    ? 'bg-white border-slate-100 shadow-sm hover:bg-rose-50'
-                                    : 'glass-card border-surface-700/50 hover:bg-red-500/10'
+                                ? 'bg-white border-slate-100 shadow-sm hover:bg-rose-50'
+                                : 'glass-card border-surface-700/50 hover:bg-red-500/10'
                                 }`}
                         >
                             <div className="flex items-center gap-3">
@@ -531,8 +531,8 @@ export default function SettingsPage() {
                         <button
                             onClick={() => signOut()}
                             className={`w-full p-4 rounded-2xl flex items-center justify-between border transition-all ${theme === 'light'
-                                    ? 'bg-white border-slate-100 shadow-sm hover:bg-slate-50'
-                                    : 'glass-card border-surface-700/50 hover:bg-surface-700/50'
+                                ? 'bg-white border-slate-100 shadow-sm hover:bg-slate-50'
+                                : 'glass-card border-surface-700/50 hover:bg-surface-700/50'
                                 }`}
                         >
                             <div className="flex items-center gap-3">

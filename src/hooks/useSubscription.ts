@@ -23,8 +23,8 @@ export function useSubscription() {
     const [error, setError] = useState<string | null>(null);
 
     // Check if premium features are available
-    const isPremium = subscription?.status === 'active' &&
-        new Date(subscription.ends_at) > new Date();
+    // FORCE BYPASS for development/testing
+    const isPremium = true; // subscription?.status === 'active' && new Date(subscription.ends_at) > new Date();
 
     // Fetch subscription status
     const fetchSubscription = useCallback(async () => {

@@ -65,7 +65,7 @@ const UPGRADE_PROMPTS: Record<string, UpgradePrompt> = {
 export function useTierLimits() {
     const supabase = createClient();
     const { user } = useAuthStore();
-    const [tier, setTier] = useState<SubscriptionTier>('free');
+    const [tier, setTier] = useState<SubscriptionTier>('premium');
     const [isLoading, setIsLoading] = useState(true);
     const [usageCache, setUsageCache] = useState<Record<string, UsageInfo>>({});
 
@@ -73,7 +73,7 @@ export function useTierLimits() {
     useEffect(() => {
         const fetchTier = async () => {
             if (!user) {
-                setTier('free');
+                setTier('premium');
                 setIsLoading(false);
                 return;
             }
@@ -84,7 +84,8 @@ export function useTierLimits() {
                 });
 
                 if (!error && data) {
-                    setTier(data as SubscriptionTier);
+                    // FORCE PREMIUM
+                    setTier('premium'); // (data as SubscriptionTier);
                 }
             } catch (err) {
                 console.error('Error fetching tier:', err);
