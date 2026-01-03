@@ -164,9 +164,13 @@ export function useJourneys() {
                 }
             }
         } catch (error) {
-            console.error('Error syncing to server:', error);
+            // Suppress repeated errors - DB might not be configured
+            console.warn('Error syncing to server (this is okay if DB is not set up):', error);
         }
     };
+
+    // Track if sync has failed to avoid repeated attempts
+    const syncFailedRef = useRef(false);
 
     const updateProgress = async (journeyType: string, completedSteps: number) => {
         // Always save to localStorage first
@@ -183,8 +187,8 @@ export function useJourneys() {
         setLocalProgress(currentLocal);
         setProgressMap({ ...currentLocal });
 
-        // Save to server if user is logged in
-        if (user?.id) {
+        // Save to server if user is logged in (and previous sync didn't fail)
+        if (user?.id && !syncFailedRef.current) {
             try {
                 // Always save to user_journey_progress (user-specific)
                 const { error: userError } = await supabase
@@ -199,7 +203,9 @@ export function useJourneys() {
                     }, { onConflict: 'user_id,journey_type' });
 
                 if (userError) {
-                    console.error('Error saving user progress:', userError);
+                    console.warn('Journey progress sync failed (DB may not be configured):', userError.message);
+                    syncFailedRef.current = true; // Stop retrying
+                    return; // Don't try couple sync if user sync failed
                 }
 
                 // Also save to couple progress if paired

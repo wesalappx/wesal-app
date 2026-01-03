@@ -124,20 +124,21 @@ function GameSessionContent() {
 
     const { updateProgress, progressMap } = useJourneys();
     const { user } = useAuth();
+    const { preferredSessionMode } = useSettingsStore();
 
-    // Init modal state based on preference to avoid flash
-    const [showModeModal, setShowModeModal] = useState(() => {
-        // We can access the store directly for initial state
-        return !useSettingsStore.getState().preferredSessionMode;
-    });
+    // Init modal state - start with true (show modal) then check preference
+    const [showModeModal, setShowModeModal] = useState(true);
 
     // Check preference on mount and init session if needed
     useEffect(() => {
-        const { preferredSessionMode } = useSettingsStore.getState();
-        if (preferredSessionMode && !session) {
-            initGameSession(preferredSessionMode);
+        if (preferredSessionMode) {
+            setShowModeModal(false);
+            if (!session) {
+                initGameSession(preferredSessionMode);
+            }
         }
-    }, []); // Run once on mount
+    }, [preferredSessionMode, session]);
+
     // Sync Game State
     useEffect(() => {
         if (isRemote && session?.state) {
