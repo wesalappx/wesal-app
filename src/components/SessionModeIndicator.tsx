@@ -24,8 +24,8 @@ export default function SessionModeIndicator({ onClick, className = '' }: Sessio
             whileTap={{ scale: 0.95 }}
             onClick={onClick}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm transition-all text-sm font-medium ${theme === 'light'
-                    ? 'bg-white/80 border-slate-200 text-slate-600 hover:bg-white'
-                    : 'bg-surface-800/80 border-white/10 text-surface-300 hover:bg-surface-700'
+                ? 'bg-white/80 border-slate-200 text-slate-600 hover:bg-white'
+                : 'bg-surface-800/80 border-white/10 text-surface-300 hover:bg-surface-700'
                 } ${className}`}
         >
             <div className={`w-2 h-2 rounded-full ${isRemote ? 'bg-green-500 animate-pulse' : 'bg-blue-500'}`} />
@@ -33,12 +33,12 @@ export default function SessionModeIndicator({ onClick, className = '' }: Sessio
             {isRemote ? (
                 <>
                     <Users className="w-3.5 h-3.5" />
-                    <span>{t('mode.remote', 'Remote Session')}</span>
+                    <span>جلسة عن بعد</span>
                 </>
             ) : (
                 <>
                     <User className="w-3.5 h-3.5" />
-                    <span>{t('mode.local', 'Local Session')}</span>
+                    <span>جلسة محلية</span>
                 </>
             )}
 

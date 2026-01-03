@@ -155,13 +155,12 @@ export default function JourneysPage() {
             return;
         }
 
-        const { preferredSessionMode } = useSettingsStore.getState();
-
         if (preferredSessionMode) {
-            // If remote is preferred but not paired/available might need check, but isPaired is true here
+            // Use saved preference
             playSound('success');
             router.push(`/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=${preferredSessionMode}`);
         } else {
+            // No preference set - show modal
             setPendingExercise({ journeyId, stepIndex });
             setShowModeModal(true);
         }
