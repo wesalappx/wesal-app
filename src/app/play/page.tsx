@@ -14,7 +14,9 @@ import {
     Gamepad2,
     Lock,
     Crown,
-    Sparkles
+    Sparkles,
+    Users,
+    X
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -22,6 +24,9 @@ import { useSound } from '@/hooks/useSound';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTierLimits } from '@/hooks/useTierLimits';
 import { useSettingsStore } from '@/stores/settings-store';
+import SessionModeModal from '@/components/SessionModeModal';
+import SessionModeIndicator from '@/components/SessionModeIndicator';
+import { usePairing } from '@/hooks/usePairing';
 
 // Game Types
 type GameType = 'would-you-rather' | 'compliment-battle' | 'memory-lane' | 'deep-questions' | 'love-roulette' | 'truth-or-dare' | 'couple-quiz' | 'minute-challenges' | null;
@@ -46,6 +51,17 @@ export default function PlayPage() {
     const [sessionUsage, setSessionUsage] = useState<{ remaining: number; limit: number } | null>(null);
     const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
     const [selectedLockedGame, setSelectedLockedGame] = useState<string | null>(null);
+    const [showModeModal, setShowModeModal] = useState(false);
+
+    // Store
+    const { preferredSessionMode, setPreferredSessionMode } = useSettingsStore();
+
+    // Check Preference on Mount
+    useEffect(() => {
+        if (!preferredSessionMode) {
+            setShowModeModal(true);
+        }
+    }, [preferredSessionMode]);
 
     // Fetch session usage on mount
     useEffect(() => {
@@ -57,6 +73,82 @@ export default function PlayPage() {
         };
         fetchUsage();
     }, [canUse]);
+
+
+    // Active Session & Pairing Logic
+    const { getStatus } = usePairing();
+    const [activeSession, setActiveSession] = useState<any | null>(null);
+    const [rejectedSessions, setRejectedSessions] = useState<string[]>([]);
+
+    useEffect(() => {
+        const checkStatus = async () => {
+            const status = await getStatus();
+
+            if (status.isPaired && status.coupleId) {
+                const supabase = await import('@/lib/supabase/client').then(m => m.createClient());
+
+                // Check for active GAME session
+                const { data } = await supabase
+                    .from('active_sessions')
+                    .select('*')
+                    .eq('couple_id', status.coupleId)
+                    .eq('activity_type', 'game') // Only games here
+                    .maybeSingle();
+
+                if (data && !rejectedSessions.includes(data.id)) {
+                    setActiveSession(data);
+                }
+
+                const channel = supabase.channel('games_hub')
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'active_sessions',
+                        filter: `couple_id=eq.${status.coupleId}`
+                    }, (payload) => {
+                        if (payload.new && (payload.new as any).activity_type === 'game') {
+                            const newSession = payload.new as any;
+                            if (!rejectedSessions.includes(newSession.id)) {
+                                setActiveSession(newSession);
+                                playSound('pop');
+                            }
+                        } else if (payload.eventType === 'DELETE') {
+                            setActiveSession(null);
+                        }
+                    })
+                    .subscribe();
+
+                return () => {
+                    supabase.removeChannel(channel);
+                };
+            }
+        };
+        checkStatus();
+    }, [rejectedSessions]); // Re-run if rejected list changes? No, filter inside. Actually effect dep is tricky.
+
+    // Better way: Filter in render or use effect to update activeSession based on rejectedSessions
+    useEffect(() => {
+        if (activeSession && rejectedSessions.includes(activeSession.id)) {
+            setActiveSession(null);
+        }
+    }, [rejectedSessions, activeSession]);
+
+
+    const handleJoinSession = () => {
+        if (!activeSession) return;
+        playSound('success');
+        // Navigate to the specific game mode
+        // Assuming activity_id is the game mode? Or activity_id is 'game'? 
+        // In useSessionSync for games: activityType='game', activityId=mode (e.g. 'values')
+        const gameMode = activeSession.activity_id;
+        router.push(`/game-session?mode=${gameMode}`);
+    };
+
+    const handleRejectSession = () => {
+        if (!activeSession) return;
+        setRejectedSessions(prev => [...prev, activeSession.id]);
+        setActiveSession(null);
+    };
 
     const { theme } = useSettingsStore();
 
@@ -101,8 +193,8 @@ export default function PlayPage() {
 
     return (
         <main className={`min-h-screen p-4 pb-44 relative overflow-hidden font-sans transition-colors duration-500 ${theme === 'light'
-                ? 'bg-gradient-to-br from-slate-50 via-white to-orange-50/30'
-                : 'bg-surface-950'
+            ? 'bg-gradient-to-br from-slate-50 via-white to-orange-50/30'
+            : 'bg-surface-950'
             }`}>
             {/* Background */}
             <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
@@ -122,25 +214,77 @@ export default function PlayPage() {
                                 {t('common.back')}
                             </Link>
 
-                            {/* Session Usage Badge */}
-                            {sessionUsage && sessionUsage.limit > 0 && (
-                                <div className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${sessionUsage.remaining <= 1
+                            <div className="flex items-center gap-2">
+                                {/* Mode Indicator */}
+                                <SessionModeIndicator onClick={() => setShowModeModal(true)} />
+
+                                {/* Session Usage Badge */}
+                                {sessionUsage && sessionUsage.limit > 0 && (
+                                    <div className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${sessionUsage.remaining <= 1
                                         ? 'bg-orange-500/20 text-orange-400'
                                         : theme === 'light'
                                             ? 'bg-slate-100 text-slate-500 border border-slate-200'
                                             : 'bg-surface-700/50 text-surface-300'
-                                    }`}>
-                                    {isRTL ? `${sessionUsage.remaining}/${sessionUsage.limit} جلسات` : `${sessionUsage.remaining}/${sessionUsage.limit} sessions`}
-                                </div>
-                            )}
+                                        }`}>
+                                        {isRTL ? `${sessionUsage.remaining}/${sessionUsage.limit} جلسات` : `${sessionUsage.remaining}/${sessionUsage.limit} sessions`}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <h1 className={`text-3xl font-bold bg-clip-text text-transparent mb-2 ${theme === 'light'
-                                ? 'bg-gradient-to-r from-orange-500 to-amber-500'
-                                : 'bg-gradient-to-r from-amber-200 to-yellow-400'
+                            ? 'bg-gradient-to-r from-orange-500 to-amber-500'
+                            : 'bg-gradient-to-r from-amber-200 to-yellow-400'
                             }`}>
                             {t('play.title')}
                         </h1>
+
+                        {/* Active Session Banner */}
+                        <AnimatePresence>
+                            {activeSession && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="mb-6 overflow-hidden"
+                                >
+                                    <div className={`p-4 rounded-2xl flex items-center justify-between backdrop-blur-md border ${theme === 'light'
+                                        ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-100 shadow-lg shadow-green-500/10'
+                                        : 'bg-gradient-to-r from-green-600/20 to-emerald-600/20 border-green-500/30'
+                                        }`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center animate-pulse ${theme === 'light' ? 'bg-green-100' : 'bg-green-500/20'
+                                                }`}>
+                                                <Users className={`w-5 h-5 ${theme === 'light' ? 'text-green-600' : 'text-green-400'}`} />
+                                            </div>
+                                            <div>
+                                                <h3 className={`font-bold text-sm ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                                    {isRTL ? 'جلسة نشطة مع الشريك' : 'Partner is Playing'}
+                                                </h3>
+                                                <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-green-200'}`}>
+                                                    {isRTL ? 'شريكك بانتظارك!' : 'Join them now!'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={handleRejectSession}
+                                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${theme === 'light' ? 'bg-white/50 hover:bg-white text-slate-400' : 'bg-black/20 hover:bg-black/40 text-white/60'}`}
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={handleJoinSession}
+                                                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl transition-colors shadow-lg shadow-green-500/20"
+                                            >
+                                                {isRTL ? 'انضمام' : 'Join'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                         <p className={`mb-8 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                             {t('play.subtitle')}
                         </p>
@@ -159,12 +303,12 @@ export default function PlayPage() {
                                         whileTap={{ scale: isLocked ? 1 : 0.98 }}
                                         onClick={() => handleGameSelect(game.type, game.title)}
                                         className={`relative w-full p-4 rounded-2xl text-right flex items-center gap-4 group transition-all border ${theme === 'light'
-                                                ? isLocked
-                                                    ? 'bg-slate-50 border-slate-100 opacity-70'
-                                                    : 'bg-white border-slate-100 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:border-orange-200/50'
-                                                : isLocked
-                                                    ? `bg-gradient-to-r ${game.bgGradient} border-white/5 opacity-70`
-                                                    : `bg-gradient-to-r ${game.bgGradient} border-white/5 hover:border-white/10`
+                                            ? isLocked
+                                                ? 'bg-slate-50 border-slate-100 opacity-70'
+                                                : 'bg-white border-slate-100 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:border-orange-200/50'
+                                            : isLocked
+                                                ? `bg-gradient-to-r ${game.bgGradient} border-white/5 opacity-70`
+                                                : `bg-gradient-to-r ${game.bgGradient} border-white/5 hover:border-white/10`
                                             } ${isLocked ? 'cursor-pointer' : ''}`}
                                     >
                                         {/* Lock overlay for premium games */}
@@ -179,14 +323,14 @@ export default function PlayPage() {
                                         )}
 
                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform ${!isLocked && 'group-hover:scale-110'} ${theme === 'light'
-                                                ? 'bg-slate-50 shadow-sm'
-                                                : `bg-surface-900/50`
+                                            ? 'bg-slate-50 shadow-sm'
+                                            : `bg-surface-900/50`
                                             }`}>
                                             {isLocked
                                                 ? <Lock className={`w-6 h-6 ${theme === 'light' ? 'text-slate-400' : 'text-surface-400'}`} />
                                                 : <game.icon className={`w-6 h-6 ${theme === 'light'
-                                                        ? game.color.replace('text-', 'text-')
-                                                        : game.color
+                                                    ? game.color.replace('text-', 'text-')
+                                                    : game.color
                                                     }`} />
                                             }
                                         </div>
@@ -197,8 +341,8 @@ export default function PlayPage() {
                                                 }`}>{game.description}</p>
                                         </div>
                                         <ArrowLeft className={`w-5 h-5 transition-colors ${theme === 'light'
-                                                ? 'text-slate-300 group-hover:text-slate-500'
-                                                : 'text-surface-500 group-hover:text-white'
+                                            ? 'text-slate-300 group-hover:text-slate-500'
+                                            : 'text-surface-500 group-hover:text-white'
                                             }`} />
                                     </motion.button>
                                 );
@@ -212,8 +356,8 @@ export default function PlayPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.8 }}
                                 className={`mt-8 p-4 rounded-2xl border ${theme === 'light'
-                                        ? 'bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border-amber-200'
-                                        : 'bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border-amber-500/30'
+                                    ? 'bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border-amber-200'
+                                    : 'bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border-amber-500/30'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
@@ -242,6 +386,22 @@ export default function PlayPage() {
                         )}
                     </motion.div>
                 </AnimatePresence>
+
+                {/* Session Mode Modal */}
+                <SessionModeModal
+                    isOpen={showModeModal}
+                    onClose={() => {
+                        // If closing without picking, maybe fallback or ensure logic handles it?
+                        // Ideally modal shouldn't be closable if forced? But user can just browse.
+                        setShowModeModal(false);
+                    }}
+                    onSelectMode={(mode) => {
+                        setPreferredSessionMode(mode);
+                        setShowModeModal(false);
+                        playSound('success');
+                    }}
+                    rememberChoice={true} // Force remember in this context
+                />
             </div>
 
             {/* Upgrade Prompt Modal */}
@@ -260,8 +420,8 @@ export default function PlayPage() {
                             exit={{ scale: 0.9, opacity: 0 }}
                             onClick={(e) => e.stopPropagation()}
                             className={`rounded-3xl p-6 max-w-sm w-full text-center border ${theme === 'light'
-                                    ? 'bg-white border-slate-100 shadow-2xl'
-                                    : 'bg-surface-800 border-white/10'
+                                ? 'bg-white border-slate-100 shadow-2xl'
+                                : 'bg-surface-800 border-white/10'
                                 }`}
                         >
                             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/30">

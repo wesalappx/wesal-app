@@ -25,6 +25,7 @@ import { usePairing } from '@/hooks/usePairing';
 import { createClient } from '@/lib/supabase/client';
 import { journeysData, getJourneySteps } from '@/data/journeys';
 import SessionModeModal from '@/components/SessionModeModal';
+import SessionModeIndicator from '@/components/SessionModeIndicator';
 import { useSettingsStore } from '@/stores/settings-store';
 
 export default function JourneysPage() {
@@ -47,6 +48,7 @@ export default function JourneysPage() {
     const [activeSession, setActiveSession] = useState<any | null>(null);
     const [showModeModal, setShowModeModal] = useState(false);
     const [pendingExercise, setPendingExercise] = useState<{ journeyId: string; stepIndex: number } | null>(null);
+    const [rejectedSessions, setRejectedSessions] = useState<string[]>([]);
 
     // Check pairing and active sessions
     useEffect(() => {
@@ -91,6 +93,20 @@ export default function JourneysPage() {
         };
         checkStatus();
     }, []);
+
+    // Gateway Logic: Check Preference
+    const { preferredSessionMode, setPreferredSessionMode } = useSettingsStore();
+    useEffect(() => {
+        if (!preferredSessionMode && !activeSession) {
+            // Only show if no active session (invite) logic is pending?
+            // Actually user implies invite check first.
+            // If activeSession exists (fetched above), we shouldn't prompt yet?
+            // But activeSession fetch is async.
+            // Let's rely on the user to click "Join" if there is one.
+            // But valid point: if they just landed, prompt them.
+            setShowModeModal(true);
+        }
+    }, [preferredSessionMode, activeSession]);
 
     // Toggle journey expansion
     const toggleJourney = (journeyId: string) => {
@@ -211,17 +227,21 @@ export default function JourneysPage() {
             </div>
 
             <div className="max-w-md mx-auto pt-4 relative z-10">
-                {/* Back Button */}
-                <Link
-                    href="/dashboard"
-                    className={`inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full backdrop-blur-sm border transition-all ${theme === 'light'
-                        ? 'bg-white/50 border-slate-200 text-slate-500 hover:bg-white hover:text-slate-800'
-                        : 'bg-white/5 border-white/10 text-surface-400 hover:text-white hover:bg-white/10'
-                        }`}
-                >
-                    <ArrowRight className="w-4 h-4 transform rotate-180" />
-                    {t('common.back')}
-                </Link>
+                <div className="flex items-center justify-between mb-6">
+                    <Link
+                        href="/dashboard"
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border transition-all ${theme === 'light'
+                            ? 'bg-white/50 border-slate-200 text-slate-500 hover:bg-white hover:text-slate-800'
+                            : 'bg-white/5 border-white/10 text-surface-400 hover:text-white hover:bg-white/10'
+                            }`}
+                    >
+                        <ArrowRight className="w-4 h-4 transform rotate-180" />
+                        {t('common.back')}
+                    </Link>
+
+                    {/* Mode Indicator */}
+                    <SessionModeIndicator onClick={() => setShowModeModal(true)} />
+                </div>
 
                 {/* Header */}
                 <div className="mb-8 text-center">
@@ -268,12 +288,25 @@ export default function JourneysPage() {
                                         <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-primary-200'}`}>يبدو أن شريكك بدأ رحلة!</p>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={handleJoinSession}
-                                    className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold rounded-xl transition-colors shadow-lg shadow-primary-500/20"
-                                >
-                                    انضمام
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => {
+                                            if (activeSession) {
+                                                setRejectedSessions(prev => [...prev, activeSession.id]);
+                                                setActiveSession(null);
+                                            }
+                                        }}
+                                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${theme === 'light' ? 'bg-white/50 hover:bg-white text-slate-400' : 'bg-black/20 hover:bg-black/40 text-white/60'}`}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={handleJoinSession}
+                                        className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold rounded-xl transition-colors shadow-lg shadow-primary-500/20"
+                                    >
+                                        انضمام
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     )}
