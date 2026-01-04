@@ -65,7 +65,7 @@ const UPGRADE_PROMPTS: Record<string, UpgradePrompt> = {
 export function useTierLimits() {
     const supabase = createClient();
     const { user } = useAuthStore();
-    const [tier, setTier] = useState<SubscriptionTier>('premium');
+    const [tier, setTier] = useState<SubscriptionTier>('free'); // Default to free until we verify
     const [isLoading, setIsLoading] = useState(true);
     const [usageCache, setUsageCache] = useState<Record<string, UsageInfo>>({});
 
@@ -84,8 +84,10 @@ export function useTierLimits() {
                 });
 
                 if (!error && data) {
-                    // FORCE PREMIUM
-                    setTier('premium'); // (data as SubscriptionTier);
+                    setTier(data as SubscriptionTier);
+                } else {
+                    // Default to free if no subscription found
+                    setTier('free');
                 }
             } catch (err) {
                 console.error('Error fetching tier:', err);
