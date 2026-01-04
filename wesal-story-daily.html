@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wesal - The Daily (Habit)</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+
+        .story-container {
+            width: 1080px;
+            height: 1920px;
+            background: linear-gradient(180deg, #ffedd5 0%, #fff7ed 100%);
+            /* Light/Morning Theme */
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 90px 70px;
+            color: #1c1917;
+        }
+
+        .sun-glow {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 1000px;
+            height: 1000px;
+            background: radial-gradient(circle, rgba(253, 186, 116, 0.4) 0%, transparent 70%);
+            /* Orange Glow */
+            filter: blur(100px);
+            z-index: 0;
+        }
+
+        .z-10 {
+            position: relative;
+            z-index: 10;
+        }
+
+        .habit-card {
+            background: white;
+            border-right: 8px solid #f97316;
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            box-shadow: 0 10px 40px -10px rgba(249, 115, 22, 0.15);
+            transition: transform 0.2s ease;
+        }
+
+        .habit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px -10px rgba(249, 115, 22, 0.25);
+        }
+
+        .check-circle {
+            min-width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid #f97316;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f97316;
+            font-size: 30px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="story-container">
+        <div class="sun-glow"></div>
+
+        <!-- Header: Official Logo + Arabic Brand Name (Dark Version for Light Bg) -->
+        <div class="z-10 flex flex-col items-center gap-6 mb-16 pt-8">
+            <div class="w-28 h-28 relative">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" class="w-full h-full drop-shadow-xl">
+                    <defs>
+                        <linearGradient id="gDaily" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f97316;stop-opacity:1" /> <!-- Orange-500 -->
+                            <stop offset="100%" style="stop-color:#c2410c;stop-opacity:1" /> <!-- Orange-700 -->
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#gDaily)"
+                        d="M187.5 30C100.5 30 30 100.5 30 187.5S100.5 345 187.5 345 345 274.5 345 187.5 274.5 30 187.5 30zm0 280c-67.5 0-122.5-55-122.5-122.5S120 65 187.5 65 310 120 310 187.5 255 310 187.5 310zm-45-122.5c0-24.8 20.2-45 45-45s45 20.2 45 45-20.2 45-45 45-45-20.2-45-45z" />
+                </svg>
+            </div>
+            <h2 class="text-6xl font-bold text-gray-900 tracking-wide pb-4 leading-normal">
+                وِصال
+            </h2>
+        </div>
+
+        <!-- Routine Hook -->
+        <div class="z-10 mb-20 text-center">
+            <h2 class="text-xl text-orange-600 font-bold tracking-[0.2em] mb-4 uppercase font-['Outfit']">Morning
+                Routine</h2>
+            <h1 class="text-[85px] font-bold leading-tight text-gray-900 mb-6">
+                دقيقتان يومياً<br>
+                <span class="text-orange-500">تغير كل شيء.</span>
+            </h1>
+            <p class="text-3xl text-gray-500 font-light leading-relaxed px-8">
+                العادات الصغيرة تبني علاقات عظيمة.<br>
+                ابدأوا يومكم باتصال حقيقي.
+            </p>
+        </div>
+
+        <!-- Daily Features -->
+        <div class="z-10 flex-1 px-2 w-full">
+            <div class="habit-card">
+                <div class="check-circle">✓</div>
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-2">تسجيل المشاعر</h3>
+                    <p class="text-xl text-gray-500">كيف تشعر اليوم؟ شارك حالتك بلمسة واحدة.</p>
+                </div>
+            </div>
+
+            <div class="habit-card">
+                <div class="check-circle">✓</div>
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-2">أذكار الصباح</h3>
+                    <p class="text-xl text-gray-500">بداية يوم مباركة، وهدوء نفسي للزوجين.</p>
+                </div>
+            </div>
+
+            <div class="habit-card">
+                <div class="check-circle">✓</div>
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-2">امتنان يومي</h3>
+                    <p class="text-xl text-gray-500">شيء واحد جميل تشكرون الله عليه اليوم.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="z-10 mt-12 text-center w-full pb-12">
+            <button
+                class="bg-orange-500 text-white px-16 py-6 rounded-2xl text-4xl font-bold shadow-xl shadow-orange-200 hover:bg-orange-600 transition">
+                ابدأ الروتين ☀️
+            </button>
+            <p class="mt-10 text-xl font-medium text-gray-400 tracking-widest">صنع بحب بالسعودية 🇸🇦</p>
+        </div>
+
+    </div>
+</body>
+
+</html>

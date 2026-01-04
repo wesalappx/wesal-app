@@ -3,8 +3,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Heart, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+
+// Email validation regex
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginPage() {
     const { signIn, isLoading: authLoading, user, session } = useAuth();
@@ -17,37 +20,118 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
+    const [loginAttempts, setLoginAttempts] = useState(0);
+    const [isLocked, setIsLocked] = useState(false);
+    const [lockoutTime, setLockoutTime] = useState(0);
 
     // If user is already logged in, redirect to dashboard
     useEffect(() => {
         if (!authLoading && user && session) {
-
             router.push('/dashboard');
         }
     }, [authLoading, user, session, router]);
 
+    // Handle lockout countdown
+    useEffect(() => {
+        if (lockoutTime > 0) {
+            const timer = setInterval(() => {
+                setLockoutTime((prev) => {
+                    if (prev <= 1) {
+                        setIsLocked(false);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+            return () => clearInterval(timer);
+        }
+    }, [lockoutTime]);
+
+    // Validate form fields
+    const validateForm = (): boolean => {
+        const errors: { email?: string; password?: string } = {};
+
+        // Email validation
+        if (!formData.email.trim()) {
+            errors.email = 'البريد الإلكتروني مطلوب';
+        } else if (!EMAIL_REGEX.test(formData.email)) {
+            errors.email = 'صيغة البريد الإلكتروني غير صحيحة';
+        }
+
+        // Password validation
+        if (!formData.password) {
+            errors.password = 'كلمة المرور مطلوبة';
+        } else if (formData.password.length < 6) {
+            errors.password = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+        }
+
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        // Check if account is locked
+        if (isLocked) {
+            setError(`الحساب مقفل مؤقتاً. انتظر ${lockoutTime} ثانية`);
+            return;
+        }
+
+        // Validate form
+        if (!validateForm()) {
+            return;
+        }
+
         setIsLoading(true);
 
         const { error: signInError } = await signIn(formData.email, formData.password);
 
         if (signInError) {
-            setError(getArabicError(signInError.message));
+            const newAttempts = loginAttempts + 1;
+            setLoginAttempts(newAttempts);
+
+            // Lock account after 5 failed attempts
+            if (newAttempts >= 5) {
+                setIsLocked(true);
+                setLockoutTime(60); // 60 seconds lockout
+                setError('تم تجاوز عدد المحاولات المسموحة. الحساب مقفل لمدة دقيقة');
+            } else {
+                setError(getArabicError(signInError.message, 5 - newAttempts));
+            }
+        } else {
+            // Reset attempts on successful login
+            setLoginAttempts(0);
         }
 
         setIsLoading(false);
     };
 
-    const getArabicError = (message: string): string => {
+    const getArabicError = (message: string, remainingAttempts: number): string => {
+        let errorMsg = '';
         if (message.includes('Invalid login credentials')) {
-            return 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
-        }
-        if (message.includes('Email not confirmed')) {
+            errorMsg = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+        } else if (message.includes('Email not confirmed')) {
             return 'يرجى تأكيد البريد الإلكتروني أولاً';
+        } else {
+            errorMsg = 'حدث خطأ أثناء تسجيل الدخول';
         }
-        return 'حدث خطأ أثناء تسجيل الدخول';
+
+        if (remainingAttempts > 0 && remainingAttempts < 4) {
+            errorMsg += ` (${remainingAttempts} محاولات متبقية)`;
+        }
+        return errorMsg;
+    };
+
+    // Handle field change and clear errors
+    const handleFieldChange = (field: 'email' | 'password', value: string) => {
+        setFormData({ ...formData, [field]: value });
+        if (fieldErrors[field]) {
+            setFieldErrors({ ...fieldErrors, [field]: undefined });
+        }
+        if (error) setError('');
     };
 
     if (authLoading) {
@@ -83,7 +167,8 @@ export default function LoginPage() {
                     </p>
 
                     {error && (
-                        <div className="mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm text-center">
+                        <div className="mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm text-center flex items-center justify-center gap-2">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
                             {error}
                         </div>
                     )}
@@ -93,17 +178,20 @@ export default function LoginPage() {
                         <div>
                             <label className="block text-sm font-medium mb-2 text-right">البريد الإلكتروني</label>
                             <div className="relative">
-                                <Mail className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
+                                <Mail className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.email ? 'text-red-400' : 'text-surface-400'}`} />
                                 <input
                                     type="email"
-                                    className="input pr-12 text-right"
+                                    className={`input pr-12 text-right ${fieldErrors.email ? 'border-red-500 focus:border-red-500' : ''}`}
                                     placeholder="example@email.com"
                                     value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    required
+                                    onChange={(e) => handleFieldChange('email', e.target.value)}
                                     dir="ltr"
+                                    disabled={isLocked}
                                 />
                             </div>
+                            {fieldErrors.email && (
+                                <p className="mt-1 text-xs text-red-400 text-right">{fieldErrors.email}</p>
+                            )}
                         </div>
 
                         {/* Password */}
@@ -118,37 +206,43 @@ export default function LoginPage() {
                                 <label className="block text-sm font-medium">كلمة المرور</label>
                             </div>
                             <div className="relative">
-                                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
+                                <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.password ? 'text-red-400' : 'text-surface-400'}`} />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
-                                    className="input pr-12 pl-12 text-right"
+                                    className={`input pr-12 pl-12 text-right ${fieldErrors.password ? 'border-red-500 focus:border-red-500' : ''}`}
                                     placeholder="أدخل كلمة المرور"
                                     value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    required
+                                    onChange={(e) => handleFieldChange('password', e.target.value)}
                                     dir="ltr"
+                                    disabled={isLocked}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
                                     className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white"
+                                    disabled={isLocked}
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
                             </div>
+                            {fieldErrors.password && (
+                                <p className="mt-1 text-xs text-red-400 text-right">{fieldErrors.password}</p>
+                            )}
                         </div>
 
                         {/* Submit */}
                         <button
                             type="submit"
-                            disabled={isLoading}
-                            className="btn-primary w-full flex items-center justify-center gap-2"
+                            disabled={isLoading || isLocked}
+                            className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                             {isLoading ? (
                                 <>
                                     <Loader2 className="w-5 h-5 animate-spin" />
                                     جاري الدخول...
                                 </>
+                            ) : isLocked ? (
+                                `مقفل (${lockoutTime}ث)`
                             ) : (
                                 'تسجيل الدخول'
                             )}

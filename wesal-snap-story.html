@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wesal - Snap Story Premium</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"IBM Plex Sans Arabic"', 'sans-serif'],
+                        english: ['"Outfit"', 'sans-serif'],
+                    },
+                    colors: {
+                        wesal: {
+                            bg: '#120d18', // Simpler, flatter dark background
+                            card: '#1e1625',
+                            purple: '#a855f7',
+                            pink: '#ec4899',
+                        }
+                    },
+                    boxShadow: {
+                        // Softer, less neon glow
+                        'subtle': '0 4px 20px -5px rgba(0, 0, 0, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .story-container {
+            width: 1080px;
+            height: 1920px;
+            background: #120d18;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 90px 70px;
+            color: white;
+        }
+
+        /* Ambient Background Mesh - Simplified */
+        .mesh-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.08) 0%, transparent 60%);
+        }
+
+        .z-10 {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Typography */
+        .display-text {
+            font-size: 76px;
+            line-height: 1.15;
+            letter-spacing: -1px;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Feature Grid System */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            width: 100%;
+            margin-top: 50px;
+            flex: 1;
+        }
+
+        .feature-card {
+            background: #1e1625;
+            /* Solid simplified color instead of heavy glass */
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 32px;
+            padding: 36px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            transition: transform 0.2s ease;
+        }
+
+        /* Subtle hover only */
+        .feature-card:hover {
+            background: #231a2b;
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .icon-box {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="story-container">
+        <div class="mesh-bg"></div>
+
+        <!-- Header -->
+        <div class="z-10 flex justify-center items-center mb-12">
+            <div class="flex flex-col items-center gap-6">
+                <!-- Logo without heavy glow -->
+                <div class="w-28 h-28 relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375"
+                        class="w-full h-full relative z-10 drop-shadow-lg">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ec4899;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path fill="url(#grad1)"
+                            d="M 110.613281 55.339844 C 103.695312 55.960938 98.8125 57.160156 91.542969 60.023438 C 79.617188 64.722656 68.910156 72.417969 60.417969 82.386719 C 52.941406 91.164062 47.175781 101.058594 43.738281 111.007812 C 39.800781 122.394531 38.925781 127.0625 38.941406 136.574219 C 38.949219 141.992188 39.105469 143.792969 39.964844 148.53125 C 42.324219 161.539062 46.3125 171.824219 52.902344 181.886719 C 56.722656 187.730469 60.566406 192.277344 70.964844 203.261719 C 76.273438 208.867188 83.515625 216.84375 85.433594 219.191406 C 87.101562 221.234375 89.234375 223.417969 89.480469 223.335938 C 89.632812 223.285156 89.714844 221.339844 89.730469 217.566406 C 89.757812 211.132812 90.128906 206.628906 91.128906 200.582031 C 92.15625 194.375 93.660156 188.519531 95.035156 185.386719 C 95.515625 184.285156 95.640625 183.765625 95.503906 183.433594 C 95.398438 183.183594 94.007812 181.777344 92.40625 180.304688 C 86.058594 174.46875 83.652344 171.738281 79.871094 166.089844 C 76.171875 160.566406 74.042969 155.792969 72.277344 149.070312 C 70.238281 141.28125 69.976562 135.613281 71.300781 127.820312 C 73.039062 117.578125 78.808594 106.363281 85.640625 99.945312 C 91.90625 94.058594 98.039062 90.523438 105.988281 88.210938 C 110.25 86.972656 112.09375 86.746094 117.828125 86.742188 C 121.511719 86.742188 123.539062 86.839844 125.261719 87.105469 C 128.292969 87.570312 132.402344 88.554688 134.320312 89.277344 C 138.953125 91.019531 147.105469 96.117188 154.132812 101.667969 C 155.4375 102.699219 156.699219 103.613281 156.933594 103.699219 C 157.292969 103.832031 157.996094 103.214844 161.136719 100.007812 C 163.210938 97.886719 167.765625 93.386719 171.261719 90 C 174.761719 86.617188 177.765625 83.578125 177.941406 83.25 C 178.261719 82.652344 178.257812 82.648438 176.429688 80.925781 C 173.636719 78.292969 166.316406 72.140625 163.183594 69.789062 C 154.601562 63.359375 146.113281 59.414062 135.34375 56.847656 C 130.445312 55.679688 126.859375 55.320312 119.339844 55.238281 C 115.605469 55.199219 111.679688 55.246094 110.613281 55.339844 M 249.195312 55.347656 C 239.695312 56.253906 230.441406 59.371094 221.023438 64.835938 C 214.605469 68.5625 209.894531 71.933594 204.226562 76.851562 C 200.546875 80.042969 168.113281 112.464844 155.039062 126.015625 C 150.636719 130.578125 145.238281 136.152344 143.042969 138.40625 C 139.617188 141.921875 133.664062 148.480469 129.449219 153.382812 C 124.914062 158.664062 120.0625 164.945312 117.800781 168.460938 C 111.972656 177.53125 107.179688 188.761719 105.15625 198.085938 C 103.933594 203.707031 102.964844 212.121094 102.964844 217.070312 C 102.964844 223.683594 103.859375 233.03125 104.9375 237.621094 C 105.6875 240.816406 107.054688 245.359375 107.949219 247.613281 C 109.527344 251.597656 112.859375 258.160156 114.914062 261.320312 C 119.886719 268.988281 121.722656 271.429688 125.742188 275.726562 C 135.570312 286.230469 146.394531 293.546875 159.089844 298.273438 C 170.488281 302.515625 176.148438 303.695312 186.128906 303.914062 C 197.050781 304.152344 203.449219 303.1875 213.902344 299.734375 C 220.722656 297.480469 229.785156 292.964844 236.113281 288.671875 C 241.019531 285.335938 247.542969 279.628906 250.839844 275.78125 C 257.875 267.566406 261.976562 261.082031 266.054688 251.734375 C 268.484375 246.160156 271.921875 235.628906 271.519531 234.980469 C 271.347656 234.699219 270.191406 234.90625 267.746094 235.660156 C 264.234375 236.742188 258.273438 237.964844 251.839844 238.921875 C 249.453125 239.277344 247.550781 239.398438 243.761719 239.433594 C 240.140625 239.464844 238.648438 239.554688 238.222656 239.765625 C 237.511719 240.113281 236.898438 241.015625 235.5625 243.675781 C 233.40625 247.972656 230.753906 251.414062 225.785156 256.371094 C 221.042969 261.097656 217.503906 263.71875 212.433594 266.265625 C 209.113281 267.929688 202.871094 270.113281 198.625 271.089844 C 193.910156 272.175781 193.621094 272.203125 187.097656 272.183594 C 181.175781 272.167969 180.703125 272.136719 178.046875 271.585938 C 174.105469 270.765625 171.808594 270.082031 168.460938 268.722656 C 160.722656 265.585938 155.289062 261.851562 149.210938 255.496094 C 144.757812 250.84375 142.691406 247.96875 140.214844 243.007812 C 137.472656 237.507812 135.125 230.035156 134.316406 224.222656 C 133.933594 221.488281 133.882812 215.019531 134.210938 211.335938 C 134.816406 204.578125 136.867188 197.359375 139.902344 191.320312 C 142.609375 185.933594 145.820312 181.550781 152.875 173.628906 C 154.402344 171.910156 157.078125 168.84375 158.824219 166.804688 C 164.671875 159.976562 179.617188 144.144531 187.664062 136.25 C 189.839844 134.117188 198.453125 125.582031 206.808594 117.285156 C 222.894531 101.308594 224.8125 99.5 228.859375 96.464844 C 232.441406 93.777344 238.574219 90.808594 242.792969 89.722656 C 247.375 88.539062 257.117188 86.746094 258.089844 86.90625 C 258.503906 86.972656 259.714844 87.113281 260.78125 87.21875 C 263.152344 87.449219 269.070312 88.398438 271.125 88.878906 C 274.390625 89.640625 280.425781 92.546875 284.15625 95.160156 C 291.46875 100.277344 296.757812 106.695312 300.535156 115.054688 C 301.800781 117.847656 302.546875 120.113281 303.652344 124.507812 C 304.972656 129.753906 305.144531 131.085938 305.128906 136.035156 C 305.101562 146.183594 303.792969 152.480469 300.195312 159.753906 C 294.5625 171.148438 286.507812 178.691406 272.523438 185.671875 C 263.828125 190.007812 257.882812 191.9375 246.824219 194.007812 C 241.847656 194.941406 237.085938 195.171875 231.265625 194.761719 C 223.472656 194.210938 219.195312 193.097656 212.304688 189.832031 C 204.546875 186.152344 200.324219 183.480469 193.339844 177.839844 C 188.105469 173.609375 186.175781 172.417969 182.894531 171.378906 C 175.566406 169.058594 169.15625 172.503906 165.96875 180.476562 C 165.246094 182.277344 164.589844 185.40625 164.585938 187.050781 C 164.578125 190.050781 165.6875 193.257812 167.515625 195.527344 C 171.824219 200.878906 183.734375 209.722656 193.851562 215.078125 C 205.953125 221.488281 214 224.160156 225.828125 225.683594 C 230.035156 226.226562 230.472656 226.242188 238.265625 226.136719 C 244.832031 226.046875 246.972656 225.941406 249.6875 225.570312 C 265.722656 223.386719 280.609375 217.910156 295.296875 208.785156 C 303.414062 203.738281 313.699219 194.632812 319.832031 187.054688 C 326.152344 179.25 331.617188 168.320312 334.335938 158.0625 C 337.628906 145.628906 337.492188 128.074219 334.007812 116.105469 C 331.585938 107.792969 327.355469 98.859375 321.929688 90.59375 C 313.546875 77.832031 302.574219 67.945312 290.667969 62.425781 C 284.003906 59.332031 274.808594 56.464844 268.96875 55.65625 C 266.019531 55.25 252.464844 55.039062 249.195312 55.347656 M 208.949219 135.355469 C 203.3125 141.0625 198.523438 146 198.3125 146.328125 C 197.933594 146.910156 197.933594 146.9375 198.460938 147.726562 C 198.757812 148.167969 203.441406 152.992188 208.867188 158.441406 C 217.808594 167.421875 222.648438 172.511719 225.664062 176.109375 C 227.660156 178.492188 229.898438 180.847656 230.476562 181.171875 C 230.9375 181.433594 231.878906 181.488281 235.359375 181.460938 C 240.15625 181.425781 244.265625 180.964844 249.734375 179.855469 C 254.863281 178.816406 261.570312 176.511719 261.886719 175.679688 C 262.035156 175.296875 258.757812 169.699219 255.519531 164.796875 C 252.925781 160.878906 249.0625 155.710938 246.410156 152.625 C 240.140625 145.328125 220.308594 124.914062 219.527344 124.957031 C 219.347656 124.96875 214.585938 129.648438 208.949219 135.355469" />
+                    </svg>
+                </div>
+                <h2
+                    class="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 tracking-tight pb-4 leading-normal">
+                    وِصال</h2>
+            </div>
+        </div>
+
+        <!-- Hero Typography -->
+        <div class="z-10 mb-10 text-center">
+            <h1 class="display-text font-bold text-white mb-8 leading-tight">
+                هل تعاني علاقتك من<br>
+                <span class="text-gradient font-extrabold pb-2 inline-block">"الصمت الزوجي"؟</span>
+            </h1>
+            <div class="inline-block bg-white/5 border border-white/10 rounded-full px-8 py-3">
+                <p class="text-3xl text-white/80 font-normal">
+                    <span class="font-bold text-pink-400">45%</span> من الأزواج يشعرون بالابتعاد العاطفي
+                </p>
+            </div>
+            <p class="text-3xl text-white/50 font-light mt-6">
+                وِصال هو الحل الذكي لاستعادة الشغف والتقارب.
+            </p>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="z-10 feature-grid">
+
+            <!-- Feature 1 -->
+            <div class="feature-card">
+                <div class="icon-box bg-purple-500/10">
+                    <svg class="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-100 mb-2">مستشار ذكي</h3>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">وسيط محايد يمنع تصاعد الخلافات لحظياً
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="feature-card">
+                <div class="icon-box bg-pink-500/10">
+                    <svg class="w-10 h-10 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-100 mb-2">ألعاب تفاعلية</h3>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">تحديات يومية ممتعة تجدد العلاقة</p>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="feature-card">
+                <div class="icon-box bg-blue-500/10">
+                    <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-100 mb-2">تقويم مشترك</h3>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">نسّق خططكم ومواعيدكم في مكان واحد</p>
+                </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="feature-card">
+                <div class="icon-box bg-emerald-500/10">
+                    <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-100 mb-2">رحلات زوجية</h3>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">مسارات نمو وتطوير للعلاقة خطوة بخطوة</p>
+                </div>
+            </div>
+
+            <!-- Feature 5 -->
+            <div class="feature-card">
+                <div class="icon-box bg-slate-500/10">
+                    <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-100 mb-2">مساحة آمنة</h3>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">بيانات مشفرة وخصوصية تامة للزوجين</p>
+                </div>
+            </div>
+
+            <!-- Feature 6 -->
+            <div class="feature-card">
+                <div class="icon-box bg-orange-500/10">
+                    <svg class="w-10 h-10 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-100 mb-2">شرارات</h3>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">أفكار رومانسية يومية لإشعال الحب</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer / CTA -->
+        <div class="z-10 mt-16 text-center w-full">
+            <div class="relative group cursor-pointer inline-block">
+                <div
+                    class="absolute -inset-1 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 rounded-full blur opacity-60 group-hover:opacity-100 transition duration-500">
+                </div>
+                <div
+                    class="relative bg-white text-black px-20 py-7 rounded-full flex items-center justify-center gap-5 shadow-[0_0_40px_-5px_rgba(255,255,255,0.3)]">
+                    <span
+                        class="font-english text-[46px] font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-800">wesal.life</span>
+                    <svg class="w-9 h-9 text-purple-600 animate-bounce" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                    </svg>
+                </div>
+            </div>
+            <!-- Updated Footer Text -->
+            <div class="mt-8 flex justify-center items-center gap-3 opacity-60">
+                <div class="h-px w-10 bg-white/30"></div>
+                <p class="text-xl font-light tracking-wide text-white/70">صنع بحب بالسعودية 🇸🇦</p>
+                <div class="h-px w-10 bg-white/30"></div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

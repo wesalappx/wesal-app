@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(node capture_snapshot.js:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell -Command \"\\(Get-Item wesal-snap-story.png\\).Length / 1MB\")"
+    ]
+  }
+}

@@ -22,6 +22,7 @@
         "lucide-react": "^0.303.0",
         "next": "^14.2.35",
         "next-intl": "^3.4.0",
+        "puppeteer": "^24.34.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "resend": "^6.6.0",
@@ -30,20 +31,20 @@
         "zustand": "^4.4.7"
     },
     "devDependencies": {
+        "@testing-library/jest-dom": "^6.1.4",
+        "@testing-library/react": "^14.0.0",
+        "@testing-library/user-event": "^14.5.1",
+        "@types/jest": "^29.5.8",
         "@types/node": "^20.10.6",
         "@types/react": "^18.2.46",
         "@types/react-dom": "^18.2.18",
         "autoprefixer": "^10.4.16",
         "eslint": "^8.56.0",
         "eslint-config-next": "14.0.4",
-        "postcss": "^8.4.32",
-        "tailwindcss": "^3.4.0",
-        "typescript": "^5.3.3",
-        "@testing-library/react": "^14.0.0",
-        "@testing-library/jest-dom": "^6.1.4",
-        "@testing-library/user-event": "^14.5.1",
         "jest": "^29.7.0",
         "jest-environment-jsdom": "^29.7.0",
-        "@types/jest": "^29.5.8"
+        "postcss": "^8.4.32",
+        "tailwindcss": "^3.4.0",
+        "typescript": "^5.3.3"
     }
 }

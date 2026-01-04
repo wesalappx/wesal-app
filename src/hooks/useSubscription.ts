@@ -59,13 +59,13 @@ export function useSubscription() {
                 .single();
 
             if (subError && subError.code !== 'PGRST116') { // Not "no rows" error
-                console.log('Subscription lookup returned no results');
+                // No subscription found
             }
 
             setSubscription(data || null);
         } catch (err: any) {
             // Don't treat missing subscription as error
-            console.log('Subscription check:', err?.message || err);
+            // Subscription check failed (might not have premium)
             setSubscription(null);
         } finally {
             setIsLoading(false);

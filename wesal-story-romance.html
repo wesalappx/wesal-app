@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wesal - The Spark (Romance)</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+
+        .story-container {
+            width: 1080px;
+            height: 1920px;
+            background: linear-gradient(180deg, #370617 0%, #1a050b 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 90px 70px;
+            color: white;
+        }
+
+        .pulse-bg {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 900px;
+            height: 900px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 60%);
+            animation: heartbeat 4s infinite ease-in-out;
+            z-index: 0;
+        }
+
+        @keyframes heartbeat {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.4;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.7;
+            }
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            /* More subtle border */
+            border-radius: 40px;
+            padding: 40px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: flex-start;
+            gap: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(236, 72, 153, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .z-10 {
+            position: relative;
+            z-index: 10;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="story-container">
+        <div class="pulse-bg"></div>
+
+        <!-- Header: Official Logo + Arabic Brand Name -->
+        <div class="z-10 flex flex-col items-center gap-6 mb-16 pt-8">
+            <div class="w-28 h-28 relative">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" class="w-full h-full drop-shadow-2xl">
+                    <defs>
+                        <linearGradient id="gRomance" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f9a8d4;stop-opacity:1" /> <!-- Pink-300 -->
+                            <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" /> <!-- Pink-500 -->
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#gRomance)"
+                        d="M187.5 30C100.5 30 30 100.5 30 187.5S100.5 345 187.5 345 345 274.5 345 187.5 274.5 30 187.5 30zm0 280c-67.5 0-122.5-55-122.5-122.5S120 65 187.5 65 310 120 310 187.5 255 310 187.5 310zm-45-122.5c0-24.8 20.2-45 45-45s45 20.2 45 45-20.2 45-45 45-45-20.2-45-45z" />
+                </svg>
+            </div>
+            <!-- Added Arabic Text with fix for clipping -->
+            <h2 class="text-6xl font-bold text-white tracking-wide pb-4 leading-normal">
+                وِصال
+            </h2>
+        </div>
+
+        <!-- Emotional Hook -->
+        <div class="z-10 text-center mb-16">
+            <h1 class="text-[85px] font-bold leading-[1.1] mb-8 tracking-tight">
+                هل اشتقت<br>
+                <span class="text-gradient">لشغف البدايات؟</span>
+            </h1>
+            <p class="text-3xl text-pink-100/70 font-light leading-relaxed px-8">
+                الحب قرار يومي، وليس مجرد صدفة.<br>
+                <span class="text-white font-medium">أعد اكتشاف شريك حياتك من جديد.</span>
+            </p>
+        </div>
+
+        <!-- Romance Features -->
+        <div class="z-10 flex flex-col gap-6 flex-1 w-full">
+            <div class="feature-card">
+                <div
+                    class="min-w-[80px] h-20 rounded-2xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 flex items-center justify-center text-4xl border border-white/5">
+                    ✨</div>
+                <div>
+                    <h3 class="text-3xl font-bold text-white mb-2">شرارات الحب</h3>
+                    <p class="text-xl text-pink-100/60 leading-relaxed font-light">لفتات رومانسية صغيرة تصنع فرقاً
+                        كبيراً في يومكم.</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div
+                    class="min-w-[80px] h-20 rounded-2xl bg-gradient-to-br from-rose-500/20 to-red-500/20 flex items-center justify-center text-4xl border border-white/5">
+                    🎲</div>
+                <div>
+                    <h3 class="text-3xl font-bold text-white mb-2">ألعاب الزوجين</h3>
+                    <p class="text-xl text-pink-100/60 leading-relaxed font-light">أسئلة وتحديات ممتعة لكسر الروتين
+                        وتعميق التواصل.</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div
+                    class="min-w-[80px] h-20 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-600/20 flex items-center justify-center text-4xl border border-white/5">
+                    🎁</div>
+                <div>
+                    <h3 class="text-3xl font-bold text-white mb-2">مفاجآت ذكية</h3>
+                    <p class="text-xl text-pink-100/60 leading-relaxed font-light">تذكير بالمناسبات الخاصة واقتراحات
+                        هدايا مميزة.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="z-10 mt-12 text-center w-full pb-8">
+            <div class="relative group cursor-pointer inline-block">
+                <div
+                    class="absolute -inset-1 bg-gradient-to-r from-pink-600 to-rose-600 rounded-full blur opacity-50 group-hover:opacity-100 transition duration-500">
+                </div>
+                <div
+                    class="relative bg-white text-rose-900 px-20 py-7 rounded-full flex items-center justify-center gap-5 shadow-2xl">
+                    <span class="font-english text-5xl font-bold tracking-tight">wesal.life</span>
+                    <svg class="w-8 h-8 text-rose-600 animate-bounce" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                            d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="mt-8 text-xl font-light text-white/50 tracking-widest">صنع بحب بالسعودية 🇸🇦</p>
+        </div>
+
+    </div>
+</body>
+
+</html>

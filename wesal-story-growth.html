@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wesal - The Growth (Lifestyle)</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+
+        .story-container {
+            width: 1080px;
+            height: 1920px;
+            background: linear-gradient(180deg, #1c1917 0%, #0a0a09 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 90px 70px;
+            color: white;
+        }
+
+        .gold-glow {
+            position: absolute;
+            top: -15%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(234, 179, 8, 0.12) 0%, transparent 70%);
+            filter: blur(100px);
+            opacity: 0.8;
+        }
+
+        .z-10 {
+            position: relative;
+            z-index: 10;
+        }
+
+        .goal-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(234, 179, 8, 0.15);
+            border-radius: 32px;
+            padding: 40px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .goal-card:hover {
+            background: rgba(234, 179, 8, 0.05);
+            border-color: rgba(234, 179, 8, 0.4);
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="story-container">
+        <div class="gold-glow"></div>
+
+        <!-- Header: Official Logo + Arabic Brand Name -->
+        <div class="z-10 flex flex-col items-center gap-6 mb-16 pt-8">
+            <div class="w-28 h-28 relative">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375"
+                    class="w-full h-full drop-shadow-[0_0_20px_rgba(234,179,8,0.3)]">
+                    <defs>
+                        <linearGradient id="gGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" /> <!-- Amber-400 -->
+                            <stop offset="100%" style="stop-color:#b45309;stop-opacity:1" /> <!-- Amber-700 -->
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#gGold)"
+                        d="M187.5 30C100.5 30 30 100.5 30 187.5S100.5 345 187.5 345 345 274.5 345 187.5 274.5 30 187.5 30zm0 280c-67.5 0-122.5-55-122.5-122.5S120 65 187.5 65 310 120 310 187.5 255 310 187.5 310zm-45-122.5c0-24.8 20.2-45 45-45s45 20.2 45 45-20.2 45-45 45-45-20.2-45-45z" />
+                </svg>
+            </div>
+            <h2 class="text-6xl font-bold text-white tracking-wide pb-4 leading-normal">
+                وِصال
+            </h2>
+        </div>
+
+        <!-- Visionary Hook -->
+        <div class="z-10 mb-20 text-center">
+            <h2
+                class="text-2xl text-amber-500/80 font-bold tracking-[0.3em] mb-6 uppercase font-['Outfit'] border-b border-amber-500/30 inline-block pb-2">
+                Relationship Goals</h2>
+            <h1 class="text-[76px] font-bold leading-tight text-white mb-8">
+                لا تدعوا الحياة<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">تسرق وقتكم
+                    معاً.</span>
+            </h1>
+            <p class="text-3xl text-stone-300 font-light leading-relaxed max-w-4xl mx-auto">
+                العلاقات الناجحة لا تحدث بالصدفة.<br>
+                هي نتيجة <span class="text-amber-100 font-normal">تخطيط، اهتمام، ونمو مشترك.</span>
+            </p>
+        </div>
+
+        <!-- Lifestyle Features -->
+        <div class="z-10 flex-1 px-2 w-full">
+            <div class="goal-card">
+                <div
+                    class="w-24 h-24 bg-gradient-to-br from-amber-500/20 to-orange-600/10 rounded-3xl flex items-center justify-center text-amber-400 border border-amber-500/20">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-4xl font-bold text-white mb-2">رحلات النمو</h3>
+                    <p class="text-2xl text-stone-400 font-light">خطوات عملية لتطوير العلاقة وتحقيق الأهداف.</p>
+                </div>
+            </div>
+
+            <div class="goal-card">
+                <div
+                    class="w-24 h-24 bg-gradient-to-br from-amber-500/20 to-orange-600/10 rounded-3xl flex items-center justify-center text-amber-400 border border-amber-500/20">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-4xl font-bold text-white mb-2">تقويم الحياة</h3>
+                    <p class="text-2xl text-stone-400 font-light">تنسيق المواعيد، الإجازات، والخطط المالية.</p>
+                </div>
+            </div>
+
+            <div class="goal-card border-stone-800">
+                <div
+                    class="w-24 h-24 bg-gradient-to-br from-stone-800 to-stone-900 rounded-3xl flex items-center justify-center text-stone-400 border border-white/5">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-4xl font-bold text-white mb-2">لوحة الإنجازات</h3>
+                    <p class="text-2xl text-stone-400 font-light">احتفلوا بكل نجاح صغير وكبير سوياً.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="z-10 mt-12 mb-8 text-center w-full">
+            <div class="text-4xl font-bold text-white mb-8">ابنوا إرثكم معاً</div>
+            <div class="relative group cursor-pointer inline-block">
+                <div
+                    class="absolute -inset-1 bg-amber-600 rounded-full blur opacity-40 group-hover:opacity-80 transition duration-500">
+                </div>
+                <div
+                    class="relative bg-[#1c1917] border border-amber-500/30 text-amber-500 px-24 py-8 rounded-full flex items-center justify-center gap-6 shadow-2xl">
+                    <span class="font-['Outfit'] text-5xl font-bold tracking-tight text-white">wesal.life</span>
+                    <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="mt-12 flex justify-center items-center gap-3 opacity-60">
+                <div class="h-px w-10 bg-white/30"></div>
+                <p class="text-xl font-light tracking-wide text-white/70">صنع بحب بالسعودية 🇸🇦</p>
+                <div class="h-px w-10 bg-white/30"></div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

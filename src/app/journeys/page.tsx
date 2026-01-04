@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -53,9 +53,15 @@ export default function JourneysPage() {
 
     // Check pairing and active sessions
     useEffect(() => {
+        let mounted = true;
+        let channel: ReturnType<typeof supabase.channel> | null = null;
+
         const checkStatus = async () => {
             const status = await getStatus();
+            if (!mounted) return;
+
             setIsPaired(status.isPaired);
+            setPairingChecked(true); // Mark pairing check as complete BEFORE conditional
 
             if (status.isPaired && status.coupleId) {
                 // Check for ANY active journey session
@@ -66,18 +72,19 @@ export default function JourneysPage() {
                     .eq('activity_type', 'journey')
                     .maybeSingle();
 
-                if (data) {
+                if (mounted && data) {
                     setActiveSession(data);
                 }
 
                 // Subscribe to new sessions (invites)
-                const channel = supabase.channel('journeys_hub')
+                channel = supabase.channel('journeys_hub')
                     .on('postgres_changes', {
                         event: '*',
                         schema: 'public',
                         table: 'active_sessions',
                         filter: `couple_id=eq.${status.coupleId}`
                     }, (payload) => {
+                        if (!mounted) return;
                         if (payload.new && (payload.new as any).activity_type === 'journey') {
                             setActiveSession(payload.new);
                             playSound('pop');
@@ -86,14 +93,17 @@ export default function JourneysPage() {
                         }
                     })
                     .subscribe();
-
-                return () => {
-                    supabase.removeChannel(channel);
-                };
             }
-            setPairingChecked(true); // Mark pairing check as complete
         };
         checkStatus();
+
+        return () => {
+            mounted = false;
+            if (channel) {
+                supabase.removeChannel(channel);
+            }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Gateway Logic: Check Preference (only after ALL loading completes)
@@ -112,45 +122,45 @@ export default function JourneysPage() {
     }, [preferredSessionMode, activeSession, isPaired, isLoading, pairingChecked]);
 
     // Toggle journey expansion
-    const toggleJourney = (journeyId: string) => {
+    const toggleJourney = useCallback((journeyId: string) => {
         playSound('click');
-        setSelectedJourneyId(selectedJourneyId === journeyId ? null : journeyId);
-    };
+        setSelectedJourneyId(prev => prev === journeyId ? null : journeyId);
+    }, [playSound]);
 
     // Open step modal
-    const openStep = (journeyId: string, stepIndex: number) => {
+    const openStep = useCallback((journeyId: string, stepIndex: number) => {
         playSound('pop');
         setActiveStep({ journeyId, stepIndex });
-    };
+    }, [playSound]);
 
     // Close step modal
-    const closeStep = () => {
+    const closeStep = useCallback(() => {
         playSound('click');
         setActiveStep(null);
-    };
+    }, [playSound]);
 
-    // Navigate to previous step in modal
-    const prevStep = () => {
+    // Navigate to previous step in modal - memoized
+    const prevStep = useCallback(() => {
         if (!activeStep) return;
         const steps = getJourneySteps(activeStep.journeyId);
         if (steps && activeStep.stepIndex > 0) {
             playSound('click');
             setActiveStep({ ...activeStep, stepIndex: activeStep.stepIndex - 1 });
         }
-    };
+    }, [activeStep, playSound]);
 
-    // Navigate to next step in modal
-    const nextStep = () => {
+    // Navigate to next step in modal - memoized
+    const nextStep = useCallback(() => {
         if (!activeStep) return;
         const steps = getJourneySteps(activeStep.journeyId);
         if (steps && activeStep.stepIndex < steps.length - 1) {
             playSound('click');
             setActiveStep({ ...activeStep, stepIndex: activeStep.stepIndex + 1 });
         }
-    };
+    }, [activeStep, playSound]);
 
-    // Initiate Exercise Flow
-    const initiateExercise = (journeyId: string, stepIndex: number) => {
+    // Initiate Exercise Flow - memoized
+    const initiateExercise = useCallback((journeyId: string, stepIndex: number) => {
         // If solo or no preference, default logic
         if (!isPaired) {
             playSound('success');
@@ -167,7 +177,7 @@ export default function JourneysPage() {
             setPendingExercise({ journeyId, stepIndex });
             setShowModeModal(true);
         }
-    };
+    }, [isPaired, preferredSessionMode, playSound, router]);
 
     // Handle Mode Selection
     const handleModeSelect = async (mode: 'local' | 'remote') => {
@@ -193,10 +203,10 @@ export default function JourneysPage() {
         router.push(`/journey-exercise?journey=${journeyId}&step=${stepIndex + 1}&mode=remote`);
     };
 
-    // Get completed steps count for a journey
-    const getCompletedSteps = (journeyId: string): number => {
+    // Get completed steps count for a journey - memoized
+    const getCompletedSteps = useCallback((journeyId: string): number => {
         return progressMap[journeyId]?.completed_steps || 0;
-    };
+    }, [progressMap]);
 
     if (isLoading) {
         return (
@@ -222,9 +232,9 @@ export default function JourneysPage() {
                 <div className={`absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-3xl transition-colors ${theme === 'light' ? 'bg-accent-200/20' : 'bg-gradient-radial from-accent-500/15 via-transparent to-transparent'
                     }`} />
 
-                {/* Floating Hearts */}
-                <motion.div className="absolute top-24 right-8 text-3xl opacity-20" animate={{ y: [0, -15, 0], rotate: [0, 10, 0] }} transition={{ duration: 4, repeat: Infinity }}>💕</motion.div>
-                <motion.div className="absolute top-1/2 left-6 text-2xl opacity-15" animate={{ y: [0, -10, 0], rotate: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, delay: 1 }}>✨</motion.div>
+                {/* Floating Hearts - using CSS animation for better performance */}
+                <div className="absolute top-24 right-8 text-3xl opacity-20 animate-bounce" style={{ animationDuration: '4s' }}>💕</div>
+                <div className="absolute top-1/2 left-6 text-2xl opacity-15 animate-pulse" style={{ animationDuration: '5s' }}>✨</div>
             </div>
 
             <div className="max-w-md mx-auto pt-4 relative z-10">
@@ -410,13 +420,10 @@ export default function JourneysPage() {
                                                     const isCurrent = idx === completedSteps;
 
                                                     return (
-                                                        <motion.div
+                                                        <div
                                                             key={step.id}
-                                                            initial={{ x: -20, opacity: 0 }}
-                                                            animate={{ x: 0, opacity: 1 }}
-                                                            transition={{ delay: idx * 0.05 }}
                                                             onClick={() => openStep(journey.id, idx)}
-                                                            className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border
+                                                            className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors border
                                                                 ${isCurrent
                                                                     ? theme === 'light'
                                                                         ? 'bg-primary-50 border-primary-200 shadow-sm'
@@ -464,7 +471,7 @@ export default function JourneysPage() {
 
                                                             {/* Arrow */}
                                                             <ChevronLeft className={`w-4 h-4 ${theme === 'light' ? 'text-slate-300' : 'text-surface-500'}`} />
-                                                        </motion.div>
+                                                        </div>
                                                     );
                                                 })}
                                             </div>

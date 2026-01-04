@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wesal - The Peace (Conflict)</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+
+        .story-container {
+            width: 1080px;
+            height: 1920px;
+            background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 90px 70px;
+            color: white;
+        }
+
+        .wave-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(0deg, rgba(56, 189, 248, 0.08) 0%, transparent 100%);
+            z-index: 0;
+            border-top: 1px solid rgba(56, 189, 248, 0.1);
+        }
+
+        .z-10 {
+            position: relative;
+            z-index: 10;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 6px solid #38bdf8;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 8px 32px 32px 8px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateX(-10px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="story-container">
+        <div class="wave-bg"></div>
+
+        <!-- Header: Official Logo + Arabic Brand Name -->
+        <div class="z-10 flex flex-col items-center gap-6 mb-16 pt-8">
+            <div class="w-28 h-28 relative">
+                <!-- Using themed gradient for consistency -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" class="w-full h-full drop-shadow-2xl">
+                    <defs>
+                        <linearGradient id="gConflict" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#38bdf8;stop-opacity:1" /> <!-- Sky-400 -->
+                            <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" /> <!-- Sky-500 -->
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#gConflict)"
+                        d="M187.5 30C100.5 30 30 100.5 30 187.5S100.5 345 187.5 345 345 274.5 345 187.5 274.5 30 187.5 30zm0 280c-67.5 0-122.5-55-122.5-122.5S120 65 187.5 65 310 120 310 187.5 255 310 187.5 310zm-45-122.5c0-24.8 20.2-45 45-45s45 20.2 45 45-20.2 45-45 45-45-20.2-45-45z" />
+                </svg>
+            </div>
+            <h2 class="text-6xl font-bold text-white tracking-wide pb-4 leading-normal">
+                وِصال
+            </h2>
+        </div>
+
+        <!-- Problem Statement -->
+        <div class="z-10 mb-20 text-center">
+            <div
+                class="bg-red-500/10 border border-red-500/20 text-red-400 inline-block px-8 py-3 rounded-full mb-8 font-bold tracking-wide text-lg shadow-[0_0_20px_rgba(239,68,68,0.1)]">
+                ⚠️ مشكلة شائعة
+            </div>
+            <h1 class="text-[76px] font-bold leading-tight mb-8">
+                "هو لا يفهمني...<br>
+                هي تبالغ دائماً..."
+            </h1>
+            <p class="text-3xl text-slate-400 font-light leading-relaxed max-w-4xl mx-auto">
+                سوء التفاهم الصغير قد يدمر أجمل اللحظات.<br>
+                <span class="text-sky-200">لا تدعوا الخلافات تتراكم بصمت.</span>
+            </p>
+        </div>
+
+        <!-- Solution -->
+        <div class="z-10 flex-1 w-full">
+            <h2 class="text-3xl text-sky-400 font-bold mb-10 mr-2 flex items-center gap-3">
+                <span class="w-2 h-10 bg-sky-400 rounded-full inline-block"></span>
+                الحل الذكي من وِصال:
+            </h2>
+
+            <div class="glass-card">
+                <div class="flex items-center gap-5 mb-4">
+                    <span class="text-5xl bg-sky-500/10 p-2 rounded-xl">🤖</span>
+                    <h3 class="text-4xl font-bold text-white">وسيط الذكاء الاصطناعي</h3>
+                </div>
+                <p class="text-2xl text-slate-300 font-light leading-relaxed">طرف ثالث محايد يحلل المشكلة ويقترح حلولاً
+                    عادلة للطرفين دون تحيز.</p>
+            </div>
+
+            <div class="glass-card" style="border-left-color: #a855f7;">
+                <div class="flex items-center gap-5 mb-4">
+                    <span class="text-5xl bg-purple-500/10 p-2 rounded-xl">🧠</span>
+                    <h3 class="text-4xl font-bold text-white">فهم لغة الشريك</h3>
+                </div>
+                <p class="text-2xl text-slate-300 font-light leading-relaxed">ترجمة المشاعر المعقدة إلى كلمات واضحة
+                    يفهمها الطرف الآخر.</p>
+            </div>
+
+            <div class="glass-card" style="border-left-color: #22c55e;">
+                <div class="flex items-center gap-5 mb-4">
+                    <span class="text-5xl bg-green-500/10 p-2 rounded-xl">🔒</span>
+                    <h3 class="text-4xl font-bold text-white">مساحة آمنة</h3>
+                </div>
+                <p class="text-2xl text-slate-300 font-light leading-relaxed">سجلات سرية ومشفرة للنقاشات الحساسة، لضمان
+                    الخصوصية التامة.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="z-10 mt-8 text-center w-full pb-8">
+            <div class="relative group cursor-pointer w-full mb-8">
+                <div
+                    class="absolute -inset-1 bg-sky-500 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500">
+                </div>
+                <button
+                    class="relative w-full bg-sky-600 text-white py-8 rounded-2xl text-5xl font-bold shadow-2xl flex items-center justify-center gap-4">
+                    <span>احصل على السلام</span>
+                    <span class="text-4xl">🕊️</span>
+                </button>
+            </div>
+
+            <div class="flex justify-center items-center gap-3 opacity-60">
+                <div class="h-px w-10 bg-white/30"></div>
+                <p class="text-xl font-light tracking-wide text-white/70">صنع بحب بالسعودية 🇸🇦</p>
+                <div class="h-px w-10 bg-white/30"></div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

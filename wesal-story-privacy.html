@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wesal - The Vault (Privacy)</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+
+        .story-container {
+            width: 1080px;
+            height: 1920px;
+            background: linear-gradient(180deg, #111827 0%, #000000 100%);
+            /* Slate-900 to Black */
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 90px 70px;
+            color: white;
+        }
+
+        .shield-glow {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 60%);
+            /* Emerald Glow */
+            filter: blur(80px);
+            opacity: 0.6;
+            z-index: 0;
+        }
+
+        /* Scanline effect */
+        .scanlines {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.2));
+            background-size: 100% 4px;
+            opacity: 0.15;
+        }
+
+        .z-10 {
+            position: relative;
+            z-index: 10;
+        }
+
+        .security-card {
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .security-card:hover {
+            border-color: rgba(52, 211, 153, 0.5);
+            background: rgba(17, 24, 39, 0.9);
+        }
+
+        .lock-icon {
+            color: #34d399;
+            text-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="story-container">
+        <div class="shield-glow"></div>
+        <div class="scanlines"></div>
+
+        <!-- Header: Official Logo + Arabic Brand Name -->
+        <div class="z-10 flex flex-col items-center gap-6 mb-16 pt-8">
+            <div class="w-28 h-28 relative">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375"
+                    class="w-full h-full drop-shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                    <defs>
+                        <linearGradient id="gVault" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#34d399;stop-opacity:1" /> <!-- Emerald-400 -->
+                            <stop offset="100%" style="stop-color:#059669;stop-opacity:1" /> <!-- Emerald-600 -->
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#gVault)"
+                        d="M187.5 30C100.5 30 30 100.5 30 187.5S100.5 345 187.5 345 345 274.5 345 187.5 274.5 30 187.5 30zm0 280c-67.5 0-122.5-55-122.5-122.5S120 65 187.5 65 310 120 310 187.5 255 310 187.5 310zm-45-122.5c0-24.8 20.2-45 45-45s45 20.2 45 45-20.2 45-45 45-45-20.2-45-45z" />
+                </svg>
+            </div>
+            <h2 class="text-6xl font-bold text-white tracking-wide pb-4 leading-normal">
+                وِصال
+            </h2>
+        </div>
+
+        <!-- Privacy Hook -->
+        <div class="z-10 mb-20 text-center">
+            <div
+                class="inline-flex items-center gap-2 border border-emerald-500/30 bg-emerald-900/20 px-6 py-2 rounded-full mb-8">
+                <div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
+                <span class="text-emerald-400 font-bold tracking-widest uppercase text-sm">Encrypted & Secure</span>
+            </div>
+            <h1 class="text-[76px] font-bold leading-tight text-white mb-8">
+                أسراركم<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200">في الحفظ
+                    والصون.</span>
+            </h1>
+            <p class="text-3xl text-slate-400 font-light leading-relaxed px-12">
+                نحن نؤمن بأن الخصوصية هي أساس الثقة.<br>
+                بياناتكم مشفرة ولا يراها أحد غيركم.
+            </p>
+        </div>
+
+        <!-- Security Features -->
+        <div class="z-10 flex-1 px-2 w-full">
+            <div class="security-card">
+                <div
+                    class="w-20 h-20 bg-emerald-900/30 rounded-full flex items-center justify-center text-4xl lock-icon border border-emerald-500/20">
+                    🔒
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-white mb-2">تشفير تام</h3>
+                    <p class="text-xl text-slate-400 font-light">محادثاتكم وبياناتكم محمية بأعلى معايير الأمان.</p>
+                </div>
+            </div>
+
+            <div class="security-card">
+                <div
+                    class="w-20 h-20 bg-emerald-900/30 rounded-full flex items-center justify-center text-4xl lock-icon border border-emerald-500/20">
+                    🛡️
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-white mb-2">مساحة خاصة</h3>
+                    <p class="text-xl text-slate-400 font-light">لا إعلانات، لا تتبع، فقط مساحة هادئة لكم.</p>
+                </div>
+            </div>
+
+            <div class="security-card">
+                <div
+                    class="w-20 h-20 bg-emerald-900/30 rounded-full flex items-center justify-center text-4xl lock-icon border border-emerald-500/20">
+                    📵
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-white mb-2">بياناتكم ملككم</h3>
+                    <p class="text-xl text-slate-400 font-light">إمكانية حذف جميع البيانات بضغطة زر واحدة.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="z-10 mt-8 text-center w-full pb-8">
+            <div class="flex justify-center items-center gap-4 mb-8">
+                <svg class="w-12 h-12 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                    </path>
+                </svg>
+                <span class="text-4xl font-bold font-['Outfit'] tracking-tight">WESAL SECURE</span>
+            </div>
+            <p class="text-xl font-light text-slate-600 tracking-widest">صنع بحب بالسعودية 🇸🇦</p>
+        </div>
+
+    </div>
+</body>
+
+</html>

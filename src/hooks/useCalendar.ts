@@ -104,13 +104,6 @@ export function useCalendar() {
                 }
             });
 
-            console.log('[useCalendar] Fetched events:', {
-                rangeCount: rangeEvents.length,
-                recurringCount: recurringEvents.length,
-                totalCount: allEvents.length,
-                events: allEvents
-            });
-
             return { data: allEvents, error: null };
         } catch (err: any) {
             console.error('[useCalendar] Fetch error:', err);

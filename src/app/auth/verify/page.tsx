@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Heart, Check } from 'lucide-react';
+import { Check, Loader2, RefreshCw, AlertCircle } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -13,14 +13,42 @@ function VerifyContent() {
     const { setTokens, setUser } = useAuthStore();
 
     const userId = searchParams.get('userId');
+    const email = searchParams.get('email') || '';
     const type = searchParams.get('type') || 'EMAIL_VERIFICATION';
 
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [isLoading, setIsLoading] = useState(false);
+    const [isResending, setIsResending] = useState(false);
     const [error, setError] = useState('');
     const [isVerified, setIsVerified] = useState(false);
+    const [resendCooldown, setResendCooldown] = useState(0);
 
-    // Auto-focus and handle input
+    // Resend cooldown timer
+    useEffect(() => {
+        if (resendCooldown > 0) {
+            const timer = setInterval(() => {
+                setResendCooldown((prev) => prev - 1);
+            }, 1000);
+            return () => clearInterval(timer);
+        }
+    }, [resendCooldown]);
+
+    // Auto-focus first input on mount
+    useEffect(() => {
+        const firstInput = document.querySelector('input[data-index="0"]') as HTMLInputElement;
+        firstInput?.focus();
+    }, []);
+
+    // Auto-submit when all 6 digits are entered
+    useEffect(() => {
+        const fullCode = code.join('');
+        if (fullCode.length === 6 && !code.includes('')) {
+            handleSubmit();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [code]);
+
+    // Handle code input
     const handleCodeChange = (index: number, value: string) => {
         if (value.length > 1) {
             // Handle paste
@@ -48,6 +76,7 @@ function VerifyContent() {
                 nextInput?.focus();
             }
         }
+        setError('');
     };
 
     const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
@@ -57,8 +86,8 @@ function VerifyContent() {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = useCallback(async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
         setError('');
 
         const fullCode = code.join('');
@@ -87,14 +116,36 @@ function VerifyContent() {
 
             setIsVerified(true);
 
-            // Redirect to onboarding (pairing) after a short delay
+            // Redirect to onboarding after a short delay
             setTimeout(() => {
                 router.push('/onboarding');
             }, 2000);
         } catch (err: any) {
-            setError(err.message || 'Verification failed');
+            setError(err.message || 'Verification failed. Please try again.');
+            // Clear code on error
+            setCode(['', '', '', '', '', '']);
+            const firstInput = document.querySelector('input[data-index="0"]') as HTMLInputElement;
+            firstInput?.focus();
         } finally {
             setIsLoading(false);
+        }
+    }, [code, userId, type, router, setTokens]);
+
+    // Resend OTP
+    const handleResend = async () => {
+        if (resendCooldown > 0 || !userId) return;
+
+        setIsResending(true);
+        setError('');
+
+        try {
+            // TODO: Implement resend OTP API endpoint
+            // For now, just start the cooldown timer
+            setResendCooldown(60); // 60 second cooldown
+        } catch (err: any) {
+            setError('Failed to resend code. Please try again.');
+        } finally {
+            setIsResending(false);
         }
     };
 
@@ -105,8 +156,8 @@ function VerifyContent() {
                     <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
                         <Check className="w-10 h-10 text-green-500" />
                     </div>
-                    <h1 className="text-2xl font-bold mb-2">Verified!</h1>
-                    <p className="text-surface-400">Redirecting to dashboard...</p>
+                    <h1 className="text-2xl font-bold mb-2">Email Verified!</h1>
+                    <p className="text-surface-400">Redirecting to your dashboard...</p>
                 </div>
             </main>
         );
@@ -124,27 +175,33 @@ function VerifyContent() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-2">
-                        <Heart className="w-8 h-8 text-primary-500" fill="currentColor" />
-                        <span className="text-xl font-bold">Couples Game</span>
+                        <img src="/wesal-logo.svg" alt="Wesal" className="w-12 h-12" />
+                        <span className="text-2xl font-bold">وصال</span>
                     </Link>
                 </div>
 
                 {/* Form Card */}
                 <div className="glass-card p-8">
                     <h1 className="text-2xl font-bold text-center mb-2">Verify Your Email</h1>
-                    <p className="text-surface-400 text-center mb-8">
-                        We've sent a 6-digit code to your email
+                    <p className="text-surface-400 text-center mb-2">
+                        We've sent a 6-digit code to
                     </p>
+                    {email && (
+                        <p className="text-primary-400 text-center mb-6 font-medium">
+                            {email}
+                        </p>
+                    )}
 
                     {error && (
-                        <div className="mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm">
+                        <div className="mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm flex items-center justify-center gap-2">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
                             {error}
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* OTP Input */}
-                        <div className="flex justify-center gap-3">
+                        <div className="flex justify-center gap-3" dir="ltr">
                             {code.map((digit, index) => (
                                 <input
                                     key={index}
@@ -155,7 +212,8 @@ function VerifyContent() {
                                     value={digit}
                                     onChange={(e) => handleCodeChange(index, e.target.value)}
                                     onKeyDown={(e) => handleKeyDown(index, e)}
-                                    className="w-12 h-14 text-center text-2xl font-bold rounded-xl bg-surface-800/50 border border-surface-600 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                                    disabled={isLoading}
+                                    className="w-12 h-14 text-center text-2xl font-bold rounded-xl bg-surface-800/50 border border-surface-600 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all disabled:opacity-50"
                                 />
                             ))}
                         </div>
@@ -163,19 +221,45 @@ function VerifyContent() {
                         {/* Submit */}
                         <button
                             type="submit"
-                            disabled={isLoading}
-                            className="btn-primary w-full"
+                            disabled={isLoading || code.join('').length !== 6}
+                            className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
                         >
-                            {isLoading ? 'Verifying...' : 'Verify'}
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    Verifying...
+                                </>
+                            ) : (
+                                'Verify Email'
+                            )}
                         </button>
                     </form>
 
-                    <p className="mt-6 text-center text-surface-400 text-sm">
-                        Didn't receive the code?{' '}
-                        <button className="text-primary-400 hover:underline">
-                            Resend
+                    {/* Resend Section */}
+                    <div className="mt-6 text-center">
+                        <p className="text-surface-400 text-sm mb-2">
+                            Didn't receive the code?
+                        </p>
+                        <button
+                            onClick={handleResend}
+                            disabled={resendCooldown > 0 || isResending}
+                            className="text-primary-400 hover:underline disabled:opacity-50 disabled:no-underline flex items-center justify-center gap-2 mx-auto"
+                        >
+                            {isResending ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Sending...
+                                </>
+                            ) : resendCooldown > 0 ? (
+                                `Resend in ${resendCooldown}s`
+                            ) : (
+                                <>
+                                    <RefreshCw className="w-4 h-4" />
+                                    Resend Code
+                                </>
+                            )}
                         </button>
-                    </p>
+                    </div>
                 </div>
             </div>
         </main>
