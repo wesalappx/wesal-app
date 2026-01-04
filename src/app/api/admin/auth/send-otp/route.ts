@@ -1,16 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-
-// In-memory OTP store (in production, use Redis or database)
-declare global {
-    var adminOtpStore: Map<string, { otp: string; expires: number }> | undefined;
-}
-
-// Use global store to persist across hot reloads in development
-const otpStore = global.adminOtpStore || new Map<string, { otp: string; expires: number }>();
-if (process.env.NODE_ENV === 'development') {
-    global.adminOtpStore = otpStore;
-}
+import { createAdminClient } from '@/lib/supabase/server';
 
 // Allowed admin emails (in production, store in database or env)
 const ALLOWED_ADMIN_EMAILS = [
@@ -38,16 +28,29 @@ export async function POST(request: Request) {
 
         // Generate OTP
         const otp = generateOTP();
-        const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
 
-        // Store OTP
-        otpStore.set(email.toLowerCase(), { otp, expires });
+        // Store OTP in database
+        const supabase = await createAdminClient();
 
-        // Clean up expired OTPs
-        for (const [key, value] of otpStore.entries()) {
-            if (value.expires < Date.now()) {
-                otpStore.delete(key);
-            }
+        // Delete any existing OTP for this email first
+        await supabase
+            .from('admin_otps')
+            .delete()
+            .eq('email', email.toLowerCase());
+
+        // Insert new OTP
+        const { error: insertError } = await supabase
+            .from('admin_otps')
+            .insert({
+                email: email.toLowerCase(),
+                otp_hash: otp, // In production, hash this
+                expires_at: expiresAt,
+            });
+
+        if (insertError) {
+            console.error('Failed to store OTP:', insertError);
+            return NextResponse.json({ error: 'Failed to generate OTP' }, { status: 500 });
         }
 
         // Always log to console (for Vercel logs)

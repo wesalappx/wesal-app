@@ -2,17 +2,6 @@ import { NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
 import { createAdminClient } from '@/lib/supabase/server';
 
-// This should match the store in send-otp
-declare global {
-    var adminOtpStore: Map<string, { otp: string; expires: number }> | undefined;
-}
-
-// Use global store to persist across hot reloads in development
-const otpStore = global.adminOtpStore || new Map<string, { otp: string; expires: number }>();
-if (process.env.NODE_ENV === 'development') {
-    global.adminOtpStore = otpStore;
-}
-
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
 
 export async function POST(request: Request) {
@@ -23,29 +12,41 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Email and OTP are required' }, { status: 400 });
         }
 
-        // Get stored OTP
-        const stored = otpStore.get(email.toLowerCase());
+        const supabase = await createAdminClient();
 
-        if (!stored) {
-            return NextResponse.json({ error: 'OTP not found or expired' }, { status: 400 });
+        // Get stored OTP from database
+        const { data: storedOtp, error: fetchError } = await supabase
+            .from('admin_otps')
+            .select('*')
+            .eq('email', email.toLowerCase())
+            .single();
+
+        if (fetchError || !storedOtp) {
+            return NextResponse.json({ error: 'OTP not found. Please request a new one.' }, { status: 400 });
         }
 
         // Check if OTP is expired
-        if (stored.expires < Date.now()) {
-            otpStore.delete(email.toLowerCase());
-            return NextResponse.json({ error: 'OTP expired' }, { status: 400 });
+        if (new Date(storedOtp.expires_at) < new Date()) {
+            // Delete expired OTP
+            await supabase
+                .from('admin_otps')
+                .delete()
+                .eq('email', email.toLowerCase());
+            return NextResponse.json({ error: 'OTP expired. Please request a new one.' }, { status: 400 });
         }
 
         // Verify OTP
-        if (stored.otp !== otp) {
+        if (storedOtp.otp_hash !== otp) {
             return NextResponse.json({ error: 'Invalid OTP' }, { status: 400 });
         }
 
         // OTP is valid - delete it
-        otpStore.delete(email.toLowerCase());
+        await supabase
+            .from('admin_otps')
+            .delete()
+            .eq('email', email.toLowerCase());
 
         // Get User ID from Supabase Auth
-        const supabase = await createAdminClient();
         const { data: { users }, error: userError } = await supabase.auth.admin.listUsers();
 
         if (userError) {
