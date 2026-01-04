@@ -11,7 +11,6 @@ import {
     Settings,
     Shield,
     DollarSign,
-    Crown,
     LogOut,
     Sparkles
 } from 'lucide-react';
@@ -24,8 +23,7 @@ const navigation = [
     { name: 'Couples', href: '/admin/couples', icon: Heart },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { name: 'Content', href: '/admin/content', icon: FileText },
-    { name: 'Finance', href: '/admin/finance', icon: DollarSign },
-    { name: 'Subscriptions', href: '/admin/subscriptions', icon: Crown },
+    { name: 'Finance', href: '/admin/subscriptions', icon: DollarSign },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 

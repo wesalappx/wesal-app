@@ -22,9 +22,40 @@ import {
     BarChart3,
     Plus,
     Trash2,
-    Clock
+    Clock,
+    DollarSign,
+    CreditCard,
+    TrendingUp,
+    Download,
+    Wallet,
+    FileText
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+// Types
+interface FinanceStats {
+    summary: {
+        total_revenue: number;
+        transactions_last_30d: number;
+        total_premium_couples: number;
+        active_trials: number;
+    };
+    transactions: {
+        id: string;
+        amount: number;
+        currency: string;
+        status: string;
+        created_at: string;
+        user?: {
+            display_name: string;
+            email: string;
+        };
+    }[];
+    monthlyRevenue: {
+        month: string;
+        amount: number;
+    }[];
+}
 
 interface TierLimit {
     id: string;
@@ -52,6 +83,7 @@ interface Pricing {
     annual_discount_months: number;
 }
 
+// Feature icons mapping
 const featureIcons: Record<string, any> = {
     ai_chat: MessageCircle,
     conflict_ai: Zap,
@@ -63,11 +95,41 @@ const featureIcons: Record<string, any> = {
     health_tracking: Heart,
 };
 
+// Stat Card Component
+function StatCard({ title, value, subtext, icon: Icon, color, delay }: any) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay }}
+        >
+            <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm hover:border-slate-700 transition-all group overflow-hidden relative">
+                <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-5 transition-opacity`} />
+                <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-slate-400">{title}</p>
+                            <p className="text-3xl font-bold text-white mt-2 tracking-tight">{value ?? '0'}</p>
+                            <p className="text-xs text-slate-500 mt-1">{subtext}</p>
+                        </div>
+                        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg shadow-black/20`}>
+                            <Icon className="w-7 h-7 text-white" />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </motion.div>
+    );
+}
+
 export default function AdminSubscriptionsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    // State
+    // Finance stats
+    const [stats, setStats] = useState<FinanceStats | null>(null);
+
+    // Subscription state
     const [freeLimits, setFreeLimits] = useState<TierLimit[]>([]);
     const [offers, setOffers] = useState<SpecialOffer[]>([]);
     const [pricing, setPricing] = useState<Pricing>({
@@ -85,16 +147,23 @@ export default function AdminSubscriptionsPage() {
     });
 
     useEffect(() => {
-        fetchData();
+        fetchAllData();
     }, []);
 
-    const fetchData = async () => {
+    const fetchAllData = async () => {
         try {
+            // Fetch finance stats
+            const financeRes = await fetch('/api/admin/finance');
+            if (financeRes.ok) {
+                const data = await financeRes.json();
+                setStats(data);
+            }
+
             // Fetch tier limits
             const limitsRes = await fetch('/api/admin/subscriptions/limits');
             if (limitsRes.ok) {
                 const data = await limitsRes.json();
-                setFreeLimits(data.limits.filter((l: TierLimit) => l.tier === 'free'));
+                setFreeLimits(data.limits?.filter((l: TierLimit) => l.tier === 'free') || []);
             }
 
             // Fetch offers
@@ -225,10 +294,50 @@ export default function AdminSubscriptionsPage() {
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
                         <Crown className="w-8 h-8 text-amber-400" />
-                        Subscription Management
+                        Finance & Subscriptions
                     </h1>
-                    <p className="text-slate-400 mt-1">Manage tiers, pricing, limits and special offers</p>
+                    <p className="text-slate-400 mt-1">Manage revenue, pricing, limits and offers</p>
                 </div>
+                <Button variant="outline" className="border-slate-700 bg-slate-800/50 text-slate-300 hover:text-white hover:bg-slate-800">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export Report
+                </Button>
+            </div>
+
+            {/* Revenue Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard
+                    title="Total Revenue"
+                    value={`SAR ${stats?.summary?.total_revenue?.toLocaleString() || '0'}`}
+                    subtext="Lifetime earnings"
+                    icon={DollarSign}
+                    color="from-indigo-500 to-violet-500"
+                    delay={0}
+                />
+                <StatCard
+                    title="Sales (30d)"
+                    value={stats?.summary?.transactions_last_30d || 0}
+                    subtext="Transactions in last 30 days"
+                    icon={CreditCard}
+                    color="from-emerald-500 to-teal-500"
+                    delay={0.1}
+                />
+                <StatCard
+                    title="Premium Couples"
+                    value={stats?.summary?.total_premium_couples || 0}
+                    subtext="Active subscriptions"
+                    icon={Users}
+                    color="from-amber-500 to-orange-500"
+                    delay={0.2}
+                />
+                <StatCard
+                    title="Active Trials"
+                    value={stats?.summary?.active_trials || 0}
+                    subtext="Potential conversions"
+                    icon={Wallet}
+                    color="from-blue-500 to-cyan-500"
+                    delay={0.3}
+                />
             </div>
 
             {/* Pricing Configuration */}
@@ -295,56 +404,58 @@ export default function AdminSubscriptionsPage() {
             </motion.div>
 
             {/* Free Tier Limits */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 }}
-            >
-                <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm">
-                    <CardHeader>
-                        <CardTitle className="text-white flex items-center gap-2">
-                            <Settings2 className="w-5 h-5 text-blue-400" />
-                            Free Tier Limits
-                        </CardTitle>
-                        <CardDescription className="text-slate-400">
-                            Adjust feature limits for free users. Premium users have unlimited access.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {freeLimits.map((limit) => {
-                                const Icon = featureIcons[limit.feature] || Settings2;
-                                return (
-                                    <div key={limit.id} className="bg-slate-800/30 rounded-xl p-4 border border-slate-800/50">
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <div className="w-10 h-10 rounded-lg bg-slate-700/50 flex items-center justify-center">
-                                                <Icon className="w-5 h-5 text-slate-300" />
+            {freeLimits.length > 0 && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                >
+                    <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm">
+                        <CardHeader>
+                            <CardTitle className="text-white flex items-center gap-2">
+                                <Settings2 className="w-5 h-5 text-blue-400" />
+                                Free Tier Limits
+                            </CardTitle>
+                            <CardDescription className="text-slate-400">
+                                Adjust feature limits for free users. Premium users have unlimited access.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {freeLimits.map((limit) => {
+                                    const Icon = featureIcons[limit.feature] || Settings2;
+                                    return (
+                                        <div key={limit.id} className="bg-slate-800/30 rounded-xl p-4 border border-slate-800/50">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <div className="w-10 h-10 rounded-lg bg-slate-700/50 flex items-center justify-center">
+                                                    <Icon className="w-5 h-5 text-slate-300" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium text-white capitalize">
+                                                        {limit.feature.replace(/_/g, ' ')}
+                                                    </p>
+                                                    <p className="text-xs text-slate-500">{limit.period || 'Total'}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-white capitalize">
-                                                    {limit.feature.replace(/_/g, ' ')}
-                                                </p>
-                                                <p className="text-xs text-slate-500">{limit.period || 'Total'}</p>
+                                            <div className="flex items-center gap-2">
+                                                <Input
+                                                    type="number"
+                                                    value={limit.limit_value || 0}
+                                                    onChange={(e) => handleUpdateLimit(limit.feature, Number(e.target.value))}
+                                                    className="h-10 bg-slate-900/50 border-slate-700 text-white font-mono"
+                                                />
+                                                <span className="text-xs text-slate-500 min-w-[50px]">
+                                                    /{limit.period || 'forever'}
+                                                </span>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Input
-                                                type="number"
-                                                value={limit.limit_value || 0}
-                                                onChange={(e) => handleUpdateLimit(limit.feature, Number(e.target.value))}
-                                                className="h-10 bg-slate-900/50 border-slate-700 text-white font-mono"
-                                            />
-                                            <span className="text-xs text-slate-500 min-w-[50px]">
-                                                /{limit.period || 'forever'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </CardContent>
-                </Card>
-            </motion.div>
+                                    );
+                                })}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            )}
 
             {/* Special Offers */}
             <motion.div
@@ -465,33 +576,79 @@ export default function AdminSubscriptionsPage() {
                 </Card>
             </motion.div>
 
-            {/* Premium Stats */}
+            {/* Recent Transactions */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
             >
-                <Card className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border-amber-500/20 backdrop-blur-sm">
-                    <CardContent className="py-6">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                                    <Crown className="w-7 h-7 text-white" />
-                                </div>
-                                <div>
-                                    <p className="text-amber-300 font-medium">Quick Tip</p>
-                                    <p className="text-amber-400/70 text-sm">
-                                        Offers with promo codes have 2x higher conversion rates
-                                    </p>
-                                </div>
-                            </div>
-                            <Button
-                                variant="outline"
-                                className="border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
-                            >
-                                <Users className="w-4 h-4 mr-2" />
-                                View Subscribers
-                            </Button>
+                <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm overflow-hidden">
+                    <CardHeader>
+                        <CardTitle className="text-white flex items-center gap-2">
+                            <CreditCard className="w-5 h-5 text-emerald-400" />
+                            Recent Transactions
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-slate-900/50 border-b border-white/5">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Date</th>
+                                        <th className="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">User</th>
+                                        <th className="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Amount</th>
+                                        <th className="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
+                                        <th className="px-6 py-4 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">Receipt</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5">
+                                    {!stats?.transactions || stats.transactions.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                                                No recent transactions found
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        stats.transactions.map((tx) => (
+                                            <tr key={tx.id} className="hover:bg-white/5 transition-colors group">
+                                                <td className="px-6 py-4 text-sm text-slate-300 whitespace-nowrap">
+                                                    {new Date(tx.created_at).toLocaleDateString()}
+                                                    <span className="text-slate-500 ml-2 text-xs">
+                                                        {new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white">
+                                                            {(tx.user?.display_name || tx.user?.email || '?').charAt(0).toUpperCase()}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-medium text-white">{tx.user?.display_name || 'Unknown'}</p>
+                                                            <p className="text-xs text-slate-500">{tx.user?.email}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-sm font-medium text-white font-mono">
+                                                    {tx.currency} {tx.amount.toFixed(2)}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <Badge
+                                                        variant={tx.status === 'completed' ? 'default' : 'secondary'}
+                                                        className={tx.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400 border-0' : ''}
+                                                    >
+                                                        {tx.status}
+                                                    </Badge>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-500 hover:text-white hover:bg-slate-700 rounded-full">
+                                                        <FileText className="w-4 h-4" />
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </CardContent>
                 </Card>
