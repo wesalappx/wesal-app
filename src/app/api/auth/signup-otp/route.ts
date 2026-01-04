@@ -46,7 +46,7 @@ export async function POST(request: Request) {
             try {
                 const resend = new Resend(resendApiKey);
                 await resend.emails.send({
-                    from: 'Wesal <onboarding@resend.dev>',
+                    from: 'Wesal <noreply@wesal.life>',
                     to: email,
                     subject: 'رمز التحقق - Wesal Verification Code',
                     html: `

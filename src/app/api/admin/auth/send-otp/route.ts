@@ -62,7 +62,7 @@ export async function POST(request: Request) {
             try {
                 const resend = new Resend(resendApiKey);
                 await resend.emails.send({
-                    from: 'Wesal Admin <onboarding@resend.dev>',
+                    from: 'Wesal Admin <noreply@wesal.life>',
                     to: email,
                     subject: 'رمز الدخول - Wesal Admin OTP',
                     html: `
