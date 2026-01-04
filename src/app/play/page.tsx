@@ -46,9 +46,8 @@ export default function PlayPage() {
     const router = useRouter();
     const { t, language } = useTranslation();
     const isRTL = language === 'ar';
-    const { isGameAvailable, canUse, trackUsage, isPremium } = useTierLimits();
+    const { isGameAvailable, isPremium } = useTierLimits();
 
-    const [sessionUsage, setSessionUsage] = useState<{ remaining: number; limit: number } | null>(null);
     const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
     const [selectedLockedGame, setSelectedLockedGame] = useState<string | null>(null);
     const [showModeModal, setShowModeModal] = useState(false);
@@ -62,17 +61,6 @@ export default function PlayPage() {
             setShowModeModal(true);
         }
     }, [preferredSessionMode]);
-
-    // Fetch session usage on mount
-    useEffect(() => {
-        const fetchUsage = async () => {
-            const usage = await canUse('game_sessions');
-            if (usage.limit > 0) {
-                setSessionUsage({ remaining: usage.remaining, limit: usage.limit });
-            }
-        };
-        fetchUsage();
-    }, [canUse]);
 
 
     // Active Session & Pairing Logic
@@ -168,26 +156,14 @@ export default function PlayPage() {
         playSound('click');
         if (!type) return;
 
-        // Check if game is available for this tier
+        // Check if game is available for this tier (premium lock)
         if (!isGameAvailable(type)) {
             setSelectedLockedGame(title);
             setShowUpgradePrompt(true);
             return;
         }
 
-        // Check session limit
-        const usage = await canUse('game_sessions');
-        if (!usage.canUse && usage.limit > 0) {
-            setShowUpgradePrompt(true);
-            return;
-        }
-
-        // Track usage
-        const trackResult = await trackUsage('game_sessions');
-        if (trackResult.remaining >= 0) {
-            setSessionUsage({ remaining: trackResult.remaining, limit: usage.limit });
-        }
-
+        // No session limits - go directly to game
         router.push(`/game-session?mode=${type}`);
     };
 
@@ -217,18 +193,6 @@ export default function PlayPage() {
                             <div className="flex items-center gap-2">
                                 {/* Mode Indicator */}
                                 <SessionModeIndicator onClick={() => setShowModeModal(true)} />
-
-                                {/* Session Usage Badge */}
-                                {sessionUsage && sessionUsage.limit > 0 && (
-                                    <div className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${sessionUsage.remaining <= 1
-                                        ? 'bg-orange-500/20 text-orange-400'
-                                        : theme === 'light'
-                                            ? 'bg-slate-100 text-slate-500 border border-slate-200'
-                                            : 'bg-surface-700/50 text-surface-300'
-                                        }`}>
-                                        {isRTL ? `${sessionUsage.remaining}/${sessionUsage.limit} جلسات` : `${sessionUsage.remaining}/${sessionUsage.limit} sessions`}
-                                    </div>
-                                )}
                             </div>
                         </div>
 

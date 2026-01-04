@@ -44,15 +44,12 @@ export interface TierLimit {
 }
 
 // Free tier limits configuration
+// Only AI Coach, Conflict AI, and Whispers have usage limits
+// Games and Journeys use lock system (FREE_GAMES, FREE_JOURNEYS) not usage limits
 export const FREE_TIER_LIMITS: Record<string, TierLimit> = {
     ai_chat: { feature: 'ai_chat', limit: 5, period: 'daily', descriptionAr: '5 رسائل يومياً', descriptionEn: '5 messages/day' },
     conflict_ai: { feature: 'conflict_ai', limit: 2, period: 'weekly', descriptionAr: 'جلستين أسبوعياً', descriptionEn: '2 sessions/week' },
-    game_sessions: { feature: 'game_sessions', limit: 3, period: 'daily', descriptionAr: '3 جلسات يومياً', descriptionEn: '3 sessions/day' },
-    games_available: { feature: 'games_available', limit: 4, period: 'forever', descriptionAr: '4 ألعاب أساسية', descriptionEn: '4 basic games' },
-    journeys: { feature: 'journeys', limit: 2, period: 'forever', descriptionAr: 'رحلتين للبداية', descriptionEn: '2 starter journeys' },
     whisper: { feature: 'whisper', limit: 3, period: 'weekly', descriptionAr: '3 همسات أسبوعياً', descriptionEn: '3 whispers/week' },
-    insights: { feature: 'insights', limit: 1, period: 'forever', descriptionAr: 'إحصائيات أساسية', descriptionEn: 'Basic insights' },
-    health_tracking: { feature: 'health_tracking', limit: 1, period: 'forever', descriptionAr: 'عرض فقط', descriptionEn: 'View only' },
 };
 
 // List of games available for free tier (first 4 games)
