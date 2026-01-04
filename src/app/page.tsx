@@ -30,16 +30,16 @@ const features = [
         color: 'from-emerald-500 to-emerald-600',
     },
     {
-        icon: Lock,
-        title: 'مساحة آمنة',
-        description: 'خصوصية تامة وبيانات مشفرة',
-        color: 'from-slate-500 to-slate-600',
-    },
-    {
         icon: Heart,
         title: 'شرارات',
         description: 'أفكار رومانسية لإشعال الحب',
         color: 'from-rose-500 to-rose-600',
+    },
+    {
+        icon: Lock,
+        title: 'مساحة آمنة',
+        description: 'خصوصية تامة وبيانات مشفرة',
+        color: 'from-slate-500 to-slate-600',
     },
 ];
 
@@ -145,38 +145,55 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Features Section */}
-            <section className="py-20 px-6">
-                <div className="max-w-4xl mx-auto">
+            {/* Features Section - Bento Grid Style */}
+            <section className="py-24 px-6 relative z-10">
+                <div className="max-w-6xl mx-auto">
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-center mb-16"
+                        className="text-center mb-20"
                     >
-                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                            لماذا <span className="text-primary-400">وِصال</span>؟
+                        <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-200 to-primary-100">
+                            اكتشف مميزات <span className="text-primary-400">وِصال</span>
                         </h2>
-                        <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-                            تطبيق مصمم خصيصاً للأزواج المتزوجين لتعزيز التواصل وبناء علاقة أقوى
+                        <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                            تجربة متكاملة تجمع بين العلم والتكنولوجيا لمساعدة الأزواج على بناء علاقة أعمق ومستدامة
                         </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {features.map((feature, index) => (
                             <motion.div
                                 key={feature.title}
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
-                                className="glass-card p-5 md:p-6 rounded-2xl border border-white/5 hover:border-white/10 transition-all group"
+                                className={`group relative overflow-hidden rounded-3xl border border-white/5 bg-slate-900/50 hover:bg-slate-800/60 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary-500/5 ${[0, 3, 4].includes(index) ? 'md:col-span-2' : 'md:col-span-1'
+                                    }`}
                             >
-                                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                                    <feature.icon className="w-6 h-6 text-white" />
+                                {/* Gradient Blob Background */}
+                                <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-10 blur-[80px] transition-opacity duration-700`} />
+
+                                <div className="p-8 relative z-10 h-full flex flex-col items-start">
+                                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6 shadow-lg shadow-black/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                                        <feature.icon className="w-7 h-7 text-white" />
+                                    </div>
+
+                                    <h3 className="text-xl md:text-2xl font-bold text-white mb-3 group-hover:text-primary-200 transition-colors">
+                                        {feature.title}
+                                    </h3>
+
+                                    <p className="text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">
+                                        {feature.description}
+                                    </p>
+
+                                    {/* Decoration for large cards */}
+                                    {[0, 3, 4].includes(index) && (
+                                        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/10 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
+                                    )}
                                 </div>
-                                <h3 className="text-lg font-bold text-white mb-1">{feature.title}</h3>
-                                <p className="text-slate-400 text-sm">{feature.description}</p>
                             </motion.div>
                         ))}
                     </div>
