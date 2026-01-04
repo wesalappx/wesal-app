@@ -62,30 +62,37 @@ export async function POST(request: Request) {
         for (const update of updates) {
             const { key, value } = update;
 
+            console.log(`Updating setting: ${key} = ${value}`);
+
             const { data, error: updateError } = await supabase
                 .from('app_settings')
-                .upsert({
-                    key,
-                    value,
-                    updated_by: admin.user_id,
-                    updated_at: new Date().toISOString(),
-                })
+                .upsert(
+                    {
+                        key,
+                        value,
+                        updated_by: admin.user_id,
+                        updated_at: new Date().toISOString(),
+                    },
+                    { onConflict: 'key' }
+                )
                 .select()
                 .single();
 
             if (updateError) {
+                console.error(`Error updating ${key}:`, updateError);
                 errors.push({ key, error: updateError.message });
             } else {
+                console.log(`Successfully updated ${key}:`, data);
                 results.push(data);
 
-                // Log action
+                // Log action (ignore errors here)
                 await supabase.from('admin_audit_log').insert({
                     admin_id: admin.id,
                     action: 'update',
                     entity_type: 'settings',
-                    entity_id: data.id,
+                    entity_id: data?.id,
                     new_data: { key, value },
-                });
+                }).catch(() => { });
             }
         }
 
