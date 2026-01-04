@@ -666,6 +666,7 @@ export default function CalendarPage() {
                         date={selectedDate || new Date()}
                         initialData={editingEvent}
                         isRTL={isRTL}
+                        theme={theme}
                         onClose={() => {
                             setShowAddModal(false);
                             setEditingEvent(null);
@@ -680,6 +681,7 @@ export default function CalendarPage() {
                 {showCycleSettings && (
                     <CycleSettingsModal
                         isRTL={isRTL}
+                        theme={theme}
                         lastPeriodDate={lastPeriodDate}
                         cycleLength={cycleLength}
                         saving={savingHealth}
@@ -696,10 +698,11 @@ export default function CalendarPage() {
 }
 
 // --- Add Event Modal Component ---
-function AddEventModal({ date, initialData, isRTL, onClose, onSave }: {
+function AddEventModal({ date, initialData, isRTL, theme, onClose, onSave }: {
     date: Date;
     initialData: ScheduledEvent | null;
     isRTL: boolean;
+    theme: string;
     onClose: () => void;
     onSave: (data: { title: string; type: string; time: string; isRecurring: boolean; eventDate: Date }) => void;
 }) {
@@ -740,15 +743,15 @@ function AddEventModal({ date, initialData, isRTL, onClose, onSave }: {
                 transition={{ type: 'spring', damping: 30, stiffness: 400 }}
                 onClick={e => e.stopPropagation()}
                 dir={isRTL ? 'rtl' : 'ltr'}
-                className="w-full sm:max-w-sm bg-surface-900 border-t sm:border border-white/10 rounded-t-2xl sm:rounded-2xl overflow-hidden max-h-[85vh]"
+                className={`w-full sm:max-w-sm border-t sm:border rounded-t-2xl sm:rounded-2xl overflow-hidden max-h-[85vh] ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-surface-900 border-white/10'}`}
             >
                 {/* Drag Handle (mobile only) */}
                 <div className="flex justify-center pt-2 pb-1 sm:hidden">
-                    <div className="w-8 h-1 rounded-full bg-white/30" />
+                    <div className={`w-8 h-1 rounded-full ${theme === 'light' ? 'bg-slate-300' : 'bg-white/30'}`} />
                 </div>
 
                 {/* Header */}
-                <div className="px-4 py-3 border-b border-white/5">
+                <div className={`px-4 py-3 border-b ${theme === 'light' ? 'border-slate-100' : 'border-white/5'}`}>
                     <div className={`flex items-center gap-3 ${isRTL ? 'flex-row' : 'flex-row'}`}>
                         {/* Date Badge */}
                         <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500">
@@ -756,19 +759,19 @@ function AddEventModal({ date, initialData, isRTL, onClose, onSave }: {
                         </div>
                         {/* Info */}
                         <div className="flex-1">
-                            <h3 className="text-base font-bold text-white">
+                            <h3 className={`text-base font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                 {isRTL
                                     ? (initialData ? 'تعديل الحدث' : 'إضافة حدث')
                                     : (initialData ? 'Edit Event' : 'Add Event')}
                             </h3>
-                            <p className="text-xs text-surface-400">
+                            <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                                 {dayNames[date.getDay()]} • {monthNames[date.getMonth()]} {date.getFullYear()}
                             </p>
                         </div>
                         {/* Close */}
                         <button
                             onClick={onClose}
-                            className="p-2 hover:bg-white/5 rounded-lg text-surface-400 hover:text-white transition-colors"
+                            className={`p-2 rounded-lg transition-colors ${theme === 'light' ? 'hover:bg-slate-100 text-slate-500 hover:text-slate-700' : 'hover:bg-white/5 text-surface-400 hover:text-white'}`}
                         >
                             <X className="w-5 h-5" />
                         </button>
@@ -780,7 +783,7 @@ function AddEventModal({ date, initialData, isRTL, onClose, onSave }: {
 
                     {/* Date Picker */}
                     <div>
-                        <label className="text-xs text-surface-400 block mb-1.5">
+                        <label className={`text-xs block mb-1.5 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                             {isRTL ? 'تاريخ الحدث' : 'Event Date'}
                         </label>
                         <input
@@ -792,13 +795,13 @@ function AddEventModal({ date, initialData, isRTL, onClose, onSave }: {
                                     setEventDate(new Date(year, month - 1, day));
                                 }
                             }}
-                            className="w-full bg-surface-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-primary-500 outline-none"
+                            className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:border-primary-500 outline-none ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-surface-800 border-white/10 text-white'}`}
                         />
                     </div>
 
                     {/* Title Input */}
                     <div>
-                        <label className="text-xs text-surface-400 block mb-1.5">
+                        <label className={`text-xs block mb-1.5 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                             {isRTL ? 'عنوان الحدث' : 'Event Title'}
                         </label>
                         <input
@@ -806,13 +809,13 @@ function AddEventModal({ date, initialData, isRTL, onClose, onSave }: {
                             value={title}
                             onChange={e => setTitle(e.target.value)}
                             placeholder={isRTL ? 'مثال: عشاء رومانسي' : 'e.g., Romantic dinner'}
-                            className="w-full bg-surface-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm placeholder-surface-500 focus:border-primary-500 outline-none"
+                            className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:border-primary-500 outline-none ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400' : 'bg-surface-800 border-white/10 text-white placeholder-surface-500'}`}
                         />
                     </div>
 
                     {/* Type Selection - Compact Grid */}
                     <div>
-                        <label className="text-xs text-surface-400 block mb-1.5">
+                        <label className={`text-xs block mb-1.5 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                             {isRTL ? 'نوع الحدث' : 'Event Type'}
                         </label>
                         <div className="grid grid-cols-3 gap-1.5">
@@ -842,16 +845,16 @@ function AddEventModal({ date, initialData, isRTL, onClose, onSave }: {
 
                     {/* Time Input */}
                     <div>
-                        <label className="text-xs text-surface-400 block mb-1.5">
-                            {isRTL ? 'الوقت' : 'Time'} <span className="text-surface-500">({isRTL ? 'اختياري' : 'optional'})</span>
+                        <label className={`text-xs block mb-1.5 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
+                            {isRTL ? 'الوقت' : 'Time'} <span className={theme === 'light' ? 'text-slate-400' : 'text-surface-500'}>({isRTL ? 'اختياري' : 'optional'})</span>
                         </label>
                         <div className="relative">
-                            <Clock className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500 ${isRTL ? 'right-3' : 'left-3'}`} />
+                            <Clock className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'} ${isRTL ? 'right-3' : 'left-3'}`} />
                             <input
                                 type="time"
                                 value={time}
                                 onChange={e => setTime(e.target.value)}
-                                className={`w-full bg-surface-800 border border-white/10 rounded-lg py-2.5 text-white text-sm focus:border-primary-500 outline-none ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
+                                className={`w-full border rounded-lg py-2.5 text-sm focus:border-primary-500 outline-none ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-surface-800 border-white/10 text-white'} ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
                             />
                         </div>
                     </div>
@@ -859,14 +862,14 @@ function AddEventModal({ date, initialData, isRTL, onClose, onSave }: {
                     {/* Recurring Toggle */}
                     <div
                         onClick={() => setIsRecurring(!isRecurring)}
-                        className={`flex items-center justify-between p-3 bg-surface-800/50 rounded-lg border cursor-pointer transition-all ${isRecurring ? 'border-primary-500/50 bg-primary-500/10' : 'border-white/5 hover:border-white/10'}`}
+                        className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${isRecurring ? 'border-primary-500/50 bg-primary-500/10' : theme === 'light' ? 'bg-slate-50 border-slate-200 hover:border-slate-300' : 'bg-surface-800/50 border-white/5 hover:border-white/10'}`}
                     >
                         <div className="flex items-center gap-2.5">
-                            <div className={`p-1.5 rounded-md ${isRecurring ? 'bg-primary-500/20' : 'bg-white/5'}`}>
-                                <CalendarIcon className={`w-3.5 h-3.5 ${isRecurring ? 'text-primary-400' : 'text-surface-400'}`} />
+                            <div className={`p-1.5 rounded-md ${isRecurring ? 'bg-primary-500/20' : theme === 'light' ? 'bg-slate-100' : 'bg-white/5'}`}>
+                                <CalendarIcon className={`w-3.5 h-3.5 ${isRecurring ? 'text-primary-400' : theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`} />
                             </div>
                             <div>
-                                <p className="text-sm text-white">{isRTL ? 'يتكرر سنوياً' : 'Yearly repeat'}</p>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{isRTL ? 'يتكرر سنوياً' : 'Yearly repeat'}</p>
                             </div>
                         </div>
 
@@ -916,8 +919,9 @@ function AddEventModal({ date, initialData, isRTL, onClose, onSave }: {
 }
 
 // --- Cycle Settings Modal Component ---
-function CycleSettingsModal({ isRTL, lastPeriodDate, cycleLength, saving, onClose, onSave, onDateChange, onCycleLengthChange }: {
+function CycleSettingsModal({ isRTL, theme, lastPeriodDate, cycleLength, saving, onClose, onSave, onDateChange, onCycleLengthChange }: {
     isRTL: boolean;
+    theme: string;
     lastPeriodDate: Date | null;
     cycleLength: number;
     saving: boolean;
@@ -939,13 +943,13 @@ function CycleSettingsModal({ isRTL, lastPeriodDate, cycleLength, saving, onClos
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={e => e.stopPropagation()}
-                className="w-full max-w-sm bg-surface-900 border border-white/10 rounded-2xl p-6"
+                className={`w-full max-w-sm border rounded-2xl p-6 ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-surface-900 border-white/10'}`}
             >
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-rose-500/20 rounded-xl">
-                        <Droplets className="w-5 h-5 text-rose-400" />
+                    <div className={`p-2 rounded-xl ${theme === 'light' ? 'bg-rose-100' : 'bg-rose-500/20'}`}>
+                        <Droplets className={`w-5 h-5 ${theme === 'light' ? 'text-rose-500' : 'text-rose-400'}`} />
                     </div>
-                    <h3 className="text-lg font-bold text-white">
+                    <h3 className={`text-lg font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                         {isRTL ? 'إعدادات الدورة' : 'Cycle Settings'}
                     </h3>
                 </div>
@@ -953,20 +957,20 @@ function CycleSettingsModal({ isRTL, lastPeriodDate, cycleLength, saving, onClos
                 <div className="space-y-4">
                     {/* Last Period Date */}
                     <div>
-                        <label className="text-xs text-surface-400 block mb-2">
+                        <label className={`text-xs block mb-2 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                             {isRTL ? 'تاريخ آخر دورة' : 'Last Period Date'}
                         </label>
                         <input
                             type="date"
                             value={lastPeriodDate?.toISOString().split('T')[0] || ''}
                             onChange={e => onDateChange(e.target.value ? new Date(e.target.value) : null)}
-                            className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary-500 outline-none"
+                            className={`w-full border rounded-xl px-4 py-3 text-sm focus:border-primary-500 outline-none ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-surface-800 border-white/10 text-white'}`}
                         />
                     </div>
 
                     {/* Cycle Length */}
                     <div>
-                        <label className="text-xs text-surface-400 block mb-2">
+                        <label className={`text-xs block mb-2 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                             {isRTL ? 'طول الدورة (أيام)' : 'Cycle Length (days)'}
                         </label>
                         <input
@@ -975,7 +979,7 @@ function CycleSettingsModal({ isRTL, lastPeriodDate, cycleLength, saving, onClos
                             max={35}
                             value={cycleLength}
                             onChange={e => onCycleLengthChange(parseInt(e.target.value) || 28)}
-                            className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary-500 outline-none"
+                            className={`w-full border rounded-xl px-4 py-3 text-sm focus:border-primary-500 outline-none ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-surface-800 border-white/10 text-white'}`}
                         />
                     </div>
 
@@ -983,7 +987,7 @@ function CycleSettingsModal({ isRTL, lastPeriodDate, cycleLength, saving, onClos
                     <div className="flex gap-3 pt-2">
                         <button
                             onClick={onClose}
-                            className="flex-1 py-3 bg-surface-800 text-surface-400 font-medium rounded-xl hover:bg-surface-700 transition-colors"
+                            className={`flex-1 py-3 font-medium rounded-xl transition-colors ${theme === 'light' ? 'bg-slate-100 text-slate-600 hover:bg-slate-200' : 'bg-surface-800 text-surface-400 hover:bg-surface-700'}`}
                         >
                             {isRTL ? 'إلغاء' : 'Cancel'}
                         </button>

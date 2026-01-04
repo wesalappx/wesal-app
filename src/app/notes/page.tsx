@@ -539,13 +539,13 @@ export default function NotesPage() {
                                         placeholder={isRTL ? 'اسم المناسبة' : 'Event name'}
                                         value={newDateTitle}
                                         onChange={e => setNewDateTitle(e.target.value)}
-                                        className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white"
+                                        className={`w-full border rounded-xl px-4 py-3 ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400' : 'bg-surface-800 border-white/10 text-white'}`}
                                     />
                                     <input
                                         type="date"
                                         value={newDateDate}
                                         onChange={e => setNewDateDate(e.target.value)}
-                                        className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white"
+                                        className={`w-full border rounded-xl px-4 py-3 ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-surface-800 border-white/10 text-white'}`}
                                     />
                                     <div className="grid grid-cols-3 gap-2">
                                         {Object.entries(dateTypeConfig).map(([key, config]) => (
@@ -580,14 +580,14 @@ export default function NotesPage() {
                                         placeholder={isRTL ? 'اسم الهدف' : 'Goal name'}
                                         value={newBudgetTitle}
                                         onChange={e => setNewBudgetTitle(e.target.value)}
-                                        className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white"
+                                        className={`w-full border rounded-xl px-4 py-3 ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400' : 'bg-surface-800 border-white/10 text-white'}`}
                                     />
                                     <input
                                         type="number"
                                         placeholder={isRTL ? 'المبلغ المستهدف' : 'Target amount'}
                                         value={newBudgetAmount}
                                         onChange={e => setNewBudgetAmount(e.target.value)}
-                                        className="w-full bg-surface-800 border border-white/10 rounded-xl px-4 py-3 text-white"
+                                        className={`w-full border rounded-xl px-4 py-3 ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400' : 'bg-surface-800 border-white/10 text-white'}`}
                                     />
                                     {editingBudget && (
                                         <div>

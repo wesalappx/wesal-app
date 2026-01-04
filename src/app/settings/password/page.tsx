@@ -6,9 +6,11 @@ import { ArrowRight, Eye, EyeOff, Lock, Check, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { validationMessages, getPasswordStrength } from '@/lib/validation-messages';
 import { useAuth } from '@/hooks/useAuth';
+import { useSettingsStore } from '@/stores/settings-store';
 
 export default function PasswordChangePage() {
     const { updatePassword } = useAuth();
+    const { theme } = useSettingsStore();
 
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -67,14 +69,14 @@ export default function PasswordChangePage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900">
+        <div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}>
             {/* Header */}
-            <header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5">
+            <header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}>
                 <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
-                    <Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <ArrowRight className="w-6 h-6 text-white" />
+                    <Link href="/settings" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}>
+                        <ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} />
                     </Link>
-                    <h1 className="text-xl font-bold text-white">تغيير كلمة المرور</h1>
+                    <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>تغيير كلمة المرور</h1>
                 </div>
             </header>
 
@@ -85,11 +87,11 @@ export default function PasswordChangePage() {
                         animate={{ opacity: 1, scale: 1 }}
                         className="text-center py-12"
                     >
-                        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                            <Check className="w-10 h-10 text-emerald-400" />
+                        <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-emerald-100' : 'bg-emerald-500/20'}`}>
+                            <Check className={`w-10 h-10 ${theme === 'light' ? 'text-emerald-600' : 'text-emerald-400'}`} />
                         </div>
-                        <h2 className="text-2xl font-bold text-white mb-2">تم بنجاح!</h2>
-                        <p className="text-surface-400 mb-8">تم تغيير كلمة المرور بنجاح</p>
+                        <h2 className={`text-2xl font-bold mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>تم بنجاح!</h2>
+                        <p className={`mb-8 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>تم تغيير كلمة المرور بنجاح</p>
                         <Link
                             href="/settings"
                             className="inline-block px-8 py-3 bg-primary-500 hover:bg-primary-600 rounded-xl text-white font-medium transition-colors"
@@ -106,10 +108,10 @@ export default function PasswordChangePage() {
                     >
                         {/* Security Icon */}
                         <div className="text-center mb-8">
-                            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary-500/20 flex items-center justify-center">
-                                <Lock className="w-8 h-8 text-primary-400" />
+                            <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center ${theme === 'light' ? 'bg-primary-100' : 'bg-primary-500/20'}`}>
+                                <Lock className={`w-8 h-8 ${theme === 'light' ? 'text-primary-600' : 'text-primary-400'}`} />
                             </div>
-                            <p className="text-surface-400">أدخل كلمة المرور الجديدة</p>
+                            <p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>أدخل كلمة المرور الجديدة</p>
                         </div>
 
                         {/* Submit Error */}
@@ -121,7 +123,7 @@ export default function PasswordChangePage() {
 
                         {/* New Password */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-surface-300 text-right">
+                            <label className={`block text-sm font-medium text-right ${theme === 'light' ? 'text-slate-700' : 'text-surface-300'}`}>
                                 كلمة المرور الجديدة
                             </label>
                             <div className="relative">
@@ -129,15 +131,15 @@ export default function PasswordChangePage() {
                                     type={showNew ? 'text' : 'password'}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className={`w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border text-white text-right placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all
-                    ${errors.newPassword ? 'border-red-500' : 'border-white/10'}`}
+                                    className={`w-full px-4 py-3 pr-12 rounded-xl border text-right focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all
+                      ${errors.newPassword ? 'border-red-500' : theme === 'light' ? 'bg-white border-slate-200 text-slate-900 placeholder-slate-400' : 'bg-white/5 border-white/10 text-white placeholder-surface-500'}`}
                                     placeholder="أدخل كلمة المرور الجديدة"
                                     dir="rtl"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowNew(!showNew)}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white transition-colors"
+                                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-surface-400 hover:text-white'}`}
                                 >
                                     {showNew ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
@@ -159,7 +161,7 @@ export default function PasswordChangePage() {
                                                         : passwordStrength.score <= 4
                                                             ? 'bg-yellow-500'
                                                             : 'bg-emerald-500'
-                                                    : 'bg-surface-700'
+                                                    : theme === 'light' ? 'bg-slate-200' : 'bg-surface-700'
                                                     }`}
                                             />
                                         ))}
@@ -173,7 +175,7 @@ export default function PasswordChangePage() {
 
                         {/* Confirm Password */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-surface-300 text-right">
+                            <label className={`block text-sm font-medium text-right ${theme === 'light' ? 'text-slate-700' : 'text-surface-300'}`}>
                                 تأكيد كلمة المرور
                             </label>
                             <div className="relative">
@@ -181,15 +183,15 @@ export default function PasswordChangePage() {
                                     type={showConfirm ? 'text' : 'password'}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className={`w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border text-white text-right placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all
-                    ${errors.confirmPassword ? 'border-red-500' : confirmPassword && passwordsMatch ? 'border-emerald-500' : 'border-white/10'}`}
+                                    className={`w-full px-4 py-3 pr-12 rounded-xl border text-right focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all
+                      ${errors.confirmPassword ? 'border-red-500' : confirmPassword && passwordsMatch ? 'border-emerald-500' : theme === 'light' ? 'bg-white border-slate-200 text-slate-900 placeholder-slate-400' : 'bg-white/5 border-white/10 text-white placeholder-surface-500'}`}
                                     placeholder="أعد إدخال كلمة المرور الجديدة"
                                     dir="rtl"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowConfirm(!showConfirm)}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white transition-colors"
+                                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-surface-400 hover:text-white'}`}
                                 >
                                     {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>

@@ -26,7 +26,7 @@ const quickReactions = ['❤️', '😊', '😍', '👏', '🎉', '💕'];
 export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }: DashboardChatProps) {
     const supabase = createClient();
     const { user } = useAuth();
-    const { language } = useSettingsStore();
+    const { language, theme } = useSettingsStore();
     const isRTL = language === 'ar';
 
     const [messages, setMessages] = useState<Message[]>([]);
@@ -151,7 +151,7 @@ export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: '100%', opacity: 0 }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="fixed bottom-0 sm:bottom-4 sm:right-4 w-full sm:w-[380px] h-[70vh] sm:h-[600px] bg-surface-900/95 backdrop-blur-2xl border-t sm:border border-white/15 sm:rounded-3xl rounded-t-[2rem] shadow-2xl overflow-hidden flex flex-col z-50 pointer-events-auto"
+                className={`fixed bottom-0 sm:bottom-4 sm:right-4 w-full sm:w-[380px] h-[70vh] sm:h-[600px] backdrop-blur-2xl border-t sm:border sm:rounded-3xl rounded-t-[2rem] shadow-2xl overflow-hidden flex flex-col z-50 pointer-events-auto ${theme === 'light' ? 'bg-white/95 border-slate-200' : 'bg-surface-900/95 border-white/15'}`}
             >
                 {/* Header */}
                 <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
@@ -160,7 +160,7 @@ export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }
                             {partnerName?.charAt(0) || '💬'}
                         </div>
                         <div>
-                            <h3 className="text-white font-bold text-sm">
+                            <h3 className={`font-bold text-sm ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                 {partnerName || (isRTL ? 'الدردشة' : 'Chat')}
                             </h3>
                             <div className="flex items-center gap-1.5">
@@ -181,7 +181,7 @@ export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }
                 </div>
 
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-surface-900/50">
+                <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900/50'}`}>
                     {messages.length === 0 && !isLoading && (
                         <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-70">
                             <div className="w-20 h-20 rounded-full bg-primary-500/10 flex items-center justify-center">
@@ -231,7 +231,7 @@ export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }
                 </div>
 
                 {/* Input Area */}
-                <div className="p-4 bg-surface-800/80 backdrop-blur-md border-t border-white/10 pb-8 sm:pb-4">
+                <div className={`p-4 backdrop-blur-md border-t pb-8 sm:pb-4 ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-800/80 border-white/10'}`}>
                     <div className="flex items-end gap-2">
                         {/* Reactions */}
                         <div className="relative">

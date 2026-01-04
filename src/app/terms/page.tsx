@@ -39,28 +39,28 @@ export default function TermsOfServicePage() {
                     </div>
 
                     {/* Quick Agreement Notice */}
-                    <div className="p-6 rounded-2xl bg-primary-500/10 border border-primary-500/20">
-                        <h3 className="text-lg font-bold text-primary-300 mb-3 flex items-center gap-2">
+                    <div className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/10 border-primary-500/20'}`}>
+                        <h3 className={`text-lg font-bold mb-3 flex items-center gap-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}>
                             <AlertCircle className="w-5 h-5" />
                             موافقتك
                         </h3>
-                        <p className="text-surface-200">
-                            باستخدامك لتطبيق <strong className="text-white">وصال</strong>، فإنك توافق على هذه الشروط.
+                        <p className={theme === 'light' ? 'text-slate-600' : 'text-surface-200'}>
+                            باستخدامك لتطبيق <strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>وصال</strong>، فإنك توافق على هذه الشروط.
                             يرجى قراءتها بعناية. إذا كنت لا توافق، يُرجى عدم استخدام التطبيق.
                         </p>
                     </div>
 
                     {/* Section 1: Eligibility */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">1. الأهلية</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>1. الأهلية</h3>
 
-                        <div className="space-y-4 text-surface-200">
-                            <div className="flex items-start gap-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                                <CheckCircle className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+                        <div className={`space-y-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
+                            <div className={`flex items-start gap-3 p-4 rounded-xl border ${theme === 'light' ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-500/10 border-emerald-500/20'}`}>
+                                <CheckCircle className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme === 'light' ? 'text-emerald-500' : 'text-emerald-400'}`} />
                                 <div>
-                                    <p className="font-bold text-emerald-300 mb-1">يجب أن تكون:</p>
-                                    <ul className="list-disc list-inside space-y-1 mr-4 text-surface-300">
-                                        <li>عمرك <strong className="text-white">18 عاماً أو أكثر</strong></li>
+                                    <p className={`font-bold mb-1 ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-300'}`}>يجب أن تكون:</p>
+                                    <ul className={`list-disc list-inside space-y-1 mr-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>
+                                        <li>عمرك <strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>18 عاماً أو أكثر</strong></li>
                                         <li>متزوج/ـة أو مخطوب/ـة</li>
                                         <li>مقيم/ـة في المملكة العربية السعودية</li>
                                         <li>قادر/ـة قانونياً على الدخول في عقود ملزمة</li>
@@ -68,11 +68,11 @@ export default function TermsOfServicePage() {
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-                                <XCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+                            <div className={`flex items-start gap-3 p-4 rounded-xl border ${theme === 'light' ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20'}`}>
+                                <XCircle className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme === 'light' ? 'text-red-500' : 'text-red-400'}`} />
                                 <div>
-                                    <p className="font-bold text-red-300 mb-1">غير مسموح للقُصَّر:</p>
-                                    <p className="text-surface-300">
+                                    <p className={`font-bold mb-1 ${theme === 'light' ? 'text-red-700' : 'text-red-300'}`}>غير مسموح للقُصَّر:</p>
+                                    <p className={theme === 'light' ? 'text-slate-600' : 'text-surface-300'}>
                                         لا يُسمح لمن هم دون 18 عاماً باستخدام التطبيق. نحتفظ بالحق في طلب إثبات العمر.
                                     </p>
                                 </div>
@@ -81,93 +81,93 @@ export default function TermsOfServicePage() {
                     </section>
 
                     {/* Section 2: Account Responsibilities */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">2. مسؤوليات الحساب</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>2. مسؤوليات الحساب</h3>
 
-                        <ul className="space-y-3 text-surface-200">
+                        <ul className={`space-y-3 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">•</span>
-                                <span><strong className="text-white">دقة المعلومات:</strong> يجب تقديم معلومات صحيحة عند التسجيل</span>
+                                <span className="text-primary-500 font-bold">•</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>دقة المعلومات:</strong> يجب تقديم معلومات صحيحة عند التسجيل</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">•</span>
-                                <span><strong className="text-white">سرية كلمة المرور:</strong> أنت مسؤول عن حماية كلمة مرورك</span>
+                                <span className="text-primary-500 font-bold">•</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>سرية كلمة المرور:</strong> أنت مسؤول عن حماية كلمة مرورك</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">•</span>
-                                <span><strong className="text-white">حساب واحد فقط:</strong> لكل شخص حساب واحد فقط</span>
+                                <span className="text-primary-500 font-bold">•</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>حساب واحد فقط:</strong> لكل شخص حساب واحد فقط</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">•</span>
-                                <span><strong className="text-white">الإبلاغ عن الاختراق:</strong> أخبرنا فوراً إذا شككت في اختراق حسابك</span>
+                                <span className="text-primary-500 font-bold">•</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>الإبلاغ عن الاختراق:</strong> أخبرنا فوراً إذا شككت في اختراق حسابك</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">•</span>
-                                <span><strong className="text-white">المسؤولية:</strong> أنت مسؤول عن جميع الأنشطة تحت حسابك</span>
+                                <span className="text-primary-500 font-bold">•</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>المسؤولية:</strong> أنت مسؤول عن جميع الأنشطة تحت حسابك</span>
                             </li>
                         </ul>
 
-                        <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                            <p className="text-amber-200 text-sm">
+                        <div className={`mt-6 p-4 rounded-xl border ${theme === 'light' ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20'}`}>
+                            <p className={`text-sm ${theme === 'light' ? 'text-amber-700' : 'text-amber-200'}`}>
                                 <strong>تنبيه:</strong> مشاركة حسابك مع أشخاص آخرين غير شريكك محظورة وقد تؤدي لإيقاف الحساب.
                             </p>
                         </div>
                     </section>
 
                     {/* Section 3: Acceptable Use */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">3. الاستخدام المقبول</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>3. الاستخدام المقبول</h3>
 
                         <div className="space-y-6">
                             <div>
-                                <h4 className="font-bold text-emerald-300 mb-3 flex items-center gap-2">
+                                <h4 className={`font-bold mb-3 flex items-center gap-2 ${theme === 'light' ? 'text-emerald-600' : 'text-emerald-300'}`}>
                                     <CheckCircle className="w-5 h-5" />
                                     مسموح:
                                 </h4>
-                                <ul className="space-y-2 text-surface-200 mr-6">
+                                <ul className={`space-y-2 mr-6 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-emerald-400">✓</span>
+                                        <span className="text-emerald-500">✓</span>
                                         <span>استخدام التطبيق لتحسين علاقتك الزوجية</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-emerald-400">✓</span>
+                                        <span className="text-emerald-500">✓</span>
                                         <span>الربط مع شريك حياتك الشرعي</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-emerald-400">✓</span>
+                                        <span className="text-emerald-500">✓</span>
                                         <span>مشاركة ملاحظات ومقترحات لتحسين التطبيق</span>
                                     </li>
                                 </ul>
                             </div>
 
                             <div>
-                                <h4 className="font-bold text-red-300 mb-3 flex items-center gap-2">
+                                <h4 className={`font-bold mb-3 flex items-center gap-2 ${theme === 'light' ? 'text-red-600' : 'text-red-300'}`}>
                                     <XCircle className="w-5 h-5" />
                                     محظور:
                                 </h4>
-                                <ul className="space-y-2 text-surface-200 mr-6">
+                                <ul className={`space-y-2 mr-6 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-red-400">✗</span>
+                                        <span className="text-red-500">✗</span>
                                         <span>استخدام التطبيق لأغراض غير شرعية أو غير أخلاقية</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-red-400">✗</span>
+                                        <span className="text-red-500">✗</span>
                                         <span>محاولة اختراق أو إساءة استخدام النظام</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-red-400">✗</span>
+                                        <span className="text-red-500">✗</span>
                                         <span>انتحال شخصية الآخرين أو تقديم معلومات مزيفة</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-red-400">✗</span>
+                                        <span className="text-red-500">✗</span>
                                         <span>بيع أو نقل حسابك لشخص آخر</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-red-400">✗</span>
+                                        <span className="text-red-500">✗</span>
                                         <span>استخدام أدوات آلية (bots) أو برامج ضارة</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-red-400">✗</span>
+                                        <span className="text-red-500">✗</span>
                                         <span>نسخ أو إعادة إنتاج محتوى التطبيق دون إذن</span>
                                     </li>
                                 </ul>
@@ -176,20 +176,20 @@ export default function TermsOfServicePage() {
                     </section>
 
                     {/* Section 4: Content and IP */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">4. المحتوى والملكية الفكرية</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>4. المحتوى والملكية الفكرية</h3>
 
-                        <div className="space-y-4 text-surface-200">
+                        <div className={`space-y-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             <div>
-                                <h4 className="font-bold text-white mb-2">محتوى التطبيق:</h4>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>محتوى التطبيق:</h4>
                                 <p>
-                                    جميع المحتويات (الألعاب، الرحلات، النصوص، التصاميم) هي ملك حصري لـ <strong className="text-white">وصال</strong>
+                                    جميع المحتويات (الألعاب، الرحلات، النصوص، التصاميم) هي ملك حصري لـ <strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>وصال</strong>
                                     ومحمية بموجب قوانين حقوق النشر السعودية والدولية.
                                 </p>
                             </div>
 
                             <div>
-                                <h4 className="font-bold text-white mb-2">محتواك الشخصي:</h4>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>محتواك الشخصي:</h4>
                                 <ul className="list-disc list-inside space-y-1 mr-4">
                                     <li>تحتفظ بملكية بياناتك الشخصية</li>
                                     <li>تمنحنا ترخيصاً لاستخدام بياناتك لتحسين الخدمة (بشكل مجهول)</li>
@@ -197,8 +197,8 @@ export default function TermsOfServicePage() {
                                 </ul>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                                <p className="text-blue-200 text-sm">
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20'}`}>
+                                <p className={`text-sm ${theme === 'light' ? 'text-blue-700' : 'text-blue-200'}`}>
                                     <strong>AI المستخدم:</strong> نستخدم تقنيات الذكاء الاصطناعي (DeepSeek) لتقديم نصائح شخصية.
                                     جميع الاستشارات مجهولة الهوية ولا ترتبط بهويتك الحقيقية.
                                 </p>
@@ -207,12 +207,12 @@ export default function TermsOfServicePage() {
                     </section>
 
                     {/* Section 5: Premium Subscription */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">5. الاشتراك المدفوع</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>5. الاشتراك المدفوع</h3>
 
-                        <div className="space-y-4 text-surface-200">
+                        <div className={`space-y-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             <div>
-                                <h4 className="font-bold text-white mb-2">الأسعار والفواتير:</h4>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>الأسعار والفواتير:</h4>
                                 <ul className="list-disc list-inside space-y-1 mr-4">
                                     <li>الأسعار بالريال السعودي (SAR) وشاملة ضريبة القيمة المضافة</li>
                                     <li>الدفع عبر Moyasar (بوابة دفع سعودية معتمدة)</li>
@@ -222,44 +222,44 @@ export default function TermsOfServicePage() {
                             </div>
 
                             <div>
-                                <h4 className="font-bold text-white mb-2">الإلغاء:</h4>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>الإلغاء:</h4>
                                 <p>
                                     يمكنك إلغاء اشتراكك في أي وقت من الإعدادات. سيستمر الاشتراك حتى نهاية الفترة المدفوعة.
                                 </p>
                             </div>
 
                             <div>
-                                <h4 className="font-bold text-white mb-2">فترة السماح:</h4>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>فترة السماح:</h4>
                                 <p>
-                                    نوفر فترة سماح <strong className="text-white">3 أيام</strong> بعد فشل الدفع قبل إيقاف الميزات المميزة.
+                                    نوفر فترة سماح <strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>3 أيام</strong> بعد فشل الدفع قبل إيقاف الميزات المميزة.
                                 </p>
                             </div>
                         </div>
                     </section>
 
                     {/* Section 6: Disclaimers */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">6. إخلاء المسؤولية</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>6. إخلاء المسؤولية</h3>
 
                         <div className="space-y-4">
-                            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                                <h4 className="font-bold text-amber-300 mb-2">النصائح والمشورة:</h4>
-                                <p className="text-amber-200 text-sm">
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20'}`}>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-amber-700' : 'text-amber-300'}`}>النصائح والمشورة:</h4>
+                                <p className={`text-sm ${theme === 'light' ? 'text-amber-600' : 'text-amber-200'}`}>
                                     المشورة المقدمة عبر التطبيق <strong>ليست بديلاً</strong> عن الاستشارة المهنية من مختص أسري أو نفسي.
                                     في حالات الأزمات الخطيرة، يُرجى طلب المساعدة المتخصصة.
                                 </p>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-                                <h4 className="font-bold text-red-300 mb-2">عدم الضمان:</h4>
-                                <p className="text-red-200 text-sm">
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20'}`}>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-red-700' : 'text-red-300'}`}>عدم الضمان:</h4>
+                                <p className={`text-sm ${theme === 'light' ? 'text-red-600' : 'text-red-200'}`}>
                                     نقدم التطبيق "كما هو" دون أي ضمانات صريحة أو ضمنية. لا نضمن نتائج معينة من استخدام التطبيق.
                                 </p>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                                <h4 className="font-bold text-blue-300 mb-2">تحديد المسؤولية:</h4>
-                                <p className="text-blue-200 text-sm">
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20'}`}>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-blue-700' : 'text-blue-300'}`}>تحديد المسؤولية:</h4>
+                                <p className={`text-sm ${theme === 'light' ? 'text-blue-600' : 'text-blue-200'}`}>
                                     لن نكون مسؤولين عن أي أضرار غير مباشرة أو تبعية ناتجة عن استخدام التطبيق.
                                     مسؤوليتنا الإجمالية محدودة بالمبلغ المدفوع للاشتراك.
                                 </p>
@@ -268,17 +268,17 @@ export default function TermsOfServicePage() {
                     </section>
 
                     {/* Section 7: Termination */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">7. إنهاء الخدمة</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>7. إنهاء الخدمة</h3>
 
-                        <div className="space-y-4 text-surface-200">
+                        <div className={`space-y-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             <div>
-                                <h4 className="font-bold text-white mb-2">حقك في الإنهاء:</h4>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>حقك في الإنهاء:</h4>
                                 <p>يمكنك حذف حسابك في أي وقت من: الإعدادات → حذف الحساب</p>
                             </div>
 
                             <div>
-                                <h4 className="font-bold text-white mb-2">حقنا في الإنهاء:</h4>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>حقنا في الإنهاء:</h4>
                                 <p className="mb-2">يحق لنا إيقاف أو حذف حسابك إذا:</p>
                                 <ul className="list-disc list-inside space-y-1 mr-4">
                                     <li>انتهكت هذه الشروط</li>
@@ -288,25 +288,25 @@ export default function TermsOfServicePage() {
                                 </ul>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-surface-800/50">
-                                <p className="text-surface-300 text-sm">
-                                    <strong className="text-white">ملاحظة:</strong> في حالة الإيقاف لانتهاك الشروط، لن يتم استرداد المبالغ المدفوعة.
+                            <div className={`p-4 rounded-xl ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-800/50'}`}>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>
+                                    <strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>ملاحظة:</strong> في حالة الإيقاف لانتهاك الشروط، لن يتم استرداد المبالغ المدفوعة.
                                 </p>
                             </div>
                         </div>
                     </section>
 
                     {/* Section 8: Governing Law */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">8. القانون الحاكم</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>8. القانون الحاكم</h3>
 
-                        <p className="text-surface-200 mb-4">
-                            تخضع هذه الشروط وتفسر وفقاً لـ <strong className="text-white">قوانين المملكة العربية السعودية</strong>.
+                        <p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
+                            تخضع هذه الشروط وتفسر وفقاً لـ <strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>قوانين المملكة العربية السعودية</strong>.
                         </p>
 
-                        <div className="p-4 rounded-xl bg-surface-800/50 border border-surface-700">
-                            <h4 className="font-bold text-white mb-2">حل النزاعات:</h4>
-                            <p className="text-surface-300 text-sm">
+                        <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-surface-800/50 border-surface-700'}`}>
+                            <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>حل النزاعات:</h4>
+                            <p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>
                                 في حالة نشوء أي نزاع، نشجع التواصل معنا أولاً لحله ودياً.
                                 إذا لم يتم التوصل لحل، يتم الاحتكام للجهات القضائية المختصة في المملكة.
                             </p>
@@ -314,49 +314,49 @@ export default function TermsOfServicePage() {
                     </section>
 
                     {/* Section 9: Changes to Terms */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">9. التعديلات على الشروط</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>9. التعديلات على الشروط</h3>
 
-                        <p className="text-surface-200 mb-4">
+                        <p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             نحتفظ بالحق في تعديل هذه الشروط في أي وقت. التعديلات الجوهرية سنخطرك بها عبر:
                         </p>
 
-                        <ul className="space-y-2 text-surface-200">
+                        <ul className={`space-y-2 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400">→</span>
+                                <span className="text-primary-500">→</span>
                                 <span>إشعار داخل التطبيق</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400">→</span>
+                                <span className="text-primary-500">→</span>
                                 <span>رسالة على البريد الإلكتروني</span>
                             </li>
                         </ul>
 
-                        <p className="text-surface-200 mt-4">
+                        <p className={`mt-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             استمرارك في استخدام التطبيق بعد التعديلات يعني موافقتك عليها.
                         </p>
                     </section>
 
                     {/* Contact Section */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                            <Heart className="w-6 h-6 text-primary-400" />
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 flex items-center gap-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                            <Heart className={`w-6 h-6 ${theme === 'light' ? 'text-pink-500' : 'text-primary-400'}`} />
                             تواصل معنا
                         </h3>
-                        <p className="text-surface-200 mb-4">
+                        <p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             لأي استفسارات حول هذه الشروط:
                         </p>
-                        <div className="p-4 rounded-xl bg-surface-800/50">
-                            <p className="text-surface-300"><strong className="text-white">البريد الإلكتروني:</strong> support@wesal.sa</p>
-                            <p className="text-surface-300 mt-2"><strong className="text-white">الرد خلال:</strong> 48 ساعة عمل</p>
+                        <div className={`p-4 rounded-xl ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-800/50'}`}>
+                            <p className={theme === 'light' ? 'text-slate-600' : 'text-surface-300'}><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>البريد الإلكتروني:</strong> support@wesal.sa</p>
+                            <p className={`mt-2 ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>الرد خلال:</strong> 48 ساعة عمل</p>
                         </div>
                     </section>
 
                     {/* Final Note */}
-                    <div className="p-6 rounded-2xl bg-gradient-to-r from-primary-500/20 to-accent-500/20 border border-primary-500/30 text-center">
-                        <Heart className="w-8 h-8 text-primary-400 mx-auto mb-3" />
-                        <p className="text-white font-bold mb-2">شكراً لثقتك في وصال</p>
-                        <p className="text-surface-300 text-sm">نسعد بأن نكون جزءاً من رحلتكما في بناء علاقة زوجية أقوى وأسعد</p>
+                    <div className={`p-6 rounded-2xl text-center border ${theme === 'light' ? 'bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200' : 'bg-gradient-to-r from-primary-500/20 to-accent-500/20 border-primary-500/30'}`}>
+                        <Heart className={`w-8 h-8 mx-auto mb-3 ${theme === 'light' ? 'text-pink-500' : 'text-primary-400'}`} />
+                        <p className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>شكراً لثقتك في وصال</p>
+                        <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-300'}`}>نسعد بأن نكون جزءاً من رحلتكما في بناء علاقة زوجية أقوى وأسعد</p>
                     </div>
 
                     {/* Back Button */}

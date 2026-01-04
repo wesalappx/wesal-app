@@ -964,8 +964,8 @@ function GameSessionContent() {
                                 {question.phase}
                             </div>
                         )}
-                        <h2 className="text-2xl md:text-3xl font-serif text-white leading-tight" dir="rtl">{question.text}</h2>
-                        <p className="text-surface-400 text-sm">{question.hint}</p>
+                        <h2 className={`text-2xl md:text-3xl font-serif leading-tight ${theme === 'light' ? 'text-slate-800' : 'text-white'}`} dir="rtl">{question.text}</h2>
+                        <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>{question.hint}</p>
 
                         {question.points && question.points.length > 0 && (
                             <div className="bg-surface-800/50 p-5 rounded-2xl border border-surface-700/50 text-right" dir="rtl">
@@ -1002,23 +1002,23 @@ function GameSessionContent() {
     };
 
     return (
-        <main className="min-h-screen bg-surface-900 flex flex-col relative overflow-hidden">
+        <main className={`min-h-screen flex flex-col relative overflow-hidden ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900'}`}>
             {/* Simple Background */}
             <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-96 bg-gradient-to-b from-primary-900/20 to-transparent opacity-50" />
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-full h-96 opacity-50 ${theme === 'light' ? 'bg-gradient-to-b from-primary-100/50 to-transparent' : 'bg-gradient-to-b from-primary-900/20 to-transparent'}`} />
             </div>
 
             {/* Header */}
             <header className="p-4 flex items-center justify-between z-10">
                 <button
                     onClick={() => router.back()}
-                    className="p-2 text-surface-400 hover:text-white transition-colors"
+                    className={`p-2 transition-colors ${theme === 'light' ? 'text-slate-500 hover:text-slate-700' : 'text-surface-400 hover:text-white'}`}
                 >
                     <ArrowLeft className="w-6 h-6 transform rotate-180" />
                 </button>
                 <div className="flex items-center gap-2">
                     {getModeIcon()}
-                    <span className="text-white font-bold text-sm">{getModeTitle()}</span>
+                    <span className={`font-bold text-sm ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{getModeTitle()}</span>
                 </div>
                 <div className="w-10" />
             </header>

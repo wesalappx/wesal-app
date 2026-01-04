@@ -39,34 +39,34 @@ export default function PrivacyPolicyPage() {
                     </div>
 
                     {/* Quick Summary */}
-                    <div className="p-6 rounded-2xl bg-primary-500/10 border border-primary-500/20">
-                        <h3 className="text-lg font-bold text-primary-300 mb-4 flex items-center gap-2">
+                    <div className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/10 border-primary-500/20'}`}>
+                        <h3 className={`text-lg font-bold mb-4 flex items-center gap-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}>
                             <FileText className="w-5 h-5" />
                             ملخص سريع
                         </h3>
-                        <ul className="space-y-3 text-surface-200">
+                        <ul className={`space-y-3 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             <li className="flex items-start gap-3">
-                                <Clock className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" />
-                                <span>حذف تلقائي للبيانات الحساسة بعد <strong className="text-white">7 أيام</strong></span>
+                                <Clock className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme === 'light' ? 'text-pink-500' : 'text-primary-400'}`} />
+                                <span>حذف تلقائي للبيانات الحساسة بعد <strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>7 أيام</strong></span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <Lock className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
-                                <span><strong className="text-white">لا نحفظ</strong> محادثات حل النزاعات أبداً</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>لا نحفظ</strong> محادثات حل النزاعات أبداً</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <Eye className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                                <span>بياناتك مشفرة ومحفوظة في <strong className="text-white">السعودية</strong></span>
+                                <span>بياناتك مشفرة ومحفوظة في <strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>السعودية</strong></span>
                             </li>
                         </ul>
                     </div>
 
                     {/* Section 1: Data Collection */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">1. البيانات التي نجمعها</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>1. البيانات التي نجمعها</h3>
 
-                        <div className="space-y-4 text-surface-200">
+                        <div className={`space-y-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             <div>
-                                <h4 className="font-bold text-white mb-2">بيانات الحساب:</h4>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>بيانات الحساب:</h4>
                                 <ul className="list-disc list-inside space-y-1 mr-4">
                                     <li>الاسم الكامل</li>
                                     <li>البريد الإلكتروني أو رقم الهاتف</li>
@@ -77,7 +77,7 @@ export default function PrivacyPolicyPage() {
                             </div>
 
                             <div>
-                                <h4 className="font-bold text-white mb-2">بيانات الاستخدام:</h4>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>بيانات الاستخدام:</h4>
                                 <ul className="list-disc list-inside space-y-1 mr-4">
                                     <li>التفاعل مع الألعاب والرحلات (تقدم فقط، لا محتوى)</li>
                                     <li>فحوصات الحالة المزاجية اليومية (تحذف بعد 7 أيام)</li>
@@ -87,8 +87,8 @@ export default function PrivacyPolicyPage() {
                             </div>
 
                             <div>
-                                <h4 className="font-bold text-white mb-2">بيانات لا نجمعها أبداً:</h4>
-                                <ul className="list-disc list-inside space-y-1 mr-4 text-emerald-300">
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>بيانات لا نجمعها أبداً:</h4>
+                                <ul className="list-disc list-inside space-y-1 mr-4 text-emerald-500">
                                     <li>محتوى محادثات حل النزاعات</li>
                                     <li>رسائل خاصة بينك وبين شريكك</li>
                                     <li>تفاصيل حميمية من الألعاب</li>
@@ -99,169 +99,169 @@ export default function PrivacyPolicyPage() {
                     </section>
 
                     {/* Section 2: Data Usage */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">2. كيف نستخدم بياناتك</h3>
-                        <ul className="space-y-3 text-surface-200">
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>2. كيف نستخدم بياناتك</h3>
+                        <ul className={`space-y-3 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">•</span>
+                                <span className="text-primary-500 font-bold">•</span>
                                 <span>تقديم خدمات التطبيق (الألعاب، الرحلات، المشورة)</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">•</span>
+                                <span className="text-primary-500 font-bold">•</span>
                                 <span>تحسين التجربة عبر توصيات AI مخصصة</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">•</span>
+                                <span className="text-primary-500 font-bold">•</span>
                                 <span>إرسال إشعارات مهمة (موافقة الشريك، تذكيرات)</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">•</span>
+                                <span className="text-primary-500 font-bold">•</span>
                                 <span>الحفاظ على أمان الحساب</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">•</span>
+                                <span className="text-primary-500 font-bold">•</span>
                                 <span>الامتثال للمتطلبات القانونية</span>
                             </li>
                         </ul>
 
-                        <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                            <p className="text-amber-200 text-sm">
+                        <div className={`mt-6 p-4 rounded-xl border ${theme === 'light' ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20'}`}>
+                            <p className={`text-sm ${theme === 'light' ? 'text-amber-700' : 'text-amber-200'}`}>
                                 <strong>ملاحظة:</strong> لن نبيع أو نشارك بياناتك مع أطراف ثالثة لأغراض تسويقية أبداً.
                             </p>
                         </div>
                     </section>
 
                     {/* Section 3: Data Retention */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">3. مدة الاحتفاظ بالبيانات</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>3. مدة الاحتفاظ بالبيانات</h3>
 
                         <div className="space-y-4">
-                            <div className="p-4 rounded-xl bg-surface-800/50 border border-surface-700">
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-surface-800/50 border-surface-700'}`}>
                                 <div className="flex items-center gap-3 mb-2">
                                     <Clock className="w-5 h-5 text-blue-400" />
-                                    <h4 className="font-bold text-white">فحوصات الحالة المزاجية</h4>
+                                    <h4 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>فحوصات الحالة المزاجية</h4>
                                 </div>
-                                <p className="text-surface-300 text-sm">تحذف تلقائياً بعد <strong className="text-white">7 أيام</strong> من التسجيل</p>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>تحذف تلقائياً بعد <strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>7 أيام</strong> من التسجيل</p>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-surface-800/50 border border-surface-700">
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-surface-800/50 border-surface-700'}`}>
                                 <div className="flex items-center gap-3 mb-2">
                                     <Trash2 className="w-5 h-5 text-emerald-400" />
-                                    <h4 className="font-bold text-white">جلسات حل النزاعات</h4>
+                                    <h4 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>جلسات حل النزاعات</h4>
                                 </div>
-                                <p className="text-surface-300 text-sm">المحتوى <strong className="text-emerald-300">غير محفوظ</strong> - يحذف فوراً بعد انتهاء الجلسة</p>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>المحتوى <strong className="text-emerald-500">غير محفوظ</strong> - يحذف فوراً بعد انتهاء الجلسة</p>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-surface-800/50 border border-surface-700">
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-surface-800/50 border-surface-700'}`}>
                                 <div className="flex items-center gap-3 mb-2">
                                     <FileText className="w-5 h-5 text-purple-400" />
-                                    <h4 className="font-bold text-white">بيانات الحساب والتقدم</h4>
+                                    <h4 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>بيانات الحساب والتقدم</h4>
                                 </div>
-                                <p className="text-surface-300 text-sm">تبقى حتى تحذف حسابك أو تطلب الحذف</p>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>تبقى حتى تحذف حسابك أو تطلب الحذف</p>
                             </div>
                         </div>
                     </section>
 
                     {/* Section 4: PDPL Compliance */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">4. الامتثال لنظام حماية البيانات الشخصية (PDPL)</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>4. الامتثال لنظام حماية البيانات الشخصية (PDPL)</h3>
 
-                        <p className="text-surface-200 mb-4">
+                        <p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             نلتزم التزاماً كاملاً بنظام حماية البيانات الشخصية في المملكة العربية السعودية:
                         </p>
 
-                        <ul className="space-y-3 text-surface-200">
+                        <ul className={`space-y-3 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">✓</span>
-                                <span><strong className="text-white">إقامة البيانات:</strong> جميع بياناتك محفوظة في خوادم داخل المملكة</span>
+                                <span className="text-emerald-500 font-bold">✓</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>إقامة البيانات:</strong> جميع بياناتك محفوظة في خوادم داخل المملكة</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">✓</span>
-                                <span><strong className="text-white">التشفير:</strong> بيانات حساسة مشفرة بمعايير عالمية (AES-256)</span>
+                                <span className="text-emerald-500 font-bold">✓</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>التشفير:</strong> بيانات حساسة مشفرة بمعايير عالمية (AES-256)</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">✓</span>
-                                <span><strong className="text-white">الموافقة الصريحة:</strong> نطلب موافقتك قبل جمع أي بيانات</span>
+                                <span className="text-emerald-500 font-bold">✓</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>الموافقة الصريحة:</strong> نطلب موافقتك قبل جمع أي بيانات</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">✓</span>
-                                <span><strong className="text-white">حق الحذف:</strong> يمكنك حذف حسابك وبياناتك في أي وقت</span>
+                                <span className="text-emerald-500 font-bold">✓</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>حق الحذف:</strong> يمكنك حذف حسابك وبياناتك في أي وقت</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-primary-400 font-bold">✓</span>
-                                <span><strong className="text-white">الشفافية:</strong> نخبرك بوضوح ما نجمعه ولماذا</span>
+                                <span className="text-emerald-500 font-bold">✓</span>
+                                <span><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>الشفافية:</strong> نخبرك بوضوح ما نجمعه ولماذا</span>
                             </li>
                         </ul>
                     </section>
 
                     {/* Section 5: Your Rights */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">5. حقوقك</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>5. حقوقك</h3>
 
                         <div className="grid gap-4">
-                            <div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20">
-                                <h4 className="font-bold text-primary-300 mb-2">حق الوصول</h4>
-                                <p className="text-surface-300 text-sm">يمكنك طلب نسخة من بياناتك في أي وقت</p>
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/5 border-primary-500/20'}`}>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}>حق الوصول</h4>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>يمكنك طلب نسخة من بياناتك في أي وقت</p>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20">
-                                <h4 className="font-bold text-primary-300 mb-2">حق التصحيح</h4>
-                                <p className="text-surface-300 text-sm">تعديل بياناتك الشخصية عبر الإعدادات</p>
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/5 border-primary-500/20'}`}>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}>حق التصحيح</h4>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>تعديل بياناتك الشخصية عبر الإعدادات</p>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20">
-                                <h4 className="font-bold text-primary-300 mb-2">حق الحذف</h4>
-                                <p className="text-surface-300 text-sm">حذف حسابك نهائياً من: الإعدادات → حذف الحساب</p>
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/5 border-primary-500/20'}`}>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}>حق الحذف</h4>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>حذف حسابك نهائياً من: الإعدادات → حذف الحساب</p>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20">
-                                <h4 className="font-bold text-primary-300 mb-2">حق الاعتراض</h4>
-                                <p className="text-surface-300 text-sm">رفض معالجة بياناتك لأغراض معينة</p>
+                            <div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/5 border-primary-500/20'}`}>
+                                <h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}>حق الاعتراض</h4>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>رفض معالجة بياناتك لأغراض معينة</p>
                             </div>
                         </div>
                     </section>
 
                     {/* Section 6: Security */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">6. الأمان</h3>
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>6. الأمان</h3>
 
-                        <p className="text-surface-200 mb-4">
+                        <p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             نستخدم تدابير أمنية صارمة لحماية بياناتك:
                         </p>
 
-                        <ul className="space-y-2 text-surface-200">
+                        <ul className={`space-y-2 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             <li className="flex items-start gap-2">
-                                <span className="text-emerald-400">→</span>
+                                <span className="text-emerald-500">→</span>
                                 <span>تشفير جميع الاتصالات (HTTPS/TLS)</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-emerald-400">→</span>
+                                <span className="text-emerald-500">→</span>
                                 <span>كلمات مرور مشفرة بخوارزمية Argon2 (غير قابلة للفك)</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-emerald-400">→</span>
+                                <span className="text-emerald-500">→</span>
                                 <span>رموز JWT محدودة المدة لمنع الاختراق</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-emerald-400">→</span>
+                                <span className="text-emerald-500">→</span>
                                 <span>مراقبة نشاط غير عادي وإشعارات أمنية</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-emerald-400">→</span>
+                                <span className="text-emerald-500">→</span>
                                 <span>نسخ احتياطية يومية مشفرة</span>
                             </li>
                         </ul>
                     </section>
 
                     {/* Contact Section */}
-                    <section className="glass-card p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">تواصل معنا</h3>
-                        <p className="text-surface-200 mb-4">
+                    <section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}>
+                        <h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>تواصل معنا</h3>
+                        <p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}>
                             لأي استفسارات تتعلق بالخصوصية أو لممارسة حقوقك:
                         </p>
-                        <div className="p-4 rounded-xl bg-surface-800/50">
-                            <p className="text-surface-300"><strong className="text-white">البريد الإلكتروني:</strong> privacy@wesal.sa</p>
-                            <p className="text-surface-300 mt-2"><strong className="text-white">الرد خلال:</strong> 48 ساعة عمل</p>
+                        <div className={`p-4 rounded-xl ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-800/50'}`}>
+                            <p className={theme === 'light' ? 'text-slate-600' : 'text-surface-300'}><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>البريد الإلكتروني:</strong> privacy@wesal.sa</p>
+                            <p className={`mt-2 ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}><strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}>الرد خلال:</strong> 48 ساعة عمل</p>
                         </div>
                     </section>
 
