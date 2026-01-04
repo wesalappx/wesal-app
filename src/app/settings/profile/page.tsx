@@ -7,11 +7,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { createClient } from '@/lib/supabase/client';
+import { useSettingsStore } from '@/stores/settings-store';
 
 export default function ProfileEditPage() {
     const { user, updateProfile } = useAuth();
     const router = useRouter();
     const supabase = createClient();
+    const { theme } = useSettingsStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [name, setName] = useState('');
@@ -156,14 +158,14 @@ export default function ProfileEditPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900">
+        <div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}>
             {/* Header */}
-            <header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5">
+            <header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}>
                 <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
-                    <Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <ArrowRight className="w-6 h-6 text-white" />
+                    <Link href="/settings" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}>
+                        <ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} />
                     </Link>
-                    <h1 className="text-xl font-bold text-white">تعديل الملف الشخصي</h1>
+                    <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>تعديل الملف الشخصي</h1>
                 </div>
             </header>
 
@@ -171,7 +173,7 @@ export default function ProfileEditPage() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="glass-card p-6 border-surface-700/50"
+                    className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'glass-card border-surface-700/50'}`}
                 >
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Avatar Section */}
@@ -211,7 +213,7 @@ export default function ProfileEditPage() {
                                     )}
                                 </button>
                             </div>
-                            <p className="text-surface-400 text-sm mt-3">اضغط لتغيير الصورة</p>
+                            <p className={`text-sm mt-3 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>اضغط لتغيير الصورة</p>
                             {errors.photo && (
                                 <p className="text-red-400 text-sm mt-2">{errors.photo}</p>
                             )}
@@ -227,7 +229,7 @@ export default function ProfileEditPage() {
 
                         {/* Name Field */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-bold text-surface-300 text-right">
+                            <label className={`block text-sm font-bold text-right ${theme === 'light' ? 'text-slate-700' : 'text-surface-300'}`}>
                                 الاسم المعروض
                             </label>
                             <div className="relative">
@@ -235,8 +237,8 @@ export default function ProfileEditPage() {
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className={`w-full px-4 py-3 pr-12 rounded-xl bg-surface-900/50 border text-white text-right placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all
-                      ${errors.name ? 'border-red-500/50 focus:border-red-500' : 'border-surface-600 focus:border-primary-500'}`}
+                                    className={`w-full px-4 py-3 pr-12 rounded-xl border text-right placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all
+                      ${errors.name ? 'border-red-500/50 focus:border-red-500' : theme === 'light' ? 'bg-white border-slate-200 text-slate-900' : 'bg-surface-900/50 border-surface-600 text-white'}`}
                                     placeholder="أدخل اسمك"
                                     dir="rtl"
                                 />
@@ -297,8 +299,8 @@ export default function ProfileEditPage() {
                                     type="button"
                                     onClick={() => setGender('male')}
                                     className={`py-3 rounded-xl border font-medium transition-all flex items-center justify-center gap-2 ${gender === 'male'
-                                            ? 'bg-primary-500/20 border-primary-500 text-primary-400'
-                                            : 'bg-surface-800/50 border-surface-600 text-surface-300 hover:bg-surface-700/50'
+                                        ? 'bg-primary-500/20 border-primary-500 text-primary-400'
+                                        : 'bg-surface-800/50 border-surface-600 text-surface-300 hover:bg-surface-700/50'
                                         }`}
                                 >
                                     👨 ذكر
@@ -307,8 +309,8 @@ export default function ProfileEditPage() {
                                     type="button"
                                     onClick={() => setGender('female')}
                                     className={`py-3 rounded-xl border font-medium transition-all flex items-center justify-center gap-2 ${gender === 'female'
-                                            ? 'bg-pink-500/20 border-pink-500 text-pink-400'
-                                            : 'bg-surface-800/50 border-surface-600 text-surface-300 hover:bg-surface-700/50'
+                                        ? 'bg-pink-500/20 border-pink-500 text-pink-400'
+                                        : 'bg-surface-800/50 border-surface-600 text-surface-300 hover:bg-surface-700/50'
                                         }`}
                                 >
                                     👩 أنثى

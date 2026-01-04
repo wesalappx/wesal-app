@@ -7,11 +7,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePairing } from '@/hooks/usePairing';
 import { createClient } from '@/lib/supabase/client';
+import { useSettingsStore } from '@/stores/settings-store';
 
 export default function PartnerPage() {
     const router = useRouter();
     const supabase = createClient();
     const { getStatus } = usePairing();
+    const { theme } = useSettingsStore();
 
     const [showUnpairModal, setShowUnpairModal] = useState(false);
     const [isUnpairing, setIsUnpairing] = useState(false);
@@ -73,14 +75,14 @@ export default function PartnerPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900">
+        <div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}>
             {/* Header */}
-            <header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5">
+            <header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}>
                 <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
-                    <Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <ArrowRight className="w-6 h-6 text-white" />
+                    <Link href="/settings" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}>
+                        <ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} />
                     </Link>
-                    <h1 className="text-xl font-bold text-white">إدارة الربط</h1>
+                    <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>إدارة الربط</h1>
                 </div>
             </header>
 

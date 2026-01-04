@@ -20,7 +20,7 @@ interface DynamicPricing {
 }
 
 export default function UpgradePage() {
-    const { language } = useSettingsStore();
+    const { language, theme } = useSettingsStore();
     const isRTL = language === 'ar';
 
     const {
@@ -140,13 +140,13 @@ export default function UpgradePage() {
     // Already premium
     if (isPremium) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900">
-                <header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5">
+            <div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}>
+                <header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}>
                     <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
-                        <Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                            <ArrowRight className={`w-6 h-6 text-white ${!isRTL && 'rotate-180'}`} />
+                        <Link href="/settings" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}>
+                            <ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'} ${!isRTL && 'rotate-180'}`} />
                         </Link>
-                        <h1 className="text-xl font-bold text-white">{isRTL ? 'الاشتراك' : 'Subscription'}</h1>
+                        <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{isRTL ? 'الاشتراك' : 'Subscription'}</h1>
                     </div>
                 </header>
 
@@ -155,17 +155,17 @@ export default function UpgradePage() {
                         <Crown className="w-12 h-12 text-white" />
                     </div>
 
-                    <h2 className="text-3xl font-bold text-white mb-3">
+                    <h2 className={`text-3xl font-bold mb-3 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                         {isRTL ? 'أنت مشترك Premium! 🎉' : 'You\'re Premium! 🎉'}
                     </h2>
 
-                    <p className="text-surface-300 mb-8">
+                    <p className={`mb-8 ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>
                         {isRTL
                             ? 'لديك وصول كامل لجميع المميزات. شكراً لدعمك!'
                             : 'You have full access to all features. Thank you for your support!'}
                     </p>
 
-                    <div className="glass-card p-6 text-right">
+                    <div className={`p-6 rounded-2xl border text-right ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'glass-card'}`}>
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-surface-400">{isRTL ? 'الخطة' : 'Plan'}</span>
                             <span className="text-white font-bold">{currentPlan?.name[language] || 'Premium'}</span>

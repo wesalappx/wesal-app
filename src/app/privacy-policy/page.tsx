@@ -3,17 +3,20 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, Shield, Clock, Trash2, Eye, Lock, FileText } from 'lucide-react';
+import { useSettingsStore } from '@/stores/settings-store';
 
 export default function PrivacyPolicyPage() {
+    const { theme } = useSettingsStore();
+
     return (
-        <div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900">
+        <div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}>
             {/* Header */}
-            <header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5">
+            <header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}>
                 <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
-                    <Link href="/settings/privacy" className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <ArrowRight className="w-6 h-6 text-white" />
+                    <Link href="/settings/privacy" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}>
+                        <ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} />
                     </Link>
-                    <h1 className="text-xl font-bold text-white">سياسة الخصوصية</h1>
+                    <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>سياسة الخصوصية</h1>
                 </div>
             </header>
 
@@ -25,14 +28,14 @@ export default function PrivacyPolicyPage() {
                 >
                     {/* Hero Section */}
                     <div className="text-center mb-12">
-                        <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-primary-500/20 flex items-center justify-center">
-                            <Shield className="w-10 h-10 text-primary-400" />
+                        <div className={`w-20 h-20 mx-auto mb-6 rounded-3xl flex items-center justify-center ${theme === 'light' ? 'bg-primary-100' : 'bg-primary-500/20'}`}>
+                            <Shield className={`w-10 h-10 ${theme === 'light' ? 'text-primary-600' : 'text-primary-400'}`} />
                         </div>
-                        <h2 className="text-3xl font-bold text-white mb-3">خصوصيتك أولويتنا</h2>
-                        <p className="text-surface-300 text-lg">
+                        <h2 className={`text-3xl font-bold mb-3 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>خصوصيتك أولويتنا</h2>
+                        <p className={`text-lg ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>
                             ملتزمون بحماية بياناتك وفقاً لنظام حماية البيانات الشخصية في المملكة العربية السعودية
                         </p>
-                        <p className="text-surface-500 text-sm mt-2">آخر تحديث: ديسمبر 2024</p>
+                        <p className={`text-sm mt-2 ${theme === 'light' ? 'text-slate-500' : 'text-surface-500'}`}>آخر تحديث: ديسمبر 2024</p>
                     </div>
 
                     {/* Quick Summary */}
