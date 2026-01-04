@@ -63,7 +63,8 @@ export default function RegisterPage() {
         setIsLoading(true);
 
         try {
-            const { error: signUpError } = await supabase.auth.signUp({
+            // Step 1: Create account with Supabase
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                 email: formData.email,
                 password: formData.password,
                 options: {
@@ -72,7 +73,7 @@ export default function RegisterPage() {
                         date_of_birth: formData.dateOfBirth,
                         gender: formData.gender,
                     },
-                    emailRedirectTo: `${window.location.origin}/auth/callback`,
+                    // Don't use emailRedirectTo - we'll verify with OTP
                 },
             });
 
@@ -80,10 +81,27 @@ export default function RegisterPage() {
                 console.error('Signup error:', signUpError);
                 setError(getArabicError(signUpError.message));
                 setIsLoading(false);
-            } else {
-                setSuccess(true);
-                setIsLoading(false);
+                return;
             }
+
+            // Step 2: Send OTP verification email
+            const otpRes = await fetch('/api/auth/signup-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: formData.email,
+                    displayName: formData.displayName,
+                }),
+            });
+
+            if (!otpRes.ok) {
+                // Account created but OTP failed - still redirect to verify
+                console.error('OTP send failed, but account created');
+            }
+
+            // Redirect to verify page with email param
+            router.push(`/auth/verify?email=${encodeURIComponent(formData.email)}&type=signup`);
+
         } catch (err: unknown) {
             console.error('Registration error:', err);
             setError('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');

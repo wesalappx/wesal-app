@@ -96,52 +96,90 @@ function VerifyContent() {
             return;
         }
 
-        if (!userId) {
+        // For signup verification, we use email
+        if (type === 'signup' && !email) {
+            setError('Invalid verification link');
+            return;
+        }
+
+        // For other types, we use userId
+        if (type !== 'signup' && !userId) {
             setError('Invalid verification link');
             return;
         }
 
         setIsLoading(true);
         try {
-            const result = await api.auth.verifyOtp({
-                userId,
-                code: fullCode,
-                type,
-            }) as any;
+            if (type === 'signup') {
+                // Use our custom signup verification API
+                const res = await fetch('/api/auth/verify-signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp: fullCode }),
+                });
 
-            if (result.accessToken) {
-                setTokens(result.accessToken, result.refreshToken);
-                api.setAccessToken(result.accessToken);
+                const result = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(result.error || 'Verification failed');
+                }
+
+                setIsVerified(true);
+
+                // Redirect to login after verification
+                setTimeout(() => {
+                    router.push('/auth/login?verified=true');
+                }, 2000);
+            } else {
+                // Old flow for other verification types
+                const result = await api.auth.verifyOtp({
+                    userId: userId!,
+                    code: fullCode,
+                    type,
+                }) as any;
+
+                if (result.accessToken) {
+                    setTokens(result.accessToken, result.refreshToken);
+                    api.setAccessToken(result.accessToken);
+                }
+
+                setIsVerified(true);
+
+                setTimeout(() => {
+                    router.push('/onboarding');
+                }, 2000);
             }
-
-            setIsVerified(true);
-
-            // Redirect to onboarding after a short delay
-            setTimeout(() => {
-                router.push('/onboarding');
-            }, 2000);
         } catch (err: any) {
             setError(err.message || 'Verification failed. Please try again.');
-            // Clear code on error
             setCode(['', '', '', '', '', '']);
             const firstInput = document.querySelector('input[data-index="0"]') as HTMLInputElement;
             firstInput?.focus();
         } finally {
             setIsLoading(false);
         }
-    }, [code, userId, type, router, setTokens]);
+    }, [code, userId, email, type, router, setTokens]);
 
     // Resend OTP
     const handleResend = async () => {
-        if (resendCooldown > 0 || !userId) return;
+        if (resendCooldown > 0) return;
 
         setIsResending(true);
         setError('');
 
         try {
-            // TODO: Implement resend OTP API endpoint
-            // For now, just start the cooldown timer
-            setResendCooldown(60); // 60 second cooldown
+            if (type === 'signup' && email) {
+                // Resend signup OTP
+                const res = await fetch('/api/auth/signup-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                });
+
+                if (!res.ok) {
+                    throw new Error('Failed to resend code');
+                }
+            }
+            setResendCooldown(60);
         } catch (err: any) {
             setError('Failed to resend code. Please try again.');
         } finally {
