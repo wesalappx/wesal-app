@@ -17,6 +17,7 @@ import {
 import Link from 'next/link';
 import { useSound } from '@/hooks/useSound';
 import { useAchievements } from '@/hooks/useAchievements';
+import { useSettingsStore } from '@/stores/settings-store';
 
 const iconMap: Record<string, any> = {
     star: Star,
@@ -43,10 +44,11 @@ const gradientMap: Record<string, string> = {
 export default function AchievementsPage() {
     const { playSound } = useSound();
     const { achievements, isLoading } = useAchievements();
+    const { theme } = useSettingsStore();
 
     if (isLoading) {
         return (
-            <main className="min-h-screen flex items-center justify-center">
+            <main className={`min-h-screen flex items-center justify-center ${theme === 'light' ? 'bg-slate-50' : ''}`}>
                 <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
             </main>
         );
@@ -56,25 +58,27 @@ export default function AchievementsPage() {
     const totalCount = achievements.length;
 
     return (
-        <main className="min-h-screen pb-44 p-4">
+        <main className={`min-h-screen pb-44 p-4 ${theme === 'light' ? 'bg-slate-50' : ''}`}>
             {/* Header */}
             <div className="flex items-center justify-between mb-6 pt-4">
-                <Link href="/dashboard" className="p-2 -ml-2 text-surface-400 hover:text-white">
+                <Link href="/dashboard" className={`p-2 -ml-2 ${theme === 'light' ? 'text-slate-400 hover:text-slate-700' : 'text-surface-400 hover:text-white'}`}>
                     <ArrowRight className="w-6 h-6 transform rotate-180" />
                 </Link>
-                <h1 className="text-xl font-bold">الإنجازات</h1>
-                <div className="text-sm text-surface-400">
+                <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>الإنجازات</h1>
+                <div className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                     {unlockedCount}/{totalCount}
                 </div>
             </div>
 
             {/* Progress */}
-            <div className="glass-card p-4 mb-6">
+            <div className={`p-4 mb-6 rounded-2xl border ${theme === 'light'
+                ? 'bg-white border-slate-100 shadow-sm'
+                : 'glass-card border-white/10'}`}>
                 <div className="flex justify-between text-sm mb-2">
-                    <span className="text-primary-400">{Math.round((unlockedCount / totalCount) * 100)}%</span>
-                    <span className="text-surface-400">التقدم الكلي</span>
+                    <span className="text-primary-500">{Math.round((unlockedCount / totalCount) * 100)}%</span>
+                    <span className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}>التقدم الكلي</span>
                 </div>
-                <div className="h-2 bg-surface-700 rounded-full overflow-hidden">
+                <div className={`h-2 rounded-full overflow-hidden ${theme === 'light' ? 'bg-slate-200' : 'bg-surface-700'}`}>
                     <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${(unlockedCount / totalCount) * 100}%` }}
@@ -97,34 +101,36 @@ export default function AchievementsPage() {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: index * 0.05 }}
                             onClick={() => playSound('pop')}
-                            className={`glass-card p-4 text-center relative overflow-hidden transition-transform hover:scale-105 ${!achievement.unlocked ? 'opacity-50' : ''
-                                }`}
+                            className={`p-4 text-center relative overflow-hidden transition-transform hover:scale-105 rounded-2xl border ${!achievement.unlocked ? 'opacity-50' : ''
+                                } ${theme === 'light'
+                                    ? 'bg-white border-slate-100 shadow-sm'
+                                    : 'glass-card border-white/10'}`}
                         >
                             {/* Badge */}
                             <div className={`w-16 h-16 mx-auto mb-3 rounded-xl flex items-center justify-center ${achievement.unlocked
-                                    ? `bg-gradient-to-br ${gradient} shadow-lg`
-                                    : 'bg-surface-700'
+                                ? `bg-gradient-to-br ${gradient} shadow-lg`
+                                : theme === 'light' ? 'bg-slate-100' : 'bg-surface-700'
                                 }`}>
                                 {achievement.unlocked ? (
                                     <Icon className="w-8 h-8 text-white" />
                                 ) : (
-                                    <Lock className="w-6 h-6 text-surface-500" />
+                                    <Lock className={`w-6 h-6 ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`} />
                                 )}
                             </div>
 
-                            <h3 className="font-semibold text-sm mb-1">{achievement.title}</h3>
-                            <p className="text-xs text-surface-400 line-clamp-2">{achievement.description}</p>
+                            <h3 className={`font-semibold text-sm mb-1 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{achievement.title}</h3>
+                            <p className={`text-xs line-clamp-2 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>{achievement.description}</p>
 
                             {/* Progress bar for locked achievements */}
                             {!achievement.unlocked && achievement.target && achievement.progress !== undefined && (
                                 <div className="mt-3">
-                                    <div className="h-1 bg-surface-700 rounded-full overflow-hidden">
+                                    <div className={`h-1 rounded-full overflow-hidden ${theme === 'light' ? 'bg-slate-200' : 'bg-surface-700'}`}>
                                         <div
                                             className="h-full bg-primary-500"
                                             style={{ width: `${(achievement.progress / achievement.target) * 100}%` }}
                                         />
                                     </div>
-                                    <p className="text-xs text-surface-500 mt-1">
+                                    <p className={`text-xs mt-1 ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}>
                                         {achievement.progress}/{achievement.target}
                                     </p>
                                 </div>

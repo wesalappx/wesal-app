@@ -6,10 +6,12 @@ import { Home, Map, Gamepad2, Scale, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSound } from '@/hooks/useSound';
 import { useState, useEffect } from 'react';
+import { useSettingsStore } from '@/stores/settings-store';
 
 export default function BottomNav() {
     const pathname = usePathname();
     const { playSound } = useSound();
+    const { theme } = useSettingsStore();
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -58,7 +60,10 @@ export default function BottomNav() {
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: 100, opacity: 0 }}
                         transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                        className="bg-surface-900/80 backdrop-blur-2xl border border-white/10 rounded-full px-8 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex items-center gap-4 pointer-events-auto max-w-[90vw] ring-1 ring-white/5"
+                        className={`backdrop-blur-2xl border rounded-full px-8 py-3 flex items-center gap-4 pointer-events-auto max-w-[90vw] ${theme === 'light'
+                                ? 'bg-white/90 border-slate-200 shadow-xl shadow-slate-200/50'
+                                : 'bg-surface-900/80 border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] ring-1 ring-white/5'
+                            }`}
                     >
                         {navItems.map((item) => {
                             const isActive = pathname === item.href;
@@ -77,9 +82,16 @@ export default function BottomNav() {
                                         />
                                     )}
 
-                                    <div className={`relative z-10 p-2.5 rounded-xl transition-all duration-300 ${isActive ? 'bg-surface-800 text-white shadow-inner' : 'text-surface-400 group-hover:text-surface-200'}`}>
+                                    <div className={`relative z-10 p-2.5 rounded-xl transition-all duration-300 ${isActive
+                                            ? theme === 'light'
+                                                ? 'bg-slate-100 text-slate-900 shadow-inner'
+                                                : 'bg-surface-800 text-white shadow-inner'
+                                            : theme === 'light'
+                                                ? 'text-slate-400 group-hover:text-slate-600'
+                                                : 'text-surface-400 group-hover:text-surface-200'
+                                        }`}>
                                         <item.icon
-                                            className={`w-6 h-6 transition-all duration-300 ${isActive ? 'text-primary-400 scale-110' : ''
+                                            className={`w-6 h-6 transition-all duration-300 ${isActive ? 'text-primary-500 scale-110' : ''
                                                 }`}
                                         />
                                     </div>
@@ -88,7 +100,7 @@ export default function BottomNav() {
                                         <motion.div
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
-                                            className="w-1.5 h-1.5 bg-primary-400 rounded-full absolute -bottom-1 shadow-[0_0_8px_rgba(244,114,182,0.8)]"
+                                            className="w-1.5 h-1.5 bg-primary-500 rounded-full absolute -bottom-1 shadow-[0_0_8px_rgba(244,114,182,0.8)]"
                                         />
                                     )}
                                 </Link>

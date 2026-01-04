@@ -4,19 +4,21 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, TrendingUp, TrendingDown, Minus, Calendar, Trophy, ChevronRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useProgress } from '@/hooks/useProgress';
+import { useSettingsStore } from '@/stores/settings-store';
 
 const trendConfig = {
-    'Improving': { icon: TrendingUp, color: 'text-green-400', label: 'تحسن' },
-    'Stable': { icon: Minus, color: 'text-blue-400', label: 'مستقر' },
-    'Declining': { icon: TrendingDown, color: 'text-orange-400', label: 'تراجع' },
+    'Improving': { icon: TrendingUp, color: 'text-green-500', label: 'تحسن' },
+    'Stable': { icon: Minus, color: 'text-blue-500', label: 'مستقر' },
+    'Declining': { icon: TrendingDown, color: 'text-orange-500', label: 'تراجع' },
 };
 
 export default function WeeklyProgressPage() {
     const { progress, isLoading } = useProgress();
+    const { theme } = useSettingsStore();
 
     if (isLoading) {
         return (
-            <main className="min-h-screen flex items-center justify-center">
+            <main className={`min-h-screen flex items-center justify-center ${theme === 'light' ? 'bg-slate-50' : ''}`}>
                 <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
             </main>
         );
@@ -24,14 +26,14 @@ export default function WeeklyProgressPage() {
 
     if (!progress) {
         return (
-            <main className="min-h-screen pb-44 p-6 font-sans">
+            <main className={`min-h-screen pb-44 p-6 font-sans ${theme === 'light' ? 'bg-slate-50' : ''}`}>
                 <header className="flex items-center gap-4 mb-8">
-                    <Link href="/dashboard" className="p-2 -ml-2 text-surface-400 hover:text-white transition-colors">
+                    <Link href="/dashboard" className={`p-2 -ml-2 transition-colors ${theme === 'light' ? 'text-slate-400 hover:text-slate-700' : 'text-surface-400 hover:text-white'}`}>
                         <ArrowLeft className="w-6 h-6 transform rotate-180" />
                     </Link>
-                    <h1 className="text-xl font-bold text-white">انعكاس أسبوعي</h1>
+                    <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>انعكاس أسبوعي</h1>
                 </header>
-                <div className="text-center py-12 text-surface-400">
+                <div className={`text-center py-12 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                     <p>لا توجد بيانات كافية</p>
                     <Link href="/check-in" className="btn-primary mt-4 inline-block">
                         سجل حالتك
@@ -42,25 +44,25 @@ export default function WeeklyProgressPage() {
     }
 
     const trendKey = Object.keys(trendConfig).includes(progress.trend) ? progress.trend : 'Stable';
-    const TrendIcon = trendConfig[trendKey].icon;
-    const trendColor = trendConfig[trendKey].color;
-    const trendLabel = trendConfig[trendKey].label;
+    const TrendIcon = trendConfig[trendKey as keyof typeof trendConfig].icon;
+    const trendColor = trendConfig[trendKey as keyof typeof trendConfig].color;
+    const trendLabel = trendConfig[trendKey as keyof typeof trendConfig].label;
 
     return (
-        <main className="min-h-screen pb-44 p-6 font-sans">
+        <main className={`min-h-screen pb-44 p-6 font-sans ${theme === 'light' ? 'bg-slate-50' : ''}`}>
             <header className="flex items-center gap-4 mb-8">
-                <Link href="/dashboard" className="p-2 -ml-2 text-surface-400 hover:text-white transition-colors">
+                <Link href="/dashboard" className={`p-2 -ml-2 transition-colors ${theme === 'light' ? 'text-slate-400 hover:text-slate-700' : 'text-surface-400 hover:text-white'}`}>
                     <ArrowLeft className="w-6 h-6 transform rotate-180" />
                 </Link>
-                <h1 className="text-xl font-bold text-white">انعكاس أسبوعي</h1>
+                <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>انعكاس أسبوعي</h1>
             </header>
 
             {/* Orbital Chart Visualization */}
             <div className="relative h-64 mb-8 flex items-center justify-center">
                 {/* Orbits */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-48 h-48 rounded-full border border-surface-700/30 animate-spin-slow" />
-                    <div className="absolute w-32 h-32 rounded-full border border-surface-700/50" />
+                    <div className={`w-48 h-48 rounded-full border animate-spin-slow ${theme === 'light' ? 'border-slate-200' : 'border-surface-700/30'}`} />
+                    <div className={`absolute w-32 h-32 rounded-full border ${theme === 'light' ? 'border-slate-300' : 'border-surface-700/50'}`} />
                 </div>
 
                 {/* Central Core */}
@@ -83,16 +85,16 @@ export default function WeeklyProgressPage() {
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    className="glass-card p-6"
+                    className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'glass-card border-white/10'}`}
                 >
                     <div className="flex items-center gap-3 mb-2">
-                        <div className={`p-2 rounded-lg ${progress.trend === 'Improving' ? 'bg-green-500/20 text-green-400' : progress.trend === 'Declining' ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                        <div className={`p-2 rounded-lg ${progress.trend === 'Improving' ? 'bg-green-500/20 text-green-500' : progress.trend === 'Declining' ? 'bg-orange-500/20 text-orange-500' : 'bg-blue-500/20 text-blue-500'}`}>
                             <TrendIcon className="w-5 h-5" />
                         </div>
-                        <span className="text-surface-400 text-sm">{progress.week}</span>
+                        <span className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>{progress.week}</span>
                     </div>
                     <p className={`text-lg font-semibold ${trendColor}`}>{trendLabel}</p>
-                    <p className="text-surface-400 text-sm">
+                    <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
                         التركيز هذا الأسبوع: {progress.focus}
                     </p>
                 </motion.div>
@@ -103,22 +105,22 @@ export default function WeeklyProgressPage() {
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.1 }}
-                        className="glass-card p-5 text-center"
+                        className={`p-5 text-center rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'glass-card border-white/10'}`}
                     >
-                        <Trophy className="w-6 h-6 text-amber-400 mx-auto mb-2" />
-                        <p className="text-2xl font-bold">{progress.streak}</p>
-                        <p className="text-xs text-surface-400">يوم متتالي</p>
+                        <Trophy className="w-6 h-6 text-amber-500 mx-auto mb-2" />
+                        <p className={`text-2xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{progress.streak}</p>
+                        <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>يوم متتالي</p>
                     </motion.div>
 
                     <motion.div
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.15 }}
-                        className="glass-card p-5 text-center"
+                        className={`p-5 text-center rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'glass-card border-white/10'}`}
                     >
-                        <Calendar className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-                        <p className="text-2xl font-bold">{progress.sessions}</p>
-                        <p className="text-xs text-surface-400">جلسات</p>
+                        <Calendar className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+                        <p className={`text-2xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{progress.sessions}</p>
+                        <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>جلسات</p>
                     </motion.div>
                 </div>
 
@@ -127,21 +129,24 @@ export default function WeeklyProgressPage() {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="glass-card p-5"
+                    className={`p-5 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'glass-card border-white/10'}`}
                 >
                     <div className="flex items-center justify-between">
-                        <ChevronRight className="w-5 h-5 text-surface-400" />
+                        <ChevronRight className={`w-5 h-5 ${theme === 'light' ? 'text-slate-400' : 'text-surface-400'}`} />
                         <div className="text-right">
-                            <p className="text-sm text-surface-400">تسجيلات الحالة هذا الأسبوع</p>
-                            <p className="text-xl font-bold">{progress.checkIns}</p>
+                            <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>تسجيلات الحالة هذا الأسبوع</p>
+                            <p className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{progress.checkIns}</p>
                         </div>
                     </div>
                 </motion.div>
 
                 {/* Action Link */}
-                <Link href="/insights" className="glass-card p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
-                    <ChevronRight className="w-5 h-5 text-surface-400 transform rotate-180" />
-                    <span className="font-medium">عرض الرؤى التفصيلية</span>
+                <Link href="/insights" className={`p-4 flex items-center justify-between rounded-2xl border transition-colors ${theme === 'light'
+                        ? 'bg-white border-slate-100 shadow-sm hover:bg-slate-50'
+                        : 'glass-card border-white/10 hover:bg-white/5'
+                    }`}>
+                    <ChevronRight className={`w-5 h-5 transform rotate-180 ${theme === 'light' ? 'text-slate-400' : 'text-surface-400'}`} />
+                    <span className={`font-medium ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>عرض الرؤى التفصيلية</span>
                 </Link>
             </div>
         </main>
