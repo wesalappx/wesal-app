@@ -19,6 +19,14 @@ interface DynamicPricing {
     savings: number;
 }
 
+interface ActiveOffer {
+    id: string;
+    name: string;
+    discount_percent: number;
+    valid_until: string;
+    code?: string;
+}
+
 export default function UpgradePage() {
     const { language, theme } = useSettingsStore();
     const isRTL = language === 'ar';
@@ -43,7 +51,10 @@ export default function UpgradePage() {
         savings: 99
     });
 
-    // Fetch dynamic pricing on mount
+    // Active offers state
+    const [activeOffer, setActiveOffer] = useState<ActiveOffer | null>(null);
+
+    // Fetch dynamic pricing and offers on mount
     useEffect(() => {
         const fetchPricing = async () => {
             try {
@@ -56,7 +67,23 @@ export default function UpgradePage() {
                 console.error('Failed to fetch pricing:', err);
             }
         };
+
+        const fetchOffers = async () => {
+            try {
+                const res = await fetch('/api/offers');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.bestOffer) {
+                        setActiveOffer(data.bestOffer);
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to fetch offers:', err);
+            }
+        };
+
         fetchPricing();
+        fetchOffers();
     }, []);
 
     const handleUpgrade = async () => {
@@ -203,6 +230,31 @@ export default function UpgradePage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-8"
                 >
+                    {/* Active Offer Banner */}
+                    {activeOffer && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-purple-600/30 to-pink-600/30 border border-purple-500/30 backdrop-blur-sm"
+                        >
+                            <div className="flex items-center justify-center gap-2 mb-2">
+                                <Sparkles className="w-5 h-5 text-purple-400" />
+                                <span className="text-lg font-bold text-white">{activeOffer.name}</span>
+                            </div>
+                            <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-1">
+                                {activeOffer.discount_percent}% {isRTL ? 'خصم' : 'OFF'}
+                            </div>
+                            {activeOffer.code && (
+                                <div className="inline-block px-3 py-1 rounded-full bg-white/10 text-purple-300 text-sm font-mono">
+                                    {isRTL ? 'الكود: ' : 'Code: '}{activeOffer.code}
+                                </div>
+                            )}
+                            <p className="text-purple-300/70 text-xs mt-2">
+                                {isRTL ? 'ينتهي: ' : 'Expires: '}{new Date(activeOffer.valid_until).toLocaleDateString()}
+                            </p>
+                        </motion.div>
+                    )}
+
                     <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center shadow-xl shadow-amber-500/30">
                         <Crown className="w-10 h-10 text-white" />
                     </div>

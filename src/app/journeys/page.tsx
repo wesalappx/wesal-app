@@ -16,7 +16,9 @@ import {
     Sparkles,
     Heart,
     Users,
-    MessageCircle
+    MessageCircle,
+    Crown,
+    Lock
 } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -27,6 +29,7 @@ import { journeysData, getJourneySteps } from '@/data/journeys';
 import SessionModeModal from '@/components/SessionModeModal';
 import SessionModeIndicator from '@/components/SessionModeIndicator';
 import { useSettingsStore } from '@/stores/settings-store';
+import { useTierLimits } from '@/hooks/useTierLimits';
 
 export default function JourneysPage() {
     const supabase = createClient();
@@ -38,6 +41,7 @@ export default function JourneysPage() {
     const { progressMap, isLoading } = useJourneys();
     const { getStatus } = usePairing();
     const { theme } = useSettingsStore();
+    const { isJourneyAvailable, isPremium } = useTierLimits();
 
     // State
     const [selectedJourneyId, setSelectedJourneyId] = useState<string | null>(null);
@@ -121,11 +125,17 @@ export default function JourneysPage() {
         }
     }, [preferredSessionMode, activeSession, isPaired, isLoading, pairingChecked]);
 
-    // Toggle journey expansion
+    // Toggle journey expansion (or redirect if locked)
     const toggleJourney = useCallback((journeyId: string) => {
+        // Check if journey is locked
+        if (!isJourneyAvailable(journeyId)) {
+            playSound('error');
+            router.push('/settings/upgrade');
+            return;
+        }
         playSound('click');
         setSelectedJourneyId(prev => prev === journeyId ? null : journeyId);
-    }, [playSound]);
+    }, [playSound, isJourneyAvailable, router]);
 
     // Open step modal
     const openStep = useCallback((journeyId: string, stepIndex: number) => {
@@ -330,6 +340,7 @@ export default function JourneysPage() {
                         const isExpanded = selectedJourneyId === journey.id;
                         const steps = getJourneySteps(journey.id);
                         const progressPercent = Math.round((completedSteps / journey.totalSteps) * 100);
+                        const isLocked = !isJourneyAvailable(journey.id);
 
                         return (
                             <motion.div
@@ -364,6 +375,15 @@ export default function JourneysPage() {
                                                 </>
                                             )}
                                         </div>
+
+                                        {/* Premium Lock Badge */}
+                                        {isLocked && (
+                                            <div className="absolute -top-2 -right-2 z-20">
+                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center shadow-lg">
+                                                    <Crown className="w-4 h-4 text-white" />
+                                                </div>
+                                            </div>
+                                        )}
 
                                         {/* Info */}
                                         <div className="flex-1">
