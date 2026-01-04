@@ -73,7 +73,8 @@ export function useTierLimits() {
     useEffect(() => {
         const fetchTier = async () => {
             if (!user) {
-                setTier('premium');
+                // No user = free tier (show locks)
+                setTier('free');
                 setIsLoading(false);
                 return;
             }
@@ -86,11 +87,14 @@ export function useTierLimits() {
                 if (!error && data) {
                     setTier(data as SubscriptionTier);
                 } else {
-                    // Default to free if no subscription found
+                    // RPC failed or no data - default to free to show locks
+                    console.log('Tier check failed, defaulting to free:', error?.message);
                     setTier('free');
                 }
             } catch (err) {
                 console.error('Error fetching tier:', err);
+                // On error, default to free to show locks
+                setTier('free');
             } finally {
                 setIsLoading(false);
             }
