@@ -32,18 +32,23 @@ export async function POST(req: Request) {
             return new NextResponse('Failed to record response', { status: 500 });
         }
 
-        // Trigger AI processing for the final verdict
-        // We can do this asynchronously or simply rely on the background job
-        // For better UX, let's try to trigger it immediately via an internal fetch call if possible
-        // But for now, we'll just return success and let the client assume it's being processed
-        // Ideally, we should call the process API here.
+        // Trigger AI processing for the final verdict immediately
+        try {
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+            await fetch(`${baseUrl}/api/sparks/process`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch (processError) {
+            // Don't fail the response if processing fails - it can be picked up later
+            console.error('Error triggering spark processing:', processError);
+        }
 
-        // TODO: Call /api/sparks/process to analyze the response immediately
-
-        return NextResponse.json({ success: true });
+        return NextResponse.json({ success: true, message: 'Response recorded, AI is analyzing...' });
 
     } catch (error) {
         console.error('Spark response error:', error);
         return new NextResponse('Internal Server Error', { status: 500 });
     }
 }
+

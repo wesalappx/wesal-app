@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import AIProbeCard from '@/components/AIProbeCard';
+import SparkResultCard from '@/components/SparkResultCard';
 import {
     Heart,
     Gamepad2,
@@ -116,6 +117,7 @@ export default function Dashboard() {
     }
 
     const [pendingSparks, setPendingSparks] = useState<any[]>([]);
+    const [mySparks, setMySparks] = useState<any[]>([]);
 
     const greeting = getGreeting();
 
@@ -153,6 +155,17 @@ export default function Dashboard() {
                         .eq('status', 'AI_PROPOSING');
 
                     if (sparks) setPendingSparks(sparks);
+
+                    // Fetch my own sparks (ones I created) to see their status
+                    const { data: myOwnSparks } = await supabase
+                        .from('secret_sparks')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .in('status', ['NEW', 'AI_PROPOSING', 'PARTNER_REPLIED', 'REVEALED', 'SOFT_REJECTED'])
+                        .order('created_at', { ascending: false })
+                        .limit(5);
+
+                    if (myOwnSparks) setMySparks(myOwnSparks);
                 }
             }
 
@@ -507,6 +520,28 @@ export default function Dashboard() {
                         </div>
                     ))}
                 </AnimatePresence>
+
+                {/* My Sparks Status (Requester's view of their own sparks) */}
+                {mySparks.length > 0 && (
+                    <div className="mb-6">
+                        <h3 className={`text-sm font-bold mb-3 ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}>
+                            {language === 'ar' ? '✨ رغباتي السرية' : '✨ My Secret Sparks'}
+                        </h3>
+                        <div className="space-y-3">
+                            {mySparks.map(spark => (
+                                <SparkResultCard
+                                    key={spark.id}
+                                    status={spark.status}
+                                    content={spark.content}
+                                    category={spark.category}
+                                    partnerResponse={spark.partner_response}
+                                    finalVerdict={spark.final_verdict}
+                                    createdAt={spark.created_at}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Daily Whisper - Static */}
                 <div className={`rounded-2xl p-5 mt-4 backdrop-blur-xl border ${theme === 'light' ? 'bg-white/60 border-amber-100 shadow-lg shadow-amber-500/5' : 'bg-surface-800/50 border-surface-700/30'}`}>
