@@ -58,47 +58,63 @@ export async function POST(request: Request) {
         const results = [];
         const errors = [];
 
-        // Process updates
         for (const update of updates) {
             const { key, value } = update;
 
-            console.log(`Updating setting: ${key} = ${value}`);
+            console.log(`Attempting to update setting: ${key} = ${JSON.stringify(value)}`);
 
-            const { data, error: updateError } = await supabase
+            // First try to update existing row
+            const { data: updateData, error: updateError } = await supabase
                 .from('app_settings')
-                .upsert(
-                    {
-                        key,
-                        value,
-                        updated_by: admin.user_id,
-                        updated_at: new Date().toISOString(),
-                    },
-                    { onConflict: 'key' }
-                )
+                .update({
+                    value: value,
+                    updated_at: new Date().toISOString(),
+                })
+                .eq('key', key)
                 .select()
                 .single();
 
-            if (updateError) {
+            if (updateError && updateError.code === 'PGRST116') {
+                // Row doesn't exist, insert it
+                console.log(`Key ${key} doesn't exist, inserting...`);
+                const { data: insertData, error: insertError } = await supabase
+                    .from('app_settings')
+                    .insert({
+                        key,
+                        value: value,
+                        updated_at: new Date().toISOString(),
+                    })
+                    .select()
+                    .single();
+
+                if (insertError) {
+                    console.error(`Error inserting ${key}:`, insertError);
+                    errors.push({ key, error: insertError.message });
+                } else {
+                    console.log(`Successfully inserted ${key}:`, insertData);
+                    results.push(insertData);
+                }
+            } else if (updateError) {
                 console.error(`Error updating ${key}:`, updateError);
                 errors.push({ key, error: updateError.message });
             } else {
-                console.log(`Successfully updated ${key}:`, data);
-                results.push(data);
-
-                // Log action (ignore errors here)
-                await supabase.from('admin_audit_log').insert({
-                    admin_id: admin.id,
-                    action: 'update',
-                    entity_type: 'settings',
-                    entity_id: data?.id,
-                    new_data: { key, value },
-                }).catch(() => { });
+                console.log(`Successfully updated ${key}:`, updateData);
+                results.push(updateData);
             }
+        }
+
+        if (errors.length > 0 && results.length === 0) {
+            return NextResponse.json({
+                success: false,
+                error: 'All updates failed',
+                errors
+            }, { status: 500 });
         }
 
         return NextResponse.json({
             success: true,
             updated: results.length,
+            results,
             errors: errors.length > 0 ? errors : undefined
         });
     } catch (err) {
@@ -106,3 +122,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
     }
 }
+
