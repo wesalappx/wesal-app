@@ -76,7 +76,7 @@ export function useSubscription() {
     }, [fetchSubscription]);
 
     // Start upgrade flow
-    const startUpgrade = async (planId: string = 'premium_monthly') => {
+    const startUpgrade = async (planId: string = 'premium_monthly', promoCode?: string) => {
         if (!user) {
             return { success: false, error: 'Not logged in' };
         }
@@ -94,14 +94,16 @@ export function useSubscription() {
                 return { success: false, error: 'Not paired' };
             }
 
-            // Call payment API
-            const response = await fetch('/api/payments/create', {
+            // Call Lemon Squeezy checkout API
+            const response = await fetch('/api/payments/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     planId,
                     coupleId: coupleData.id,
                     userId: user.id,
+                    email: user.email,
+                    promoCode: promoCode || undefined,
                 }),
             });
 
@@ -111,12 +113,12 @@ export function useSubscription() {
                 return { success: false, error: result.error };
             }
 
-            // Redirect to payment page
-            if (result.paymentUrl) {
-                window.location.href = result.paymentUrl;
+            // Redirect to Lemon Squeezy checkout page
+            if (result.checkoutUrl) {
+                window.location.href = result.checkoutUrl;
             }
 
-            return { success: true, paymentUrl: result.paymentUrl };
+            return { success: true, checkoutUrl: result.checkoutUrl };
 
         } catch (err: any) {
             return { success: false, error: err.message };

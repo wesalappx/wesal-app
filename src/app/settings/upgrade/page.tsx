@@ -42,6 +42,7 @@ export default function UpgradePage() {
     const [selectedPlan, setSelectedPlan] = useState<'premium_monthly' | 'premium_annual'>('premium_monthly');
     const [isUpgrading, setIsUpgrading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [promoCode, setPromoCode] = useState('');
 
     // Dynamic pricing state
     const [pricing, setPricing] = useState<DynamicPricing>({
@@ -90,13 +91,13 @@ export default function UpgradePage() {
         setError(null);
         setIsUpgrading(true);
 
-        const result = await startUpgrade(selectedPlan);
+        const result = await startUpgrade(selectedPlan, promoCode || undefined);
 
         if (!result.success) {
             setError(result.error || (isRTL ? 'حدث خطأ' : 'An error occurred'));
             setIsUpgrading(false);
         }
-        // If successful, user is redirected to payment page
+        // If successful, user is redirected to Lemon Squeezy checkout
     };
 
     // Feature comparison data
@@ -369,6 +370,27 @@ export default function UpgradePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                 >
+                    {/* Promo Code Input */}
+                    <div className="mb-4">
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={promoCode}
+                                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                                placeholder={isRTL ? 'كود الخصم (اختياري)' : 'Promo code (optional)'}
+                                className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-surface-500 focus:border-primary-500 focus:outline-none text-center font-mono"
+                            />
+                        </div>
+                        {activeOffer?.code && (
+                            <button
+                                onClick={() => setPromoCode(activeOffer.code || '')}
+                                className="mt-2 text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                            >
+                                {isRTL ? `استخدم كود: ${activeOffer.code}` : `Use code: ${activeOffer.code}`}
+                            </button>
+                        )}
+                    </div>
+
                     {error && (
                         <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm text-center">
                             {error}
