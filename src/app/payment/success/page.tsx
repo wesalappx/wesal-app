@@ -3,13 +3,11 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { CheckCircle, Crown, Sparkles, ArrowRight } from 'lucide-react';
 import { useSettingsStore } from '@/stores/settings-store';
 import confetti from 'canvas-confetti';
 
 export default function PaymentSuccessPage() {
-    const searchParams = useSearchParams();
     const { language, theme } = useSettingsStore();
     const isRTL = language === 'ar';
     const [showConfetti, setShowConfetti] = useState(false);
@@ -29,8 +27,8 @@ export default function PaymentSuccessPage() {
 
     return (
         <div className={`min-h-screen flex flex-col items-center justify-center p-6 ${theme === 'light'
-                ? 'bg-gradient-to-br from-amber-50 via-white to-yellow-50'
-                : 'bg-gradient-to-br from-surface-900 via-surface-800 to-surface-900'
+            ? 'bg-gradient-to-br from-amber-50 via-white to-yellow-50'
+            : 'bg-gradient-to-br from-surface-900 via-surface-800 to-surface-900'
             }`}>
             <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -78,8 +76,8 @@ export default function PaymentSuccessPage() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
                     className={`p-6 rounded-2xl mb-8 ${theme === 'light'
-                            ? 'bg-white/80 border border-amber-100 shadow-lg'
-                            : 'bg-white/5 border border-white/10'
+                        ? 'bg-white/80 border border-amber-100 shadow-lg'
+                        : 'bg-white/5 border border-white/10'
                         }`}
                 >
                     <div className="flex items-center gap-2 mb-4">
