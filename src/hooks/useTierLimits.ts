@@ -69,6 +69,33 @@ export function useTierLimits() {
     const [isLoading, setIsLoading] = useState(true);
     const [usageCache, setUsageCache] = useState<Record<string, UsageInfo>>({});
 
+    // Dynamic limits from admin dashboard
+    const [dynamicLimits, setDynamicLimits] = useState({
+        ai_chat: { limit: 5, period: 'daily' },
+        conflict_ai: { limit: 2, period: 'weekly' },
+        whisper: { limit: 3, period: 'weekly' }
+    });
+
+    // Fetch dynamic limits from API
+    useEffect(() => {
+        const fetchLimits = async () => {
+            try {
+                const res = await fetch('/api/limits');
+                if (res.ok) {
+                    const data = await res.json();
+                    setDynamicLimits({
+                        ai_chat: { limit: data.ai_chat_daily || 5, period: 'daily' },
+                        conflict_ai: { limit: data.conflict_ai_weekly || 2, period: 'weekly' },
+                        whisper: { limit: data.whisper_weekly || 3, period: 'weekly' }
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to fetch usage limits:', err);
+            }
+        };
+        fetchLimits();
+    }, []);
+
     // Fetch user's tier on mount
     useEffect(() => {
         const fetchTier = async () => {

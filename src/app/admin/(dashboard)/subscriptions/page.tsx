@@ -146,6 +146,13 @@ export default function AdminSubscriptionsPage() {
         code: ''
     });
 
+    // Usage limits state (controlled from admin)
+    const [usageLimits, setUsageLimits] = useState({
+        ai_chat_daily: 5,
+        conflict_ai_weekly: 2,
+        whisper_weekly: 3
+    });
+
     useEffect(() => {
         fetchAllData();
     }, []);
@@ -173,7 +180,7 @@ export default function AdminSubscriptionsPage() {
                 setOffers(data.offers || []);
             }
 
-            // Fetch pricing
+            // Fetch pricing and usage limits
             const pricingRes = await fetch('/api/admin/settings');
             if (pricingRes.ok) {
                 const data = await pricingRes.json();
@@ -182,6 +189,12 @@ export default function AdminSubscriptionsPage() {
                         monthly_price: data.settings.premium_monthly_price || 29,
                         annual_price: data.settings.premium_annual_price || 249,
                         annual_discount_months: data.settings.annual_discount_months || 2
+                    });
+                    // Load usage limits
+                    setUsageLimits({
+                        ai_chat_daily: data.settings.ai_chat_daily_limit || 5,
+                        conflict_ai_weekly: data.settings.conflict_ai_weekly_limit || 2,
+                        whisper_weekly: data.settings.whisper_weekly_limit || 3
                     });
                 }
             }
@@ -228,6 +241,30 @@ export default function AdminSubscriptionsPage() {
         } catch (err) {
             console.error('Error updating pricing:', err);
             alert('Failed to update pricing');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleSaveUsageLimits = async () => {
+        setSaving(true);
+        try {
+            const res = await fetch('/api/admin/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    updates: [
+                        { key: 'ai_chat_daily_limit', value: usageLimits.ai_chat_daily },
+                        { key: 'conflict_ai_weekly_limit', value: usageLimits.conflict_ai_weekly },
+                        { key: 'whisper_weekly_limit', value: usageLimits.whisper_weekly }
+                    ]
+                })
+            });
+            if (!res.ok) throw new Error('Failed to update usage limits');
+            alert('Usage limits updated successfully!');
+        } catch (err) {
+            console.error('Error updating usage limits:', err);
+            alert('Failed to update usage limits');
         } finally {
             setSaving(false);
         }
@@ -398,6 +435,98 @@ export default function AdminSubscriptionsPage() {
                                     {saving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <><Save className="w-5 h-5 mr-2" /> Save Pricing</>}
                                 </Button>
                             </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </motion.div>
+
+            {/* Usage Limits Control */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.05 }}
+            >
+                <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm">
+                    <CardHeader>
+                        <CardTitle className="text-white flex items-center gap-2">
+                            <Clock className="w-5 h-5 text-purple-400" />
+                            Usage Limits (Free Users)
+                        </CardTitle>
+                        <CardDescription className="text-slate-400">
+                            Control daily/weekly usage limits for AI features. Premium users have unlimited access.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* AI Coach Limit */}
+                            <div className="bg-slate-800/30 rounded-xl p-5 border border-slate-800/50">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                        <MessageCircle className="w-5 h-5 text-blue-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-white">AI Coach</p>
+                                        <p className="text-xs text-slate-500">Messages per day</p>
+                                    </div>
+                                </div>
+                                <Input
+                                    type="number"
+                                    min={0}
+                                    value={usageLimits.ai_chat_daily}
+                                    onChange={(e) => setUsageLimits({ ...usageLimits, ai_chat_daily: Number(e.target.value) })}
+                                    className="h-12 bg-slate-900/50 border-slate-700 text-white font-mono text-xl text-center"
+                                />
+                            </div>
+
+                            {/* Conflict AI Limit */}
+                            <div className="bg-slate-800/30 rounded-xl p-5 border border-slate-800/50">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                                        <Zap className="w-5 h-5 text-orange-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-white">Conflict AI</p>
+                                        <p className="text-xs text-slate-500">Sessions per week</p>
+                                    </div>
+                                </div>
+                                <Input
+                                    type="number"
+                                    min={0}
+                                    value={usageLimits.conflict_ai_weekly}
+                                    onChange={(e) => setUsageLimits({ ...usageLimits, conflict_ai_weekly: Number(e.target.value) })}
+                                    className="h-12 bg-slate-900/50 border-slate-700 text-white font-mono text-xl text-center"
+                                />
+                            </div>
+
+                            {/* Whisper Limit */}
+                            <div className="bg-slate-800/30 rounded-xl p-5 border border-slate-800/50">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center">
+                                        <Heart className="w-5 h-5 text-pink-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-white">Whispers</p>
+                                        <p className="text-xs text-slate-500">Per week</p>
+                                    </div>
+                                </div>
+                                <Input
+                                    type="number"
+                                    min={0}
+                                    value={usageLimits.whisper_weekly}
+                                    onChange={(e) => setUsageLimits({ ...usageLimits, whisper_weekly: Number(e.target.value) })}
+                                    className="h-12 bg-slate-900/50 border-slate-700 text-white font-mono text-xl text-center"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end mt-6">
+                            <Button
+                                onClick={handleSaveUsageLimits}
+                                disabled={saving}
+                                className="bg-purple-600 hover:bg-purple-500 text-white font-medium"
+                            >
+                                {saving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <><Save className="w-5 h-5 mr-2" /> Save Limits</>}
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
