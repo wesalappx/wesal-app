@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAuth } from '@/hooks/useAuth';
 import { SUBSCRIPTION_PLANS, formatPrice, getPlanById, SubscriptionTier } from '@/lib/payments';
 
 interface Subscription {
@@ -16,7 +16,7 @@ interface Subscription {
 
 export function useSubscription() {
     const supabase = createClient();
-    const { user } = useAuthStore();
+    const { user } = useAuth();
 
     const [subscription, setSubscription] = useState<Subscription | null>(null);
     const [isLoading, setIsLoading] = useState(true);
