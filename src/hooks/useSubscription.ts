@@ -94,15 +94,14 @@ export function useSubscription() {
                 return { success: false, error: 'Not paired' };
             }
 
-            // Call Lemon Squeezy checkout API
-            const response = await fetch('/api/payments/checkout', {
+            // Call Moyasar payment API
+            const response = await fetch('/api/payments/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     planId,
                     coupleId: coupleData.id,
                     userId: user.id,
-                    email: user.email,
                     promoCode: promoCode || undefined,
                 }),
             });
@@ -113,12 +112,12 @@ export function useSubscription() {
                 return { success: false, error: result.error };
             }
 
-            // Redirect to Lemon Squeezy checkout page
-            if (result.checkoutUrl) {
-                window.location.href = result.checkoutUrl;
+            // Redirect to Moyasar payment page
+            if (result.paymentUrl) {
+                window.location.href = result.paymentUrl;
             }
 
-            return { success: true, checkoutUrl: result.checkoutUrl };
+            return { success: true, paymentUrl: result.paymentUrl };
 
         } catch (err: any) {
             return { success: false, error: err.message };

@@ -423,7 +423,7 @@ export default function UpgradePage() {
                     transition={{ delay: 0.4 }}
                     className="text-center text-surface-500 text-sm space-y-2 mt-6"
                 >
-                    <p>🔒 {isRTL ? 'دفع آمن عبر Lemon Squeezy' : 'Secure payment via Lemon Squeezy'}</p>
+                    <p>🔒 {isRTL ? 'دفع آمن عبر Moyasar' : 'Secure payment via Moyasar'}</p>
                     <p>💳 {isRTL ? 'نقبل مدى، فيزا، ماستركارد' : 'We accept Mada, Visa, Mastercard'}</p>
                     <p>🔄 {isRTL ? 'إلغاء في أي وقت' : 'Cancel anytime'}</p>
                 </motion.div>

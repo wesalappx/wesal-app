@@ -23,8 +23,10 @@ export async function POST(request: NextRequest) {
             }, { status: 503 });
         }
 
-        // Validate plan
+        // Validate plan - updated to match upgrade page pricing
         const plans: Record<string, { amount: number; description: string }> = {
+            'premium_monthly': { amount: 2900, description: 'Wesal Premium - Monthly' }, // 29 SAR in halalas
+            'premium_annual': { amount: 24900, description: 'Wesal Premium - Annual' }, // 249 SAR in halalas
             'premium_lifetime': { amount: 9900, description: 'Wesal Premium - Lifetime' }, // 99 SAR in halalas
         };
 
