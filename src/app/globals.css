@@ -498,6 +498,46 @@
   }
 
   /* Floating hearts background */
+  /* Mesh Gradient Animation */
+  @keyframes gradient-xy {
+
+    0%,
+    100% {
+      background-size: 400% 400%;
+      background-position: 0% 0%;
+    }
+
+    25% {
+      background-size: 400% 400%;
+      background-position: 100% 0%;
+    }
+
+    50% {
+      background-size: 400% 400%;
+      background-position: 100% 100%;
+    }
+
+    75% {
+      background-size: 400% 400%;
+      background-position: 0% 100%;
+    }
+  }
+
+  .animate-gradient-xy {
+    animation: gradient-xy 15s ease infinite;
+  }
+
+  .glass-premium {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  }
+
   .floating-hearts::before,
   .floating-hearts::after {
     content: '💕';
