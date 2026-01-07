@@ -12,7 +12,9 @@ import {
     Shield,
     DollarSign,
     LogOut,
-    Sparkles
+    Sparkles,
+    Gamepad2,
+    Map
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -21,6 +23,8 @@ const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Couples', href: '/admin/couples', icon: Heart },
+    { name: 'Games', href: '/admin/games', icon: Gamepad2 },
+    { name: 'Journeys', href: '/admin/journeys', icon: Map },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { name: 'Content', href: '/admin/content', icon: FileText },
     { name: 'Finance', href: '/admin/subscriptions', icon: DollarSign },

@@ -13,7 +13,13 @@ import {
     MessageSquare,
     MoreVertical,
     Shield,
-    RefreshCw
+    RefreshCw,
+    Ban,
+    Crown,
+    KeyRound,
+    LogOut,
+    Check,
+    X
 } from 'lucide-react';
 
 interface UserData {
@@ -25,6 +31,9 @@ interface UserData {
     isPaired: boolean;
     coupleStatus: string | null;
     checkinCount: number;
+    isBanned?: boolean;
+    isPremium?: boolean;
+    email?: string;
 }
 
 interface Pagination {
@@ -39,10 +48,121 @@ export default function AdminUsersPage() {
     const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, totalPages: 0 });
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
+    const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
+    const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     useEffect(() => {
         fetchUsers();
     }, [pagination.page, search]);
+
+    // Close action menu when clicking outside
+    useEffect(() => {
+        const handleClick = () => setActionMenuOpen(null);
+        if (actionMenuOpen) {
+            document.addEventListener('click', handleClick);
+            return () => document.removeEventListener('click', handleClick);
+        }
+    }, [actionMenuOpen]);
+
+    const fetchUsers = async () => {
+        setLoading(true);
+        try {
+            const params = new URLSearchParams({
+                page: pagination.page.toString(),
+                limit: pagination.limit.toString(),
+                search,
+            });
+            const res = await fetch(`/api/admin/users?${params}`);
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || 'Failed to fetch users');
+            }
+            const data = await res.json();
+            setUsers(data.users);
+            setPagination(data.pagination);
+        } catch (err) {
+            console.error('Error fetching users:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // User Action Handlers
+    const handleBanUser = async (userId: string, currentlyBanned: boolean) => {
+        setActionLoading(userId);
+        try {
+            const res = await fetch('/api/admin/users/ban', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, ban: !currentlyBanned }),
+            });
+            if (res.ok) {
+                setUsers(prev => prev.map(u => u.id === userId ? { ...u, isBanned: !currentlyBanned } : u));
+            }
+        } catch (err) {
+            console.error('Error banning user:', err);
+        } finally {
+            setActionLoading(null);
+            setActionMenuOpen(null);
+        }
+    };
+
+    const handleGrantPremium = async (userId: string, currentlyPremium: boolean) => {
+        setActionLoading(userId);
+        try {
+            const res = await fetch('/api/admin/users/premium', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, grant: !currentlyPremium }),
+            });
+            if (res.ok) {
+                setUsers(prev => prev.map(u => u.id === userId ? { ...u, isPremium: !currentlyPremium } : u));
+            }
+        } catch (err) {
+            console.error('Error granting premium:', err);
+        } finally {
+            setActionLoading(null);
+            setActionMenuOpen(null);
+        }
+    };
+
+    const handleResetPassword = async (userId: string) => {
+        setActionLoading(userId);
+        try {
+            const res = await fetch('/api/admin/users/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }),
+            });
+            if (res.ok) {
+                alert('Password reset email sent!');
+            }
+        } catch (err) {
+            console.error('Error resetting password:', err);
+        } finally {
+            setActionLoading(null);
+            setActionMenuOpen(null);
+        }
+    };
+
+    const handleForceLogout = async (userId: string) => {
+        setActionLoading(userId);
+        try {
+            const res = await fetch('/api/admin/users/force-logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }),
+            });
+            if (res.ok) {
+                alert('User sessions invalidated!');
+            }
+        } catch (err) {
+            console.error('Error forcing logout:', err);
+        } finally {
+            setActionLoading(null);
+            setActionMenuOpen(null);
+        }
+    };
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -202,9 +322,80 @@ export default function AdminUsersPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-white/5 rounded-xl">
-                                                <MoreVertical className="w-4 h-4" />
-                                            </Button>
+                                            <div className="relative">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-slate-400 hover:text-white hover:bg-white/5 rounded-xl"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setActionMenuOpen(actionMenuOpen === user.id ? null : user.id);
+                                                    }}
+                                                >
+                                                    {actionLoading === user.id ? (
+                                                        <RefreshCw className="w-4 h-4 animate-spin" />
+                                                    ) : (
+                                                        <MoreVertical className="w-4 h-4" />
+                                                    )}
+                                                </Button>
+
+                                                {/* Action Dropdown */}
+                                                {actionMenuOpen === user.id && (
+                                                    <div
+                                                        className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-slate-900 border border-white/10 shadow-2xl z-50 overflow-hidden"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        <div className="p-2 border-b border-white/5">
+                                                            <p className="text-xs text-slate-500 px-2">User Actions</p>
+                                                        </div>
+                                                        <div className="p-1">
+                                                            {/* Ban/Unban */}
+                                                            <button
+                                                                onClick={() => handleBanUser(user.id, user.isBanned || false)}
+                                                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${user.isBanned
+                                                                        ? 'text-emerald-400 hover:bg-emerald-500/10'
+                                                                        : 'text-red-400 hover:bg-red-500/10'
+                                                                    }`}
+                                                            >
+                                                                {user.isBanned ? <Check className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                                                                {user.isBanned ? 'Unban User' : 'Ban User'}
+                                                            </button>
+
+                                                            {/* Grant/Revoke Premium */}
+                                                            <button
+                                                                onClick={() => handleGrantPremium(user.id, user.isPremium || false)}
+                                                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${user.isPremium
+                                                                        ? 'text-slate-400 hover:bg-slate-500/10'
+                                                                        : 'text-amber-400 hover:bg-amber-500/10'
+                                                                    }`}
+                                                            >
+                                                                <Crown className="w-4 h-4" />
+                                                                {user.isPremium ? 'Revoke Premium' : 'Grant Premium'}
+                                                            </button>
+
+                                                            <div className="my-1 border-t border-white/5" />
+
+                                                            {/* Reset Password */}
+                                                            <button
+                                                                onClick={() => handleResetPassword(user.id)}
+                                                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/5 transition-colors"
+                                                            >
+                                                                <KeyRound className="w-4 h-4" />
+                                                                Send Password Reset
+                                                            </button>
+
+                                                            {/* Force Logout */}
+                                                            <button
+                                                                onClick={() => handleForceLogout(user.id)}
+                                                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/5 transition-colors"
+                                                            >
+                                                                <LogOut className="w-4 h-4" />
+                                                                Force Logout
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

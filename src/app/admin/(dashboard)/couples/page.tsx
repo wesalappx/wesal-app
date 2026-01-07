@@ -12,7 +12,11 @@ import {
     Calendar,
     RefreshCw,
     Sparkles,
-    User
+    User,
+    MoreVertical,
+    Unlink,
+    Crown,
+    RotateCcw
 } from 'lucide-react';
 
 interface CoupleData {
@@ -37,10 +41,81 @@ export default function AdminCouplesPage() {
     const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, totalPages: 0 });
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState('');
+    const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
+    const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     useEffect(() => {
         fetchCouples();
     }, [pagination.page, statusFilter]);
+
+    // Close action menu when clicking outside
+    useEffect(() => {
+        const handleClick = () => setActionMenuOpen(null);
+        if (actionMenuOpen) {
+            document.addEventListener('click', handleClick);
+            return () => document.removeEventListener('click', handleClick);
+        }
+    }, [actionMenuOpen]);
+
+    // Action handlers
+    const handleUnpair = async (coupleId: string) => {
+        if (!confirm('Are you sure you want to unpair this couple? This cannot be undone.')) return;
+        setActionLoading(coupleId);
+        try {
+            const res = await fetch('/api/admin/couples/unpair', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ coupleId }),
+            });
+            if (res.ok) {
+                setCouples(prev => prev.map(c => c.id === coupleId ? { ...c, status: 'UNPAIRED' } : c));
+            }
+        } catch (err) {
+            console.error('Error unpairing:', err);
+        } finally {
+            setActionLoading(null);
+            setActionMenuOpen(null);
+        }
+    };
+
+    const handleResetStreak = async (coupleId: string) => {
+        if (!confirm('Are you sure you want to reset the streak to 0?')) return;
+        setActionLoading(coupleId);
+        try {
+            const res = await fetch('/api/admin/couples/reset-streak', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ coupleId }),
+            });
+            if (res.ok) {
+                setCouples(prev => prev.map(c => c.id === coupleId ? { ...c, currentStreak: 0 } : c));
+            }
+        } catch (err) {
+            console.error('Error resetting streak:', err);
+        } finally {
+            setActionLoading(null);
+            setActionMenuOpen(null);
+        }
+    };
+
+    const handleGrantPremium = async (coupleId: string) => {
+        setActionLoading(coupleId);
+        try {
+            const res = await fetch('/api/admin/couples/grant-premium', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ coupleId }),
+            });
+            if (res.ok) {
+                alert('Premium granted to couple!');
+            }
+        } catch (err) {
+            console.error('Error granting premium:', err);
+        } finally {
+            setActionLoading(null);
+            setActionMenuOpen(null);
+        }
+    };
 
     const fetchCouples = async () => {
         setLoading(true);
@@ -109,8 +184,8 @@ export default function AdminCouplesPage() {
                         key={filter}
                         onClick={() => setStatusFilter(filter)}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${statusFilter === filter
-                                ? 'bg-primary-500 shadow-lg shadow-primary-500/25 text-white'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            ? 'bg-primary-500 shadow-lg shadow-primary-500/25 text-white'
+                            : 'text-slate-400 hover:text-white hover:bg-white/5'
                             }`}
                     >
                         {filter === '' ? 'All Couples' : filter.charAt(0) + filter.slice(1).toLowerCase()}
@@ -200,9 +275,60 @@ export default function AdminCouplesPage() {
                                     <div className={`px-2.5 py-1 rounded-md border text-xs font-bold ${getStatusStyle(couple.status)}`}>
                                         {couple.status}
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
-                                        <Calendar className="w-3 h-3" />
-                                        {new Date(couple.paired_at).toLocaleDateString()}
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+                                            <Calendar className="w-3 h-3" />
+                                            {new Date(couple.paired_at).toLocaleDateString()}
+                                        </div>
+
+                                        {/* Action Menu */}
+                                        <div className="relative">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setActionMenuOpen(actionMenuOpen === couple.id ? null : couple.id);
+                                                }}
+                                                className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                                            >
+                                                {actionLoading === couple.id ? (
+                                                    <RefreshCw className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <MoreVertical className="w-4 h-4" />
+                                                )}
+                                            </button>
+
+                                            {actionMenuOpen === couple.id && (
+                                                <div
+                                                    className="absolute right-0 bottom-full mb-2 w-48 rounded-xl bg-slate-900 border border-white/10 shadow-2xl z-50 overflow-hidden"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <div className="p-1">
+                                                        <button
+                                                            onClick={() => handleGrantPremium(couple.id)}
+                                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-amber-400 hover:bg-amber-500/10 transition-colors"
+                                                        >
+                                                            <Crown className="w-4 h-4" />
+                                                            Grant Premium
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleResetStreak(couple.id)}
+                                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/5 transition-colors"
+                                                        >
+                                                            <RotateCcw className="w-4 h-4" />
+                                                            Reset Streak
+                                                        </button>
+                                                        <div className="my-1 border-t border-white/5" />
+                                                        <button
+                                                            onClick={() => handleUnpair(couple.id)}
+                                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                                                        >
+                                                            <Unlink className="w-4 h-4" />
+                                                            Unpair Couple
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

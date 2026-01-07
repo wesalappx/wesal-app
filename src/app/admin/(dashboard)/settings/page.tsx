@@ -40,6 +40,22 @@ export default function AdminSettingsPage() {
             color: 'text-slate-400',
             settings: [
                 { key: 'maintenance_mode', label: 'Maintenance Mode', description: 'Enable to put app in maintenance', type: 'toggle', value: false },
+                { key: 'registration_enabled', label: 'Registration Open', description: 'Allow new user registrations', type: 'toggle', value: true },
+                { key: 'min_app_version', label: 'Minimum App Version', description: 'Force update below this version', type: 'text', value: '1.0.0' },
+            ],
+        },
+        {
+            title: 'Features',
+            description: 'Toggle app features',
+            icon: Zap,
+            color: 'text-purple-400',
+            settings: [
+                { key: 'feature_ai_coach', label: 'AI Coach', description: 'Enable AI relationship coach', type: 'toggle', value: true },
+                { key: 'feature_conflict_ai', label: 'Conflict Resolution AI', description: 'Enable conflict resolution feature', type: 'toggle', value: true },
+                { key: 'feature_whispers', label: 'Whispers', description: 'Enable whispers feature', type: 'toggle', value: true },
+                { key: 'feature_games', label: 'Games', description: 'Enable games section', type: 'toggle', value: true },
+                { key: 'feature_journeys', label: 'Journeys', description: 'Enable journeys section', type: 'toggle', value: true },
+                { key: 'feature_insights', label: 'Insights & Analytics', description: 'Enable user insights', type: 'toggle', value: true },
             ],
         },
         {
@@ -50,6 +66,7 @@ export default function AdminSettingsPage() {
             settings: [
                 { key: 'daily_checkin_reminder', label: 'Daily Check-in Reminders', description: 'Send daily reminders to users', type: 'toggle', value: true },
                 { key: 'streak_milestone_notification', label: 'Streak Milestones', description: 'Notify on streak achievements', type: 'toggle', value: true },
+                { key: 'partner_activity_notification', label: 'Partner Activity', description: 'Notify when partner is active', type: 'toggle', value: true },
             ],
         },
         {
@@ -59,6 +76,7 @@ export default function AdminSettingsPage() {
             color: 'text-green-400',
             settings: [
                 { key: 'max_pairing_codes_per_user', label: 'Max Pairing Codes', description: 'Per user limit', type: 'number', value: 3 },
+                { key: 'max_daily_checkins', label: 'Max Daily Check-ins', description: 'Limit check-ins per day', type: 'number', value: 5 },
             ],
         },
     ]);
