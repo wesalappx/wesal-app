@@ -143,24 +143,27 @@ export default function LoginPage() {
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center p-4 font-sans">
-            {/* Background */}
-            <div className="fixed inset-0 overflow-hidden -z-10">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-500/20 rounded-full blur-3xl" />
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-500/20 rounded-full blur-3xl" />
+        <main className="min-h-screen flex items-center justify-center p-4 font-sans relative overflow-hidden">
+            {/* Vibrant Mesh Gradient Background */}
+            <div className="fixed inset-0 pointer-events-none -z-10">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/80 via-purple-50/50 to-rose-50/80 animate-gradient-xy" />
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
+                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000" />
             </div>
 
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-md relative z-10 text-center">
                 {/* Logo */}
-                <div className="text-center mb-8">
-                    <Link href="/" className="inline-flex items-center gap-2">
-                        <img src="/wesal-logo.svg" alt="وصال" className="w-12 h-12" />
-                        <span className="text-2xl font-bold">وصال</span>
+                <div className="mb-8 inline-block animate-float">
+                    <Link href="/" className="inline-flex flex-col items-center gap-2 group">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform duration-300">
+                            <img src="/wesal-logo.svg" alt="وصال" className="w-10 h-10 invert brightness-0 text-white" />
+                        </div>
+                        <span className="text-2xl font-bold text-slate-900 group-hover:text-violet-700 transition-colors">وصال</span>
                     </Link>
                 </div>
 
                 {/* Form Card */}
-                <div className="glass-card p-8">
+                <div className="bg-white/60 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/80 shadow-[0_20px_40px_rgba(0,0,0,0.05)] text-right">
                     <h1 className="text-2xl font-bold text-center mb-2">أهلاً بعودتك</h1>
                     <p className="text-surface-400 text-center mb-8">
                         استمر في رحلتك مع شريك حياتك
@@ -176,12 +179,12 @@ export default function LoginPage() {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-medium mb-2 text-right">البريد الإلكتروني</label>
-                            <div className="relative">
-                                <Mail className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.email ? 'text-red-400' : 'text-surface-400'}`} />
+                            <label className="block text-sm font-bold mb-2 text-right text-slate-700">البريد الإلكتروني</label>
+                            <div className="relative group">
+                                <Mail className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${fieldErrors.email ? 'text-rose-400' : 'text-slate-400 group-hover:text-violet-500'}`} />
                                 <input
                                     type="email"
-                                    className={`input pr-12 text-right ${fieldErrors.email ? 'border-red-500 focus:border-red-500' : ''}`}
+                                    className={`w-full bg-white/50 border ${fieldErrors.email ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200' : 'border-slate-200 focus:border-violet-500 focus:ring-violet-200'} rounded-xl px-4 py-3 pr-12 text-right outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white`}
                                     placeholder="example@email.com"
                                     value={formData.email}
                                     onChange={(e) => handleFieldChange('email', e.target.value)}
@@ -203,13 +206,13 @@ export default function LoginPage() {
                                 >
                                     نسيت كلمة المرور؟
                                 </Link>
-                                <label className="block text-sm font-medium">كلمة المرور</label>
+                                <label className="block text-sm font-bold text-slate-700">كلمة المرور</label>
                             </div>
-                            <div className="relative">
-                                <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.password ? 'text-red-400' : 'text-surface-400'}`} />
+                            <div className="relative group">
+                                <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${fieldErrors.password ? 'text-rose-400' : 'text-slate-400 group-hover:text-violet-500'}`} />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
-                                    className={`input pr-12 pl-12 text-right ${fieldErrors.password ? 'border-red-500 focus:border-red-500' : ''}`}
+                                    className={`w-full bg-white/50 border ${fieldErrors.password ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200' : 'border-slate-200 focus:border-violet-500 focus:ring-violet-200'} rounded-xl px-4 py-3 pr-12 pl-12 text-right outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white`}
                                     placeholder="أدخل كلمة المرور"
                                     value={formData.password}
                                     onChange={(e) => handleFieldChange('password', e.target.value)}
@@ -219,14 +222,14 @@ export default function LoginPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white"
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-violet-600 transition-colors"
                                     disabled={isLocked}
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
                             </div>
                             {fieldErrors.password && (
-                                <p className="mt-1 text-xs text-red-400 text-right">{fieldErrors.password}</p>
+                                <p className="mt-1 text-xs text-rose-500 text-right font-medium">{fieldErrors.password}</p>
                             )}
                         </div>
 
@@ -234,7 +237,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isLoading || isLocked}
-                            className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-violet-500/30 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center justify-center gap-2"
                         >
                             {isLoading ? (
                                 <>
@@ -249,9 +252,9 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    <p className="mt-6 text-center text-surface-400">
+                    <p className="mt-8 text-center text-slate-500 text-sm">
                         ليس لديك حساب؟{' '}
-                        <Link href="/auth/register" className="text-primary-400 hover:underline font-bold">
+                        <Link href="/auth/register" className="text-violet-600 hover:text-violet-700 font-bold hover:underline transition-all">
                             أنشئ حساب جديد
                         </Link>
                     </p>

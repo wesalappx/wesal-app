@@ -155,26 +155,28 @@ export default function RegisterPage() {
     }
 
     return (
-        <main className="min-h-[100dvh] flex items-center justify-center p-4 sm:p-6 font-sans supports-[min-height:100dvh]:min-h-[100dvh]">
-            {/* Background */}
-            <div className="fixed inset-0 overflow-hidden -z-10 bg-surface-950">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-500/10 rounded-full blur-3xl opacity-50" />
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl opacity-50" />
+        <main className="min-h-[100dvh] flex items-center justify-center p-4 sm:p-6 font-sans supports-[min-height:100dvh]:min-h-[100dvh] relative overflow-hidden">
+            {/* Vibrant Mesh Gradient Background */}
+            <div className="fixed inset-0 pointer-events-none -z-10">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/80 via-purple-50/50 to-rose-50/80 animate-gradient-xy" />
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-blob" />
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-fuchsia-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-blob animation-delay-2000" />
             </div>
 
-            <div className="w-full max-w-md w-full">
+            <div className="w-full max-w-md w-full relative z-10">
                 {/* Logo */}
-                <div className="text-center mb-8">
-                    <Link href="/" className="inline-flex items-center gap-3">
-                        <img src="/wesal-logo.svg" alt="وصال" className="w-14 h-14" />
-                        <span className="text-3xl font-bold text-white tracking-wide">وصال</span>
+                <div className="mb-6 text-center animate-float">
+                    <Link href="/" className="inline-flex flex-col items-center gap-2 group">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform duration-300">
+                            <img src="/wesal-logo.svg" alt="وصال" className="w-8 h-8 invert brightness-0 text-white" />
+                        </div>
                     </Link>
                 </div>
 
                 {/* Form Card */}
-                <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-xl bg-surface-900/60">
-                    <h1 className="text-2xl font-bold text-center mb-2">إنشاء حساب جديد</h1>
-                    <p className="text-surface-400 text-center mb-6">
+                <div className="bg-white/60 backdrop-blur-xl p-6 sm:p-8 rounded-[2.5rem] border border-white/80 shadow-[0_20px_40px_rgba(0,0,0,0.05)]">
+                    <h1 className="text-2xl font-black text-center mb-2 text-slate-900">إنشاء حساب جديد</h1>
+                    <p className="text-slate-500 text-center mb-6 font-medium">
                         ابدأ رحلتك مع شريك حياتك
                     </p>
 
@@ -187,12 +189,12 @@ export default function RegisterPage() {
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Display Name */}
                         <div>
-                            <label className="block text-sm font-medium mb-1.5 text-right">الاسم المعروض</label>
-                            <div className="relative">
-                                <User className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
+                            <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">الاسم المعروض</label>
+                            <div className="relative group">
+                                <User className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-violet-500 transition-colors" />
                                 <input
                                     type="text"
-                                    className="input pr-10 text-right"
+                                    className="w-full bg-white/50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-right outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white"
                                     placeholder="كيف تحب نناديك؟"
                                     value={formData.displayName}
                                     onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
@@ -203,12 +205,12 @@ export default function RegisterPage() {
 
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-medium mb-1.5 text-right">البريد الإلكتروني</label>
-                            <div className="relative">
-                                <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
+                            <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">البريد الإلكتروني</label>
+                            <div className="relative group">
+                                <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-violet-500 transition-colors" />
                                 <input
                                     type="email"
-                                    className="input pr-10 text-left"
+                                    className="w-full bg-white/50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-right outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white"
                                     placeholder="example@email.com"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -220,12 +222,12 @@ export default function RegisterPage() {
 
                         {/* Date of Birth */}
                         <div>
-                            <label className="block text-sm font-medium mb-1.5 text-right">تاريخ الميلاد</label>
-                            <div className="relative">
-                                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
+                            <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">تاريخ الميلاد</label>
+                            <div className="relative group">
+                                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-violet-500 transition-colors" />
                                 <input
                                     type="date"
-                                    className="input pr-10 text-left"
+                                    className="w-full bg-white/50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-right outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white text-slate-600"
                                     value={formData.dateOfBirth}
                                     onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
                                     required
@@ -235,14 +237,14 @@ export default function RegisterPage() {
 
                         {/* Gender */}
                         <div>
-                            <label className="block text-sm font-medium mb-1.5 text-right">الجنس</label>
+                            <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">الجنس</label>
                             <div className="grid grid-cols-2 gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setFormData({ ...formData, gender: 'MALE' })}
-                                    className={`p-3 rounded-xl border transition-all text-center ${formData.gender === 'MALE'
-                                        ? 'border-primary-500 bg-primary-500/20 text-primary-300'
-                                        : 'border-surface-600 hover:border-surface-500 text-surface-300'
+                                    className={`p-3 rounded-xl border transition-all duration-300 text-center font-medium ${formData.gender === 'MALE'
+                                        ? 'border-violet-500 bg-violet-50 text-violet-700 shadow-md shadow-violet-500/10'
+                                        : 'border-slate-200 bg-white/50 text-slate-500 hover:border-violet-300 hover:bg-white'
                                         }`}
                                 >
                                     👨 ذكر
@@ -250,9 +252,9 @@ export default function RegisterPage() {
                                 <button
                                     type="button"
                                     onClick={() => setFormData({ ...formData, gender: 'FEMALE' })}
-                                    className={`p-3 rounded-xl border transition-all text-center ${formData.gender === 'FEMALE'
-                                        ? 'border-primary-500 bg-primary-500/20 text-primary-300'
-                                        : 'border-surface-600 hover:border-surface-500 text-surface-300'
+                                    className={`p-3 rounded-xl border transition-all duration-300 text-center font-medium ${formData.gender === 'FEMALE'
+                                        ? 'border-fuchsia-500 bg-fuchsia-50 text-fuchsia-700 shadow-md shadow-fuchsia-500/10'
+                                        : 'border-slate-200 bg-white/50 text-slate-500 hover:border-fuchsia-300 hover:bg-white'
                                         }`}
                                 >
                                     👩 أنثى
@@ -262,12 +264,12 @@ export default function RegisterPage() {
 
                         {/* Password */}
                         <div>
-                            <label className="block text-sm font-medium mb-1.5 text-right">كلمة المرور</label>
-                            <div className="relative">
-                                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
+                            <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">كلمة المرور</label>
+                            <div className="relative group">
+                                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-violet-500 transition-colors" />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
-                                    className="input pr-10 pl-10 text-left"
+                                    className="w-full bg-white/50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 pl-10 text-left outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white"
                                     placeholder="6 أحرف على الأقل"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -277,7 +279,7 @@ export default function RegisterPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white"
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-violet-600 transition-colors"
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
@@ -286,12 +288,12 @@ export default function RegisterPage() {
 
                         {/* Confirm Password */}
                         <div>
-                            <label className="block text-sm font-medium mb-1.5 text-right">تأكيد كلمة المرور</label>
-                            <div className="relative">
-                                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
+                            <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">تأكيد كلمة المرور</label>
+                            <div className="relative group">
+                                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-violet-500 transition-colors" />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
-                                    className="input pr-10 text-left"
+                                    className="w-full bg-white/50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-left outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white"
                                     placeholder="أعد كتابة كلمة المرور"
                                     value={formData.confirmPassword}
                                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
@@ -302,13 +304,13 @@ export default function RegisterPage() {
                         </div>
 
                         {/* Terms */}
-                        <p className="text-xs text-surface-400 text-center">
+                        <p className="text-xs text-slate-400 text-center font-medium">
                             بالتسجيل، أنت تؤكد أن عمرك 18+ وتوافق على{' '}
-                            <Link href="/terms" className="text-primary-400 hover:underline">
+                            <Link href="/terms" className="text-violet-600 hover:underline">
                                 الشروط والأحكام
                             </Link>{' '}
                             و{' '}
-                            <Link href="/privacy" className="text-primary-400 hover:underline">
+                            <Link href="/privacy" className="text-violet-600 hover:underline">
                                 سياسة الخصوصية
                             </Link>
                         </p>
@@ -317,7 +319,7 @@ export default function RegisterPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="btn-primary w-full flex items-center justify-center gap-2"
+                            className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-violet-500/30 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center justify-center gap-2"
                         >
                             {isLoading ? (
                                 <>
@@ -330,9 +332,9 @@ export default function RegisterPage() {
                         </button>
                     </form>
 
-                    <p className="mt-4 text-center text-surface-400 text-sm">
+                    <p className="mt-6 text-center text-slate-500 text-sm">
                         لديك حساب بالفعل؟{' '}
-                        <Link href="/auth/login" className="text-primary-400 hover:underline font-bold">
+                        <Link href="/auth/login" className="text-violet-600 hover:text-violet-700 font-bold hover:underline transition-all">
                             سجل دخول
                         </Link>
                     </p>

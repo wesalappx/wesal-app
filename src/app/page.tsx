@@ -47,13 +47,13 @@ export default function LandingPage() {
 
                     <div className="flex items-center gap-3 md:gap-4">
                         <Link
-                            href="/auth/signin"
+                            href="/auth/login"
                             className="px-4 py-2 text-sm md:text-base md:px-6 md:py-2.5 rounded-xl text-slate-600 font-medium hover:text-violet-600 hover:bg-white/50 transition-all duration-300"
                         >
                             دخول
                         </Link>
                         <Link
-                            href="/auth/signup"
+                            href="/auth/register"
                             className="px-4 py-2 text-sm md:text-base md:px-6 md:py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-all duration-300 transform hover:-translate-y-0.5"
                         >
                             ابدأ مجاناً
@@ -114,7 +114,7 @@ export default function LandingPage() {
                             className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4"
                         >
                             <Link
-                                href="/auth/signup"
+                                href="/auth/register"
                                 className="w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 rounded-2xl bg-slate-900 text-white font-bold text-lg md:text-xl hover:bg-slate-800 transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl shadow-slate-900/20 group hover:scale-105"
                             >
                                 ابدأ رحلتك مجاناً
@@ -151,7 +151,7 @@ export default function LandingPage() {
                     <Heart className="w-8 h-8 md:w-12 md:h-12 fill-violet-100 text-violet-500 animate-pulse" />
                     <h2 className="text-3xl md:text-5xl font-bold text-slate-900">جاهزين لفرصة جديدة؟</h2>
                     <Link
-                        href="/auth/signup"
+                        href="/auth/register"
                         className="w-full md:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold text-lg hover:shadow-lg hover:shadow-violet-500/25 transition-all duration-300"
                     >
                         اشتركوا الآن مجاناً
