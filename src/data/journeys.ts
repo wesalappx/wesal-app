@@ -19,6 +19,7 @@ export interface Journey {
     border: string;
     totalSteps: number;
     steps: JourneyStep[];
+    isPremium?: boolean; // true = requires subscription, undefined/false = free
 }
 
 export const journeysData: Journey[] = [
@@ -31,6 +32,7 @@ export const journeysData: Journey[] = [
         bg: 'from-rose-500/20 to-pink-600/20',
         border: 'border-rose-500/30',
         totalSteps: 5,
+        isPremium: false, // FREE
         steps: [
             {
                 id: 1,
@@ -83,6 +85,7 @@ export const journeysData: Journey[] = [
         bg: 'from-amber-500/20 to-orange-600/20',
         border: 'border-amber-500/30',
         totalSteps: 7,
+        isPremium: false, // FREE
         steps: [
             {
                 id: 1,
@@ -151,6 +154,7 @@ export const journeysData: Journey[] = [
         bg: 'from-blue-500/20 to-cyan-600/20',
         border: 'border-blue-500/30',
         totalSteps: 6,
+        isPremium: true, // PREMIUM - requires subscription
         steps: [
             {
                 id: 1,

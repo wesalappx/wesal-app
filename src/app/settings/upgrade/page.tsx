@@ -91,13 +91,28 @@ export default function UpgradePage() {
         setError(null);
         setIsUpgrading(true);
 
-        const result = await startUpgrade(selectedPlan, promoCode || undefined);
+        // TEMPORARY: Bypass payment until payment methods are approved
+        // This will directly grant premium access without payment
+        try {
+            const response = await fetch('/api/payments/activate-free', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ planId: selectedPlan }),
+            });
 
-        if (!result.success) {
-            setError(result.error || (isRTL ? 'حدث خطأ' : 'An error occurred'));
-            setIsUpgrading(false);
+            const result = await response.json();
+
+            if (result.success) {
+                // Reload page to reflect new premium status
+                window.location.reload();
+            } else {
+                setError(result.error || (isRTL ? 'حدث خطأ' : 'An error occurred'));
+            }
+        } catch (err) {
+            setError(isRTL ? 'حدث خطأ في الاتصال' : 'Connection error');
         }
-        // If successful, user is redirected to Lemon Squeezy checkout
+
+        setIsUpgrading(false);
     };
 
     // Feature comparison data
@@ -423,7 +438,7 @@ export default function UpgradePage() {
                     transition={{ delay: 0.4 }}
                     className="text-center text-surface-500 text-sm space-y-2 mt-6"
                 >
-                    <p>🔒 {isRTL ? 'دفع آمن عبر Moyasar' : 'Secure payment via Moyasar'}</p>
+                    <p>🔒 {isRTL ? 'دفع آمن عبر Lemon Squeezy' : 'Secure payment via Lemon Squeezy'}</p>
                     <p>💳 {isRTL ? 'نقبل مدى، فيزا، ماستركارد' : 'We accept Mada, Visa, Mastercard'}</p>
                     <p>🔄 {isRTL ? 'إلغاء في أي وقت' : 'Cancel anytime'}</p>
                 </motion.div>

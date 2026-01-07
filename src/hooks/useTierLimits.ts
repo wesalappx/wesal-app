@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthStore } from '@/stores/auth-store';
 import { FREE_TIER_LIMITS, FREE_GAMES, FREE_JOURNEYS, SubscriptionTier } from '@/lib/payments';
+import { journeysData } from '@/data/journeys';
 
 export interface UsageInfo {
     canUse: boolean;
@@ -238,7 +239,10 @@ export function useTierLimits() {
     // Check if a specific journey is available
     const isJourneyAvailable = useCallback((journeySlug: string): boolean => {
         if (tier === 'premium') return true;
-        return FREE_JOURNEYS.includes(journeySlug);
+        // Check the journey's own isPremium flag from journeysData
+        const journey = journeysData.find(j => j.id === journeySlug);
+        // If journey not found or isPremium is undefined/false, it's free
+        return !journey?.isPremium;
     }, [tier]);
 
     // Get upgrade prompt for a feature
