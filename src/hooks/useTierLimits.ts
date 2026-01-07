@@ -79,8 +79,10 @@ export function useTierLimits() {
 
     // Games config from admin dashboard - maps game id to isPremium status
     const [gamesConfig, setGamesConfig] = useState<Record<string, boolean>>({});
+    // Journeys config from admin dashboard - maps journey id to isPremium status
+    const [journeysConfig, setJourneysConfig] = useState<Record<string, boolean>>({});
 
-    // Fetch dynamic limits and games config from API
+    // Fetch dynamic limits, games config, and journeys config from API
     useEffect(() => {
         const fetchConfig = async () => {
             try {
@@ -106,6 +108,20 @@ export function useTierLimits() {
                             configMap[game.id] = game.isPremium ?? false;
                         });
                         setGamesConfig(configMap);
+                    }
+                }
+
+                // Fetch journeys config (public endpoint for premium status)
+                const journeysRes = await fetch('/api/journeys-config');
+                if (journeysRes.ok) {
+                    const journeysData = await journeysRes.json();
+                    if (journeysData.journeys && Array.isArray(journeysData.journeys)) {
+                        const configMap: Record<string, boolean> = {};
+                        journeysData.journeys.forEach((journey: any) => {
+                            // Map journey id to isPremium status
+                            configMap[journey.id] = journey.isPremium ?? false;
+                        });
+                        setJourneysConfig(configMap);
                     }
                 }
             } catch (err) {
@@ -265,11 +281,18 @@ export function useTierLimits() {
     // Check if a specific journey is available
     const isJourneyAvailable = useCallback((journeySlug: string): boolean => {
         if (tier === 'premium') return true;
-        // Check the journey's own isPremium flag from journeysData
+
+        // If we have dynamic config from admin, use it
+        if (Object.keys(journeysConfig).length > 0) {
+            // Journey is available if it's NOT premium (isPremium is false or undefined)
+            return !journeysConfig[journeySlug];
+        }
+
+        // Fallback to checking journey's own isPremium flag from journeysData
         const journey = journeysData.find(j => j.id === journeySlug);
         // If journey not found or isPremium is undefined/false, it's free
         return !journey?.isPremium;
-    }, [tier]);
+    }, [tier, journeysConfig]);
 
     // Get upgrade prompt for a feature
     const getUpgradePrompt = useCallback((feature: string): UpgradePrompt | null => {

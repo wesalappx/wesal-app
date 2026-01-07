@@ -103,8 +103,8 @@ export default function UpgradePage() {
             const result = await response.json();
 
             if (result.success) {
-                // Reload page to reflect new premium status
-                window.location.reload();
+                // Redirect to success page
+                router.push('/payment/success');
             } else {
                 setError(result.error || (isRTL ? 'حدث خطأ' : 'An error occurred'));
             }

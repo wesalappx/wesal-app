@@ -1,9 +1,33 @@
 -- ============================================
--- FIX SUBSCRIPTIONS TABLE
--- Run this in Supabase SQL Editor
+-- ADMIN DASHBOARD FIX - Run in Supabase SQL Editor
 -- ============================================
 
--- Add all required columns if they don't exist
+-- 1. Create app_settings table (for games/journeys config from admin)
+CREATE TABLE IF NOT EXISTS public.app_settings (
+    key TEXT PRIMARY KEY,
+    value JSONB,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.app_settings ENABLE ROW LEVEL SECURITY;
+
+-- Allow full access to app_settings (needed for both admin and public reads)
+DROP POLICY IF EXISTS "Allow all access to app_settings" ON public.app_settings;
+CREATE POLICY "Allow all access to app_settings" ON public.app_settings
+    FOR ALL USING (true);
+
+-- 2. Fix subscriptions table - add missing columns
+DO $$ BEGIN
+    ALTER TABLE public.subscriptions ADD COLUMN status TEXT DEFAULT 'trial' CHECK (status IN ('trial', 'active', 'cancelled', 'expired', 'premium'));
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE public.subscriptions ADD COLUMN ends_at TIMESTAMPTZ;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
 DO $$ BEGIN
     ALTER TABLE public.subscriptions ADD COLUMN plan_id TEXT DEFAULT 'premium_monthly';
 EXCEPTION WHEN duplicate_column THEN NULL;
@@ -14,49 +38,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_column THEN NULL;
 END $$;
 
-DO $$ BEGIN
-    ALTER TABLE public.subscriptions ADD COLUMN ends_at TIMESTAMPTZ;
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
-
-DO $$ BEGIN
-    ALTER TABLE public.subscriptions ADD COLUMN payment_id TEXT;
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
-
--- Add created_at if missing
-DO $$ BEGIN
-    ALTER TABLE public.subscriptions ADD COLUMN created_at TIMESTAMPTZ DEFAULT NOW();
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
-
--- Add updated_at if missing
-DO $$ BEGIN
-    ALTER TABLE public.subscriptions ADD COLUMN updated_at TIMESTAMPTZ DEFAULT NOW();
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
-
--- ============================================
--- FIX APP_SETTINGS TABLE (for admin configs)
--- ============================================
-CREATE TABLE IF NOT EXISTS public.app_settings (
-    key TEXT PRIMARY KEY,
-    value JSONB,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Allow service role to access app_settings
-ALTER TABLE public.app_settings ENABLE ROW LEVEL SECURITY;
-
--- Policy for service role access
-DROP POLICY IF EXISTS "Service role can manage app_settings" ON public.app_settings;
-CREATE POLICY "Service role can manage app_settings" ON public.app_settings
-    FOR ALL USING (true);
-
--- ============================================
--- FIX ADMIN_AUDIT_LOG TABLE
--- ============================================
+-- 3. Create admin_audit_log table (for logging admin actions)
 CREATE TABLE IF NOT EXISTS public.admin_audit_log (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     admin_email TEXT,
@@ -69,17 +51,11 @@ CREATE TABLE IF NOT EXISTS public.admin_audit_log (
 
 ALTER TABLE public.admin_audit_log ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Admins can view audit log" ON public.admin_audit_log;
-CREATE POLICY "Admins can view audit log" ON public.admin_audit_log
-    FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Allow all access to audit_log" ON public.admin_audit_log;
+CREATE POLICY "Allow all access to audit_log" ON public.admin_audit_log
+    FOR ALL USING (true);
 
-DROP POLICY IF EXISTS "Service role can insert audit log" ON public.admin_audit_log;
-CREATE POLICY "Service role can insert audit log" ON public.admin_audit_log
-    FOR INSERT WITH CHECK (true);
-
--- ============================================
--- FIX PROFILES TABLE (for ban functionality)
--- ============================================
+-- 4. Fix profiles table for ban functionality
 DO $$ BEGIN
     ALTER TABLE public.profiles ADD COLUMN is_banned BOOLEAN DEFAULT FALSE;
 EXCEPTION WHEN duplicate_column THEN NULL;
@@ -90,9 +66,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_column THEN NULL;
 END $$;
 
--- ============================================
--- FIX COUPLE_STREAKS TABLE
--- ============================================
+-- 5. Create couple_streaks table (for streak reset functionality)
 CREATE TABLE IF NOT EXISTS public.couple_streaks (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     couple_id UUID REFERENCES public.couples(id) ON DELETE CASCADE NOT NULL UNIQUE,
@@ -115,23 +89,20 @@ CREATE POLICY "Couple members can view streaks" ON public.couple_streaks
         )
     );
 
-DROP POLICY IF EXISTS "Couple members can update streaks" ON public.couple_streaks;
-CREATE POLICY "Couple members can update streaks" ON public.couple_streaks
-    FOR UPDATE USING (
-        EXISTS (
-            SELECT 1 FROM public.couples
-            WHERE id = couple_id
-            AND (partner1_id = auth.uid() OR partner2_id = auth.uid())
-        )
-    );
+DROP POLICY IF EXISTS "Service role can manage streaks" ON public.couple_streaks;
+CREATE POLICY "Service role can manage streaks" ON public.couple_streaks
+    FOR ALL USING (true);
 
--- ============================================
--- INDEXES
--- ============================================
+-- 6. Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_app_settings_key ON public.app_settings(key);
 CREATE INDEX IF NOT EXISTS idx_admin_audit_log_created_at ON public.admin_audit_log(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_couple_streaks_couple_id ON public.couple_streaks(couple_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_couple_id ON public.subscriptions(couple_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON public.subscriptions(status);
 
 -- ============================================
--- DONE! Tables should now be properly set up.
+-- DONE! Now:
+-- 1. Deploy the code changes
+-- 2. Go to /admin/games and click "Save Changes"
+-- 3. Go to /admin/journeys and click "Save Changes"
+-- 4. Test the subscription flow
 -- ============================================
