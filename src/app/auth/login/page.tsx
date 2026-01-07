@@ -143,7 +143,7 @@ export default function LoginPage() {
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center p-4 font-sans relative overflow-hidden">
+        <main className="min-h-[100dvh] w-full flex flex-col items-center justify-center py-10 px-4 sm:px-6 font-sans relative">
             {/* Vibrant Mesh Gradient Background */}
             <div className="fixed inset-0 pointer-events-none -z-10">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/80 via-purple-50/50 to-rose-50/80 animate-gradient-xy" />
@@ -151,7 +151,7 @@ export default function LoginPage() {
                 <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000" />
             </div>
 
-            <div className="w-full max-w-md relative z-10 text-center">
+            <div className="w-full max-w-md relative z-10 flex flex-col gap-6 text-center">
                 {/* Logo */}
                 <div className="mb-8 inline-block animate-float">
                     <Link href="/" className="inline-flex flex-col items-center gap-2 group">
@@ -181,10 +181,10 @@ export default function LoginPage() {
                         <div>
                             <label className="block text-sm font-bold mb-2 text-right text-slate-700">البريد الإلكتروني</label>
                             <div className="relative group">
-                                <Mail className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${fieldErrors.email ? 'text-rose-400' : 'text-slate-400 group-hover:text-violet-500'}`} />
+                                <Mail className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${fieldErrors.email ? 'text-rose-400' : 'text-slate-500 group-hover:text-violet-600'}`} />
                                 <input
                                     type="email"
-                                    className={`w-full bg-white/50 border ${fieldErrors.email ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200' : 'border-slate-200 focus:border-violet-500 focus:ring-violet-200'} rounded-xl px-4 py-3 pr-12 text-right outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white`}
+                                    className={`w-full bg-slate-50 border ${fieldErrors.email ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200' : 'border-slate-200 focus:border-violet-500 focus:ring-violet-200'} rounded-xl px-4 py-3 pr-12 text-right outline-none transition-all duration-300 placeholder:text-slate-400 focus:bg-white text-slate-900`}
                                     placeholder="example@email.com"
                                     value={formData.email}
                                     onChange={(e) => handleFieldChange('email', e.target.value)}
@@ -193,7 +193,7 @@ export default function LoginPage() {
                                 />
                             </div>
                             {fieldErrors.email && (
-                                <p className="mt-1 text-xs text-red-400 text-right">{fieldErrors.email}</p>
+                                <p className="mt-1 text-xs text-rose-500 text-right font-medium">{fieldErrors.email}</p>
                             )}
                         </div>
 
@@ -202,17 +202,17 @@ export default function LoginPage() {
                             <div className="flex justify-between items-center mb-2">
                                 <Link
                                     href="/auth/forgot-password"
-                                    className="text-sm text-primary-400 hover:underline"
+                                    className="text-sm text-violet-600 hover:text-violet-700 hover:underline font-medium"
                                 >
                                     نسيت كلمة المرور؟
                                 </Link>
                                 <label className="block text-sm font-bold text-slate-700">كلمة المرور</label>
                             </div>
                             <div className="relative group">
-                                <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${fieldErrors.password ? 'text-rose-400' : 'text-slate-400 group-hover:text-violet-500'}`} />
+                                <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${fieldErrors.password ? 'text-rose-400' : 'text-slate-500 group-hover:text-violet-600'}`} />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
-                                    className={`w-full bg-white/50 border ${fieldErrors.password ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200' : 'border-slate-200 focus:border-violet-500 focus:ring-violet-200'} rounded-xl px-4 py-3 pr-12 pl-12 text-right outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white`}
+                                    className={`w-full bg-slate-50 border ${fieldErrors.password ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200' : 'border-slate-200 focus:border-violet-500 focus:ring-violet-200'} rounded-xl px-4 py-3 pr-12 pl-12 text-right outline-none transition-all duration-300 placeholder:text-slate-400 focus:bg-white text-slate-900`}
                                     placeholder="أدخل كلمة المرور"
                                     value={formData.password}
                                     onChange={(e) => handleFieldChange('password', e.target.value)}
@@ -222,7 +222,7 @@ export default function LoginPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-violet-600 transition-colors"
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-violet-600 transition-colors"
                                     disabled={isLocked}
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}

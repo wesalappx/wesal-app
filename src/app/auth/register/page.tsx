@@ -155,7 +155,7 @@ export default function RegisterPage() {
     }
 
     return (
-        <main className="min-h-[100dvh] flex items-center justify-center p-4 sm:p-6 font-sans supports-[min-height:100dvh]:min-h-[100dvh] relative overflow-hidden">
+        <main className="min-h-[100dvh] w-full flex flex-col items-center justify-center py-10 px-4 sm:px-6 font-sans relative">
             {/* Vibrant Mesh Gradient Background */}
             <div className="fixed inset-0 pointer-events-none -z-10">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/80 via-purple-50/50 to-rose-50/80 animate-gradient-xy" />
@@ -163,7 +163,7 @@ export default function RegisterPage() {
                 <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-fuchsia-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-blob animation-delay-2000" />
             </div>
 
-            <div className="w-full max-w-md w-full relative z-10">
+            <div className="w-full max-w-md w-full relative z-10 flex flex-col gap-6">
                 {/* Logo */}
                 <div className="mb-6 text-center animate-float">
                     <Link href="/" className="inline-flex flex-col items-center gap-2 group">
@@ -191,10 +191,10 @@ export default function RegisterPage() {
                         <div>
                             <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">الاسم المعروض</label>
                             <div className="relative group">
-                                <User className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-violet-500 transition-colors" />
+                                <User className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-hover:text-violet-600 transition-colors" />
                                 <input
                                     type="text"
-                                    className="w-full bg-white/50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-right outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white"
+                                    className="w-full bg-slate-50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-right outline-none transition-all duration-300 placeholder:text-slate-400 focus:bg-white text-slate-900"
                                     placeholder="كيف تحب نناديك؟"
                                     value={formData.displayName}
                                     onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
@@ -207,10 +207,10 @@ export default function RegisterPage() {
                         <div>
                             <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">البريد الإلكتروني</label>
                             <div className="relative group">
-                                <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-violet-500 transition-colors" />
+                                <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-hover:text-violet-600 transition-colors" />
                                 <input
                                     type="email"
-                                    className="w-full bg-white/50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-right outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white"
+                                    className="w-full bg-slate-50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-right outline-none transition-all duration-300 placeholder:text-slate-400 focus:bg-white text-slate-900"
                                     placeholder="example@email.com"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -224,13 +224,14 @@ export default function RegisterPage() {
                         <div>
                             <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">تاريخ الميلاد</label>
                             <div className="relative group">
-                                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-violet-500 transition-colors" />
+                                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-hover:text-violet-600 transition-colors pointer-events-none" />
                                 <input
                                     type="date"
-                                    className="w-full bg-white/50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-right outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white text-slate-600"
+                                    className="w-full bg-slate-50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-right outline-none transition-all duration-300 placeholder:text-slate-400 focus:bg-white text-slate-900 appearance-none min-h-[50px]"
                                     value={formData.dateOfBirth}
                                     onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
                                     required
+                                    style={{ colorScheme: 'light' }}
                                 />
                             </div>
                         </div>
@@ -266,10 +267,10 @@ export default function RegisterPage() {
                         <div>
                             <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">كلمة المرور</label>
                             <div className="relative group">
-                                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-violet-500 transition-colors" />
+                                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-hover:text-violet-600 transition-colors" />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
-                                    className="w-full bg-white/50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 pl-10 text-left outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white"
+                                    className="w-full bg-slate-50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 pl-10 text-left outline-none transition-all duration-300 placeholder:text-slate-400 focus:bg-white text-slate-900"
                                     placeholder="6 أحرف على الأقل"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -279,7 +280,7 @@ export default function RegisterPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-violet-600 transition-colors"
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-violet-600 transition-colors"
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
@@ -290,10 +291,10 @@ export default function RegisterPage() {
                         <div>
                             <label className="block text-sm font-bold mb-1.5 text-right text-slate-700">تأكيد كلمة المرور</label>
                             <div className="relative group">
-                                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-violet-500 transition-colors" />
+                                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-hover:text-violet-600 transition-colors" />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
-                                    className="w-full bg-white/50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-left outline-none transition-all duration-300 placeholder:text-slate-300 focus:bg-white"
+                                    className="w-full bg-slate-50 border border-slate-200 focus:border-violet-500 focus:ring-violet-200 rounded-xl px-4 py-3 pr-10 text-left outline-none transition-all duration-300 placeholder:text-slate-400 focus:bg-white text-slate-900"
                                     placeholder="أعد كتابة كلمة المرور"
                                     value={formData.confirmPassword}
                                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
