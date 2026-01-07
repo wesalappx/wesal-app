@@ -77,24 +77,42 @@ export function useTierLimits() {
         whisper: { limit: 3, period: 'weekly' }
     });
 
-    // Fetch dynamic limits from API
+    // Games config from admin dashboard - maps game id to isPremium status
+    const [gamesConfig, setGamesConfig] = useState<Record<string, boolean>>({});
+
+    // Fetch dynamic limits and games config from API
     useEffect(() => {
-        const fetchLimits = async () => {
+        const fetchConfig = async () => {
             try {
-                const res = await fetch('/api/limits');
-                if (res.ok) {
-                    const data = await res.json();
+                // Fetch usage limits
+                const limitsRes = await fetch('/api/limits');
+                if (limitsRes.ok) {
+                    const data = await limitsRes.json();
                     setDynamicLimits({
                         ai_chat: { limit: data.ai_chat_daily || 5, period: 'daily' },
                         conflict_ai: { limit: data.conflict_ai_weekly || 2, period: 'weekly' },
                         whisper: { limit: data.whisper_weekly || 3, period: 'weekly' }
                     });
                 }
+
+                // Fetch games config (public endpoint for premium status)
+                const gamesRes = await fetch('/api/games-config');
+                if (gamesRes.ok) {
+                    const gamesData = await gamesRes.json();
+                    if (gamesData.games && Array.isArray(gamesData.games)) {
+                        const configMap: Record<string, boolean> = {};
+                        gamesData.games.forEach((game: any) => {
+                            // Map game id to isPremium status
+                            configMap[game.id] = game.isPremium ?? false;
+                        });
+                        setGamesConfig(configMap);
+                    }
+                }
             } catch (err) {
-                console.error('Failed to fetch usage limits:', err);
+                console.error('Failed to fetch config:', err);
             }
         };
-        fetchLimits();
+        fetchConfig();
     }, []);
 
     // Fetch user's tier on mount
@@ -233,8 +251,16 @@ export function useTierLimits() {
     // Check if a specific game is available
     const isGameAvailable = useCallback((gameType: string): boolean => {
         if (tier === 'premium') return true;
+
+        // If we have dynamic config from admin, use it
+        if (Object.keys(gamesConfig).length > 0) {
+            // Game is available if it's NOT premium (isPremium is false or undefined)
+            return !gamesConfig[gameType];
+        }
+
+        // Fallback to hardcoded FREE_GAMES list
         return FREE_GAMES.includes(gameType);
-    }, [tier]);
+    }, [tier, gamesConfig]);
 
     // Check if a specific journey is available
     const isJourneyAvailable = useCallback((journeySlug: string): boolean => {
