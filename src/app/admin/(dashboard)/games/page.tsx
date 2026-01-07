@@ -48,14 +48,14 @@ const gameIcons: Record<string, any> = {
 
 export default function AdminGamesPage() {
     const [games, setGames] = useState<Game[]>([
-        { id: 'truth_or_dare', name: { ar: 'صراحة أو تحدي', en: 'Truth or Dare' }, description: { ar: 'لعبة الصراحة والتحديات', en: 'Classic truth or dare game' }, icon: 'target', isEnabled: true, isPremium: false, playCount: 1250 },
-        { id: 'would_you_rather', name: { ar: 'هل تفضل', en: 'Would You Rather' }, description: { ar: 'اختيارات صعبة ومضحكة', en: 'Tough and fun choices' }, icon: 'dices', isEnabled: true, isPremium: false, playCount: 980 },
-        { id: 'compliment_battle', name: { ar: 'معركة الإطراء', en: 'Compliment Battle' }, description: { ar: 'تنافسوا في المجاملات', en: 'Compete in compliments' }, icon: 'heart', isEnabled: true, isPremium: false, playCount: 750 },
-        { id: 'guess_emoji', name: { ar: 'خمن الإيموجي', en: 'Guess the Emoji' }, description: { ar: 'خمنوا المعنى من الإيموجي', en: 'Guess meaning from emojis' }, icon: 'sparkles', isEnabled: true, isPremium: false, playCount: 620 },
-        { id: 'story_builder', name: { ar: 'بناء القصة', en: 'Story Builder' }, description: { ar: 'ابنوا قصة معاً', en: 'Build a story together' }, icon: 'message', isEnabled: true, isPremium: true, playCount: 340 },
-        { id: 'memory_lane', name: { ar: 'ذكريات', en: 'Memory Lane' }, description: { ar: 'اختبروا ذاكرتكم', en: 'Test your memory' }, icon: 'star', isEnabled: true, isPremium: true, playCount: 280 },
-        { id: 'couple_quiz', name: { ar: 'اختبار الشريك', en: 'Couple Quiz' }, description: { ar: 'كم تعرفون بعضكم', en: 'How well do you know each other' }, icon: 'users', isEnabled: true, isPremium: true, playCount: 450 },
-        { id: 'roulette', name: { ar: 'روليت الحب', en: 'Love Roulette' }, description: { ar: 'دور العجلة واربح', en: 'Spin and win' }, icon: 'zap', isEnabled: true, isPremium: true, playCount: 520 },
+        { id: 'truth-or-dare', name: { ar: 'صراحة أو تحدي', en: 'Truth or Dare' }, description: { ar: 'لعبة الصراحة والتحديات', en: 'Classic truth or dare game' }, icon: 'target', isEnabled: true, isPremium: false, playCount: 1250 },
+        { id: 'would-you-rather', name: { ar: 'هل تفضل', en: 'Would You Rather' }, description: { ar: 'اختيارات صعبة ومضحكة', en: 'Tough and fun choices' }, icon: 'dices', isEnabled: true, isPremium: false, playCount: 980 },
+        { id: 'compliment-battle', name: { ar: 'معركة الإطراء', en: 'Compliment Battle' }, description: { ar: 'تنافسوا في المجاملات', en: 'Compete in compliments' }, icon: 'heart', isEnabled: true, isPremium: false, playCount: 750 },
+        { id: 'deep-questions', name: { ar: 'أسئلة عميقة', en: 'Deep Questions' }, description: { ar: 'أسئلة تقربكم أكثر', en: 'Questions that bring you closer' }, icon: 'sparkles', isEnabled: true, isPremium: false, playCount: 620 },
+        { id: 'love-roulette', name: { ar: 'عجلة الحظ', en: 'Love Roulette' }, description: { ar: 'أدر العجلة واربح', en: 'Spin and win' }, icon: 'zap', isEnabled: true, isPremium: false, playCount: 520 },
+        { id: 'memory-lane', name: { ar: 'شريط الذكريات', en: 'Memory Lane' }, description: { ar: 'استرجعوا ذكرياتكم', en: 'Relive your memories' }, icon: 'star', isEnabled: true, isPremium: true, playCount: 280 },
+        { id: 'couple-quiz', name: { ar: 'معركة الأسئلة', en: 'Couple Quiz' }, description: { ar: 'كم تعرفون بعضكم', en: 'How well do you know each other' }, icon: 'users', isEnabled: true, isPremium: true, playCount: 450 },
+        { id: 'minute-challenges', name: { ar: 'تحدي الدقيقة', en: 'Minute Challenges' }, description: { ar: 'تحديات في 60 ثانية', en: 'Challenges in 60 seconds' }, icon: 'message', isEnabled: true, isPremium: true, playCount: 340 },
     ]);
     const [saving, setSaving] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -174,8 +174,8 @@ export default function AdminGamesPage() {
                             transition={{ delay: idx * 0.05 }}
                         >
                             <Card className={`relative overflow-hidden transition-all ${game.isEnabled
-                                    ? 'bg-slate-900/40 border-slate-800 hover:border-emerald-500/30'
-                                    : 'bg-slate-900/20 border-slate-800/50 opacity-60'
+                                ? 'bg-slate-900/40 border-slate-800 hover:border-emerald-500/30'
+                                : 'bg-slate-900/20 border-slate-800/50 opacity-60'
                                 }`}>
                                 {/* Premium Badge */}
                                 {game.isPremium && (
@@ -190,8 +190,8 @@ export default function AdminGamesPage() {
                                     {/* Icon & Info */}
                                     <div className="flex items-start gap-4 mb-4">
                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${game.isEnabled
-                                                ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20'
-                                                : 'bg-slate-800/50'
+                                            ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20'
+                                            : 'bg-slate-800/50'
                                             }`}>
                                             <IconComponent className={`w-6 h-6 ${game.isEnabled ? 'text-emerald-400' : 'text-slate-500'}`} />
                                         </div>
@@ -214,8 +214,8 @@ export default function AdminGamesPage() {
                                         <button
                                             onClick={() => toggleEnabled(game.id)}
                                             className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${game.isEnabled
-                                                    ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
-                                                    : 'bg-slate-800/50 text-slate-500 hover:bg-slate-700/50'
+                                                ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
+                                                : 'bg-slate-800/50 text-slate-500 hover:bg-slate-700/50'
                                                 }`}
                                         >
                                             {game.isEnabled ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
@@ -224,8 +224,8 @@ export default function AdminGamesPage() {
                                         <button
                                             onClick={() => togglePremium(game.id)}
                                             className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${game.isPremium
-                                                    ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
-                                                    : 'bg-slate-800/50 text-slate-500 hover:bg-slate-700/50'
+                                                ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
+                                                : 'bg-slate-800/50 text-slate-500 hover:bg-slate-700/50'
                                                 }`}
                                         >
                                             <Crown className="w-4 h-4" />

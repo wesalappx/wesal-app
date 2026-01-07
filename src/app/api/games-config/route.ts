@@ -23,13 +23,13 @@ export async function GET() {
 
         // Return games array, or default if not set
         const games = data?.value || [
-            // Default games - update this to match your games
+            // Default games matching frontend play page
             { id: 'would-you-rather', isPremium: false },
             { id: 'compliment-battle', isPremium: false },
             { id: 'love-roulette', isPremium: false },
             { id: 'deep-questions', isPremium: false },
+            { id: 'truth-or-dare', isPremium: false },
             { id: 'memory-lane', isPremium: true },
-            { id: 'truth-or-dare', isPremium: true },
             { id: 'couple-quiz', isPremium: true },
             { id: 'minute-challenges', isPremium: true },
         ];
