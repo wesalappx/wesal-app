@@ -164,29 +164,6 @@ export default function AdminUsersPage() {
         }
     };
 
-    const fetchUsers = async () => {
-        setLoading(true);
-        try {
-            const params = new URLSearchParams({
-                page: pagination.page.toString(),
-                limit: pagination.limit.toString(),
-                search,
-            });
-            const res = await fetch(`/api/admin/users?${params}`);
-            if (!res.ok) {
-                const errData = await res.json().catch(() => ({}));
-                throw new Error(errData.error || 'Failed to fetch users');
-            }
-            const data = await res.json();
-            setUsers(data.users);
-            setPagination(data.pagination);
-        } catch (err) {
-            console.error('Error fetching users:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setPagination(prev => ({ ...prev, page: 1 }));
@@ -353,8 +330,8 @@ export default function AdminUsersPage() {
                                                             <button
                                                                 onClick={() => handleBanUser(user.id, user.isBanned || false)}
                                                                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${user.isBanned
-                                                                        ? 'text-emerald-400 hover:bg-emerald-500/10'
-                                                                        : 'text-red-400 hover:bg-red-500/10'
+                                                                    ? 'text-emerald-400 hover:bg-emerald-500/10'
+                                                                    : 'text-red-400 hover:bg-red-500/10'
                                                                     }`}
                                                             >
                                                                 {user.isBanned ? <Check className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
@@ -365,8 +342,8 @@ export default function AdminUsersPage() {
                                                             <button
                                                                 onClick={() => handleGrantPremium(user.id, user.isPremium || false)}
                                                                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${user.isPremium
-                                                                        ? 'text-slate-400 hover:bg-slate-500/10'
-                                                                        : 'text-amber-400 hover:bg-amber-500/10'
+                                                                    ? 'text-slate-400 hover:bg-slate-500/10'
+                                                                    : 'text-amber-400 hover:bg-amber-500/10'
                                                                     }`}
                                                             >
                                                                 <Crown className="w-4 h-4" />
