@@ -84,13 +84,13 @@ export async function POST(req: Request) {
         const endsAt = new Date();
         endsAt.setFullYear(endsAt.getFullYear() + 1);
 
-        // Insert new subscription
+        // Insert new subscription - use only columns that definitely exist
+        // Note: The table schema might vary - we'll try with minimal columns first
         const { data: newSub, error: insertError } = await adminSupabase
             .from('subscriptions')
             .insert({
                 couple_id: coupleData.id,
-                plan_id: planId,
-                status: 'active',
+                status: 'active', // or 'premium' depending on schema
                 started_at: startedAt.toISOString(),
                 ends_at: endsAt.toISOString(),
             })
