@@ -47,7 +47,10 @@ export function usePairing() {
 
             // Try to generate a unique code (with retry for collisions)
             while (attempts < maxAttempts && !code) {
-                const candidateCode = Math.floor(100000 + Math.random() * 900000).toString();
+                // Use Web Crypto API for secure random number generation
+                const randomArray = new Uint32Array(1);
+                crypto.getRandomValues(randomArray);
+                const candidateCode = (100000 + (randomArray[0] % 900000)).toString();
 
                 // Check if code already exists and is still valid
                 const { data: existingCode } = await supabase

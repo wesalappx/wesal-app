@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createAdminClient } from '@/lib/supabase/server';
+import { randomInt } from 'crypto';
 
 // Allowed admin emails (in production, store in database or env)
 const ALLOWED_ADMIN_EMAILS = [
@@ -10,7 +11,8 @@ const ALLOWED_ADMIN_EMAILS = [
 ];
 
 function generateOTP(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    // Use cryptographically secure random number generation
+    return randomInt(100000, 999999).toString();
 }
 
 export async function POST(request: Request) {

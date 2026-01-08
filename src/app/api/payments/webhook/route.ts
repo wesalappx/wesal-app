@@ -45,11 +45,13 @@ export async function POST(request: NextRequest) {
         const rawBody = await request.text();
         const signature = request.headers.get('x-signature') || '';
 
-        // Verify webhook signature (optional but recommended)
-        // if (!verifyWebhookSignature(rawBody, signature)) {
-        //     console.error('Invalid webhook signature');
-        //     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-        // }
+        // Verify webhook signature (required for production security)
+        if (process.env.LEMON_SQUEEZY_WEBHOOK_SECRET && signature) {
+            if (!verifyWebhookSignature(rawBody, signature)) {
+                console.error('Invalid webhook signature');
+                return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+            }
+        }
 
         const payload: WebhookPayload = JSON.parse(rawBody);
         const eventName = payload.meta.event_name;

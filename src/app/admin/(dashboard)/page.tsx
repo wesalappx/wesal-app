@@ -109,12 +109,28 @@ export default function AdminDashboard() {
         );
     }
 
-    const { stats, health, activity, revenue, settings } = data!;
+    if (!data) {
+        return (
+            <div className="flex h-[80vh] items-center justify-center">
+                <div className="text-center space-y-4">
+                    <div className="text-red-400 text-lg font-medium">Failed to load dashboard data</div>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    const { stats, health, activity, revenue, settings } = data;
 
     // Transform revenue for chart (ensure data exists)
     const chartData = (revenue || []).map((r: any) => ({
-        label: r.month,
-        value: r.amount
+        label: r?.month || '',
+        value: r?.amount || 0
     }));
 
     return (
@@ -329,8 +345,8 @@ function ControlCard({ title, description, isActive, onToggle, loading, icon: Ic
                 <button
                     onClick={onToggle}
                     className={`w-12 h-6 rounded-full relative transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 ${isActive
-                            ? (danger ? 'bg-red-500 focus:ring-red-500' : 'bg-primary-500 focus:ring-primary-500')
-                            : 'bg-slate-700 focus:ring-slate-500'
+                        ? (danger ? 'bg-red-500 focus:ring-red-500' : 'bg-primary-500 focus:ring-primary-500')
+                        : 'bg-slate-700 focus:ring-slate-500'
                         }`}
                 >
                     <div className={`w-4 h-4 rounded-full bg-white shadow-sm absolute top-1 transition-transform duration-300 ${isActive ? 'left-7' : 'left-1'

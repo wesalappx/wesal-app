@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createAdminClient } from '@/lib/supabase/server';
+import { randomInt } from 'crypto';
 
 function generateOTP(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    // Use cryptographically secure random number generation
+    return randomInt(100000, 999999).toString();
 }
 
 export async function POST(request: Request) {
