@@ -99,15 +99,20 @@ export function useTierLimits() {
                 }
 
                 // Fetch games config (public endpoint for premium status)
-                const gamesRes = await fetch('/api/games-config');
+                const gamesRes = await fetch('/api/games-config', {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
                 if (gamesRes.ok) {
                     const gamesData = await gamesRes.json();
+                    console.log('Games config received:', gamesData.games?.length, 'games');
                     if (gamesData.games && Array.isArray(gamesData.games)) {
                         const configMap: Record<string, boolean> = {};
                         gamesData.games.forEach((game: any) => {
                             // Map game id to isPremium status
                             configMap[game.id] = game.isPremium ?? false;
                         });
+                        console.log('Games config map:', configMap);
                         setGamesConfig(configMap);
                     }
                 }

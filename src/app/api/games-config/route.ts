@@ -21,20 +21,33 @@ export async function GET() {
             console.error('Error fetching games config:', error);
         }
 
-        // Return games array, or default if not set
-        const games = data?.value || [
+        // If we have saved config, use it; otherwise use defaults
+        let games;
+        if (data?.value && Array.isArray(data.value) && data.value.length > 0) {
+            games = data.value;
+            console.log('Using saved games config:', games.length, 'games');
+        } else {
             // Default games matching frontend play page
-            { id: 'would-you-rather', isPremium: false },
-            { id: 'compliment-battle', isPremium: false },
-            { id: 'love-roulette', isPremium: false },
-            { id: 'deep-questions', isPremium: false },
-            { id: 'truth-or-dare', isPremium: false },
-            { id: 'memory-lane', isPremium: true },
-            { id: 'couple-quiz', isPremium: true },
-            { id: 'minute-challenges', isPremium: true },
-        ];
+            games = [
+                { id: 'would-you-rather', isPremium: false },
+                { id: 'compliment-battle', isPremium: false },
+                { id: 'love-roulette', isPremium: false },
+                { id: 'deep-questions', isPremium: false },
+                { id: 'truth-or-dare', isPremium: false },
+                { id: 'memory-lane', isPremium: true },
+                { id: 'couple-quiz', isPremium: true },
+                { id: 'minute-challenges', isPremium: true },
+            ];
+            console.log('Using default games config');
+        }
 
-        return NextResponse.json({ games });
+        // Return with no-cache headers to ensure fresh data
+        return NextResponse.json({ games }, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate',
+                'Pragma': 'no-cache',
+            }
+        });
 
     } catch (error: any) {
         console.error('Games config error:', error);
