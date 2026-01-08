@@ -68,6 +68,7 @@ export function useTierLimits() {
     const { user } = useAuthStore();
     const [tier, setTier] = useState<SubscriptionTier>('free'); // Default to free until we verify
     const [isLoading, setIsLoading] = useState(true);
+    const [configLoading, setConfigLoading] = useState(true); // Track if config is still loading
     const [usageCache, setUsageCache] = useState<Record<string, UsageInfo>>({});
 
     // Dynamic limits from admin dashboard
@@ -126,6 +127,8 @@ export function useTierLimits() {
                 }
             } catch (err) {
                 console.error('Failed to fetch config:', err);
+            } finally {
+                setConfigLoading(false);
             }
         };
         fetchConfig();
@@ -266,7 +269,12 @@ export function useTierLimits() {
 
     // Check if a specific game is available
     const isGameAvailable = useCallback((gameType: string): boolean => {
+        // Premium users have full access
         if (tier === 'premium') return true;
+
+        // While config is still loading, show all games as available (no locks)
+        // This prevents the flicker where locks appear then disappear
+        if (configLoading) return true;
 
         // If we have dynamic config from admin, use it
         if (Object.keys(gamesConfig).length > 0) {
@@ -276,11 +284,15 @@ export function useTierLimits() {
 
         // Fallback to hardcoded FREE_GAMES list
         return FREE_GAMES.includes(gameType);
-    }, [tier, gamesConfig]);
+    }, [tier, gamesConfig, configLoading]);
 
     // Check if a specific journey is available
     const isJourneyAvailable = useCallback((journeySlug: string): boolean => {
+        // Premium users have full access
         if (tier === 'premium') return true;
+
+        // While config is still loading, show all journeys as available (no locks)
+        if (configLoading) return true;
 
         // If we have dynamic config from admin, use it
         if (Object.keys(journeysConfig).length > 0) {
@@ -292,7 +304,7 @@ export function useTierLimits() {
         const journey = journeysData.find(j => j.id === journeySlug);
         // If journey not found or isPremium is undefined/false, it's free
         return !journey?.isPremium;
-    }, [tier, journeysConfig]);
+    }, [tier, journeysConfig, configLoading]);
 
     // Get upgrade prompt for a feature
     const getUpgradePrompt = useCallback((feature: string): UpgradePrompt | null => {
@@ -318,6 +330,7 @@ export function useTierLimits() {
     return {
         tier,
         isLoading,
+        configLoading,
         isPremium: tier === 'premium',
         canUse,
         trackUsage,
