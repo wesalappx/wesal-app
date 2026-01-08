@@ -109,7 +109,10 @@ export function useTierLimits() {
                     if (gamesData.games && Array.isArray(gamesData.games)) {
                         const configMap: Record<string, boolean> = {};
                         gamesData.games.forEach((game: any) => {
-                            // Map game id to isPremium status
+                            // Normalize ID: convert underscores to hyphens for compatibility
+                            const normalizedId = game.id.replace(/_/g, '-');
+                            configMap[normalizedId] = game.isPremium ?? false;
+                            // Also keep original ID for backwards compatibility
                             configMap[game.id] = game.isPremium ?? false;
                         });
                         console.log('Games config map:', configMap);
