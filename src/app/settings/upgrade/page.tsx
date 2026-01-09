@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
     ArrowRight, Crown, Check, Loader2, Sparkles, Heart, X,
     MessageCircle, Gamepad2, Map, BarChart3, Zap, Shield,
@@ -30,6 +31,7 @@ interface ActiveOffer {
 export default function UpgradePage() {
     const { language, theme } = useSettingsStore();
     const isRTL = language === 'ar';
+    const router = useRouter();
 
     const {
         isPremium,
