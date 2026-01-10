@@ -14,7 +14,8 @@ import {
     LogOut,
     Sparkles,
     Gamepad2,
-    Map
+    Map,
+    Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -26,6 +27,7 @@ const navigation = [
     { name: 'Games', href: '/admin/games', icon: Gamepad2 },
     { name: 'Journeys', href: '/admin/journeys', icon: Map },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+    { name: 'Logs', href: '/admin/logs', icon: Activity },
     { name: 'Content', href: '/admin/content', icon: FileText },
     { name: 'Finance', href: '/admin/subscriptions', icon: DollarSign },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
