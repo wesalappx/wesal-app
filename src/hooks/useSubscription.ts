@@ -23,7 +23,7 @@ export function useSubscription() {
     const [error, setError] = useState<string | null>(null);
 
     // Check if premium features are available
-    const isPremium = subscription?.status === 'active' && (!subscription.ends_at || new Date(subscription.ends_at) > new Date());
+    const isPremium = subscription?.status === 'premium' && (!subscription.ends_at || new Date(subscription.ends_at) > new Date());
 
     // Fetch subscription status
     const fetchSubscription = useCallback(async () => {
@@ -54,7 +54,7 @@ export function useSubscription() {
                 .from('subscriptions')
                 .select('*')
                 .eq('couple_id', coupleData.id)
-                .eq('status', 'active')
+                .eq('status', 'premium')
                 .single();
 
             if (subError && subError.code !== 'PGRST116') { // Not "no rows" error

@@ -30,11 +30,10 @@ export async function POST(req: Request) {
             .from('subscriptions')
             .upsert({
                 couple_id: coupleId,
-                plan_id: 'premium_monthly',
-                status: 'active',
-                started_at: new Date().toISOString(),
+                status: 'premium',
+                plan_type: 'lifetime',
+                starts_at: new Date().toISOString(),
                 ends_at: endsAt.toISOString(),
-                payment_id: 'ADMIN_GRANTED',
             }, { onConflict: 'couple_id' });
 
         if (error) {
