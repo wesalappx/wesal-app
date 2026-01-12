@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/84</span>
+                <span class='fraction'>0/79</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/77</span>
+                <span class='fraction'>0/72</span>
             </div>
         
             
@@ -253,17 +253,7 @@
 <a name='L188'></a><a href='#L188'>188</a>
 <a name='L189'></a><a href='#L189'>189</a>
 <a name='L190'></a><a href='#L190'>190</a>
-<a name='L191'></a><a href='#L191'>191</a>
-<a name='L192'></a><a href='#L192'>192</a>
-<a name='L193'></a><a href='#L193'>193</a>
-<a name='L194'></a><a href='#L194'>194</a>
-<a name='L195'></a><a href='#L195'>195</a>
-<a name='L196'></a><a href='#L196'>196</a>
-<a name='L197'></a><a href='#L197'>197</a>
-<a name='L198'></a><a href='#L198'>198</a>
-<a name='L199'></a><a href='#L199'>199</a>
-<a name='L200'></a><a href='#L200'>200</a>
-<a name='L201'></a><a href='#L201'>201</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L191'></a><a href='#L191'>191</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -333,8 +323,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -345,7 +333,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -358,14 +346,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -532,9 +512,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
                 .gte('created_at', sevenDaysAgo.toISOString())
                 .order('created_at', { ascending: true });
 &nbsp;
-            // DEBUG: Log fetched data
-<span class="cstat-no" title="statement not covered" >            console.log('[useInsights] Fetched check-ins:', checkIns);</span>
-<span class="cstat-no" title="statement not covered" >            console.log('[useInsights] User ID:', user.id);</span>
+&nbsp;
 &nbsp;
 <span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (error) {</span>
 <span class="cstat-no" title="statement not covered" >                console.error('Error fetching check-ins:', error);</span>
@@ -545,7 +523,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (!checkIns || checkIns.length === 0) {</span>
-<span class="cstat-no" title="statement not covered" >                console.log('[useInsights] No check-ins found, using mock data');</span>
+&nbsp;
                 // Use mock data when no check-ins exist
 <span class="cstat-no" title="statement not covered" >                setInsights(mockInsights);</span>
 <span class="cstat-no" title="statement not covered" >                setIsLoading(false);</span>
@@ -559,15 +537,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             const avgSleep = <span class="cstat-no" title="statement not covered" >checkIns.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, c) =&gt; <span class="cstat-no" title="statement not covered" >sum + (c.sleep || 3), 0</span>) / checkIns.length;</span>
             const avgConnection = <span class="cstat-no" title="statement not covered" >checkIns.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, c) =&gt; <span class="cstat-no" title="statement not covered" >sum + (c.connection || 3), 0</span>) / checkIns.length;</span>
 &nbsp;
-            // DEBUG: Log calculated averages
-<span class="cstat-no" title="statement not covered" >            console.log('[useInsights] Averages (1-5 scale):', { avgMood, avgEnergy, avgStress, avgSleep, avgConnection });</span>
-<span class="cstat-no" title="statement not covered" >            console.log('[useInsights] Percentages:', {</span>
-                mood: Math.round(avgMood * 20),
-                energy: Math.round(avgEnergy * 20),
-                stress: Math.round(avgStress * 20),
-                sleep: Math.round(avgSleep * 20),
-                connection: Math.round(avgConnection * 20)
-            });
+&nbsp;
 &nbsp;
             // Calculate overall score (weighted average)
             const overallScore = <span class="cstat-no" title="statement not covered" >Math.round(</span>
@@ -670,7 +640,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-01T11:54:50.621Z
+                at 2026-01-12T11:01:16.464Z
             </div>
         <script src="../prettify.js"></script>
         <script>

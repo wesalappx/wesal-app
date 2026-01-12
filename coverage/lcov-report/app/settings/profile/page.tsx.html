@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/106</span>
+                <span class='fraction'>0/108</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/57</span>
+                <span class='fraction'>0/75</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/101</span>
+                <span class='fraction'>0/103</span>
             </div>
         
             
@@ -444,7 +444,9 @@
 <a name='L379'></a><a href='#L379'>379</a>
 <a name='L380'></a><a href='#L380'>380</a>
 <a name='L381'></a><a href='#L381'>381</a>
-<a name='L382'></a><a href='#L382'>382</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -453,7 +455,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -834,11 +838,13 @@ import Link from <span class="cstat-no" title="statement not covered" >'next/lin
 import { useRouter } from <span class="cstat-no" title="statement not covered" >'next/navigation';</span>
 import { useAuth } from <span class="cstat-no" title="statement not covered" >'@/hooks/useAuth';</span>
 import { createClient } from <span class="cstat-no" title="statement not covered" >'@/lib/supabase/client';</span>
+import { useSettingsStore } from <span class="cstat-no" title="statement not covered" >'@/stores/settings-store';</span>
 &nbsp;
 export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >ProfileEditPage() {</span></span>
     const { user, updateProfile } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
     const router = <span class="cstat-no" title="statement not covered" >useRouter();</span>
     const supabase = <span class="cstat-no" title="statement not covered" >createClient();</span>
+    const { theme } = <span class="cstat-no" title="statement not covered" >useSettingsStore();</span>
     const fileInputRef = <span class="cstat-no" title="statement not covered" >useRef&lt;HTMLInputElement&gt;(null);</span>
 &nbsp;
     const [name, setName] = <span class="cstat-no" title="statement not covered" >useState('');</span>
@@ -983,14 +989,14 @@ export default function <span class="cstat-no" title="statement not covered" ><s
     };
 &nbsp;
     return (
-        &lt;div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900"&gt;
+        &lt;div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}&gt;
             {/* Header */}
-            &lt;header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5"&gt;
+            &lt;header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}&gt;
                 &lt;div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4"&gt;
-                    &lt;Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors"&gt;
-                        &lt;ArrowRight className="w-6 h-6 text-white" /&gt;
+                    &lt;Link href="/settings" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}&gt;
+                        &lt;ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} /&gt;
                     &lt;/Link&gt;
-                    &lt;h1 className="text-xl font-bold text-white"&gt;تعديل الملف الشخصي&lt;/h1&gt;
+                    &lt;h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;تعديل الملف الشخصي&lt;/h1&gt;
                 &lt;/div&gt;
             &lt;/header&gt;
 &nbsp;
@@ -998,7 +1004,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                 &lt;motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="glass-card p-6 border-surface-700/50"
+                    className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'glass-card border-surface-700/50'}`}
                 &gt;
                     &lt;form onSubmit={handleSubmit} className="space-y-6"&gt;
                         {/* Avatar Section */}
@@ -1038,7 +1044,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                     )}
                                 &lt;/button&gt;
                             &lt;/div&gt;
-                            &lt;p className="text-surface-400 text-sm mt-3"&gt;اضغط لتغيير الصورة&lt;/p&gt;
+                            &lt;p className={`text-sm mt-3 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;اضغط لتغيير الصورة&lt;/p&gt;
                             {<span class="branch-0 cbranch-no" title="branch not covered" >errors.photo </span>&amp;&amp; (
                                 &lt;p className="text-red-400 text-sm mt-2"&gt;{errors.photo}&lt;/p&gt;
                             )}
@@ -1054,7 +1060,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
                         {/* Name Field */}
                         &lt;div className="space-y-2"&gt;
-                            &lt;label className="block text-sm font-bold text-surface-300 text-right"&gt;
+                            &lt;label className={`block text-sm font-bold text-right ${theme === 'light' ? 'text-slate-700' : 'text-surface-300'}`}&gt;
                                 الاسم المعروض
                             &lt;/label&gt;
                             &lt;div className="relative"&gt;
@@ -1062,8 +1068,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                     type="text"
                                     value={name}
                                     onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >setName(e.target.value)}</span>
-                                    className={`w-full px-4 py-3 pr-12 rounded-xl bg-surface-900/50 border text-white text-right placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all
-                      ${errors.name ? 'border-red-500/50 focus:border-red-500' : 'border-surface-600 focus:border-primary-500'}`}
+                                    className={`w-full px-4 py-3 pr-12 rounded-xl border text-right placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all
+                      ${errors.name ? 'border-red-500/50 focus:border-red-500' : theme === 'light' ? 'bg-white border-slate-200 text-slate-900' : 'bg-surface-900/50 border-surface-600 text-white'}`}
                                     placeholder="أدخل اسمك"
                                     dir="rtl"
                                 /&gt;
@@ -1124,8 +1130,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                     type="button"
                                     onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etGender('male')}</span>
                                     className={`py-3 rounded-xl border font-medium transition-all flex items-center justify-center gap-2 ${gender === 'male'
-                                            ? 'bg-primary-500/20 border-primary-500 text-primary-400'
-                                            : 'bg-surface-800/50 border-surface-600 text-surface-300 hover:bg-surface-700/50'
+                                        ? 'bg-primary-500/20 border-primary-500 text-primary-400'
+                                        : 'bg-surface-800/50 border-surface-600 text-surface-300 hover:bg-surface-700/50'
                                         }`}
                                 &gt;
                                     👨 ذكر
@@ -1134,8 +1140,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                     type="button"
                                     onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etGender('female')}</span>
                                     className={`py-3 rounded-xl border font-medium transition-all flex items-center justify-center gap-2 ${gender === 'female'
-                                            ? 'bg-pink-500/20 border-pink-500 text-pink-400'
-                                            : 'bg-surface-800/50 border-surface-600 text-surface-300 hover:bg-surface-700/50'
+                                        ? 'bg-pink-500/20 border-pink-500 text-pink-400'
+                                        : 'bg-surface-800/50 border-surface-600 text-surface-300 hover:bg-surface-700/50'
                                         }`}
                                 &gt;
                                     👩 أنثى
@@ -1213,7 +1219,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-01T11:54:50.621Z
+                at 2026-01-12T11:01:16.464Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

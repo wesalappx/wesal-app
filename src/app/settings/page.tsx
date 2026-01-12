@@ -66,7 +66,7 @@ export default function SettingsPage() {
                     .from('subscriptions')
                     .select('*')
                     .eq('couple_id', coupleId)
-                    .eq('status', 'active')
+                    .eq('status', 'premium')
                     .single();
 
                 if (sub) {

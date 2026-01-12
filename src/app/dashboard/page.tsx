@@ -141,7 +141,7 @@ export default function Dashboard() {
                     .from('subscriptions')
                     .select('*')
                     .eq('couple_id', cId)
-                    .eq('status', 'active')
+                    .eq('status', 'premium')
                     .single();
                 setIsPremium(!!sub);
 

@@ -116,7 +116,12 @@
 <a name='L51'></a><a href='#L51'>51</a>
 <a name='L52'></a><a href='#L52'>52</a>
 <a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -130,6 +135,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -186,24 +196,29 @@ export default async function <span class="cstat-no" title="statement not covere
     }
 &nbsp;
     return (
-        &lt;div className="min-h-screen bg-slate-950 flex font-sans selection:bg-primary-500/30" dir="ltr"&gt;
-            {/* Background Gradients */}
+        &lt;div className="min-h-screen bg-slate-950 flex font-sans selection:bg-primary-500/30 text-white" dir="ltr"&gt;
+            {/* Ultra Background Experience */}
             &lt;div className="fixed inset-0 z-0 pointer-events-none overflow-hidden"&gt;
-                &lt;div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[100px] animate-pulse-slow" /&gt;
-                &lt;div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent-500/10 rounded-full blur-[100px] animate-pulse-slow delay-700" /&gt;
+                {/* Deep atmospheric glow */}
+                &lt;div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-primary-500/10 rounded-full blur-[120px] animate-pulse-slow" /&gt;
+                &lt;div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-purple-500/10 rounded-full blur-[120px] animate-pulse-slow delay-1000" /&gt;
+                &lt;div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[100px]" /&gt;
+&nbsp;
+                {/* Noise Texture Overlay (Optional, if we had the asset, but let's stick to pure CSS via gradients) */}
+                &lt;div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] contrast-150 brightness-100" /&gt;
             &lt;/div&gt;
 &nbsp;
             {/* Sidebar */}
             &lt;AdminSidebar userEmail={session.email} /&gt;
 &nbsp;
             {/* Main Content Area */}
-            &lt;div className="flex-1 flex flex-col min-w-0 relative z-10"&gt;
+            &lt;div className="flex-1 flex flex-col min-w-0 relative z-10 overflow-hidden"&gt;
                 {/* Top bar */}
-                &lt;header className="h-20 flex items-center px-8 border-b border-white/5"&gt;
+                &lt;header className="h-20 flex items-center px-8 border-b border-white/5 bg-slate-900/20 backdrop-blur-md"&gt;
                     &lt;div className="flex-1" /&gt;
                     &lt;Link
                         href="/dashboard"
-                        className="group flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/50 border border-white/10 hover:border-primary-500/50 hover:bg-primary-500/10 transition-all duration-300"
+                        className="group flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-white/10 hover:border-primary-500/50 hover:bg-primary-500/10 transition-all duration-300"
                     &gt;
                         &lt;span className="text-sm font-medium text-slate-400 group-hover:text-primary-300 transition-colors"&gt;
                             ← Back to App
@@ -211,9 +226,9 @@ export default async function <span class="cstat-no" title="statement not covere
                     &lt;/Link&gt;
                 &lt;/header&gt;
 &nbsp;
-                {/* Page content */}
-                &lt;main className="flex-1 p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent"&gt;
-                    &lt;div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500"&gt;
+                {/* Scrollable Content */}
+                &lt;main className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent"&gt;
+                    &lt;div className="max-w-7xl mx-auto w-full"&gt;
                         {children}
                     &lt;/div&gt;
                 &lt;/main&gt;
@@ -229,7 +244,7 @@ export default async function <span class="cstat-no" title="statement not covere
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-01T11:54:50.621Z
+                at 2026-01-12T11:01:16.464Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

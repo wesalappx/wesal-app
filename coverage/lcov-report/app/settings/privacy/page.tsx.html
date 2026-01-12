@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>0/41</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>0/46</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/36</span>
+                <span class='fraction'>0/38</span>
             </div>
         
             
@@ -281,7 +281,10 @@
 <a name='L216'></a><a href='#L216'>216</a>
 <a name='L217'></a><a href='#L217'>217</a>
 <a name='L218'></a><a href='#L218'>218</a>
-<a name='L219'></a><a href='#L219'>219</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -291,6 +294,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -509,9 +515,12 @@ import { ToggleSwitch } from <span class="cstat-no" title="statement not covered
 import { createClient } from <span class="cstat-no" title="statement not covered" >'@/lib/supabase/client';</span>
 import { useAuth } from <span class="cstat-no" title="statement not covered" >'@/hooks/useAuth';</span>
 &nbsp;
+import { useSettingsStore } from <span class="cstat-no" title="statement not covered" >'@/stores/settings-store';</span>
+&nbsp;
 export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >PrivacyPage() {</span></span>
     const supabase = <span class="cstat-no" title="statement not covered" >createClient();</span>
     const { user } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
+    const { theme } = <span class="cstat-no" title="statement not covered" >useSettingsStore();</span>
 &nbsp;
     const [shareAnalytics, setShareAnalytics] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
     const [showOnlineStatus, setShowOnlineStatus] = <span class="cstat-no" title="statement not covered" >useState(true);</span>
@@ -576,14 +585,14 @@ export default function <span class="cstat-no" title="statement not covered" ><s
     }
 &nbsp;
     return (
-        &lt;div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900"&gt;
+        &lt;div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}&gt;
             {/* Header */}
-            &lt;header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5"&gt;
+            &lt;header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}&gt;
                 &lt;div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4"&gt;
-                    &lt;Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors"&gt;
-                        &lt;ArrowRight className="w-6 h-6 text-white" /&gt;
+                    &lt;Link href="/settings" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}&gt;
+                        &lt;ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} /&gt;
                     &lt;/Link&gt;
-                    &lt;h1 className="text-xl font-bold text-white"&gt;الخصوصية&lt;/h1&gt;
+                    &lt;h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;الخصوصية&lt;/h1&gt;
                 &lt;/div&gt;
             &lt;/header&gt;
 &nbsp;
@@ -598,13 +607,13 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                         &lt;div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary-500/20 flex items-center justify-center"&gt;
                             &lt;Shield className="w-8 h-8 text-primary-400" /&gt;
                         &lt;/div&gt;
-                        &lt;p className="text-surface-400"&gt;تحكم في كيفية استخدام بياناتك&lt;/p&gt;
+                        &lt;p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}&gt;تحكم في كيفية استخدام بياناتك&lt;/p&gt;
                     &lt;/div&gt;
 &nbsp;
                     {/* Privacy Settings */}
                     &lt;div className="space-y-4"&gt;
                         {/* Online Status */}
-                        &lt;div className="p-4 rounded-2xl bg-white/5 border border-white/10"&gt;
+                        &lt;div className={`p-4 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-white/5 border-white/10'}`}&gt;
                             &lt;div className="flex items-center gap-4"&gt;
                                 &lt;ToggleSwitch
                                     enabled={showOnlineStatus}
@@ -612,8 +621,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                 /&gt;
                                 &lt;div className="flex items-center gap-3 flex-1"&gt;
                                     &lt;div className="flex-1 text-right"&gt;
-                                        &lt;h3 className="font-bold text-white"&gt;إظهار حالة الاتصال&lt;/h3&gt;
-                                        &lt;p className="text-sm text-surface-400 mt-1"&gt;
+                                        &lt;h3 className={`font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;إظهار حالة الاتصال&lt;/h3&gt;
+                                        &lt;p className={`text-sm mt-1 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;
                                             يساعد شريكك على معرفة أفضل وقت للتواصل معك
                                         &lt;/p&gt;
                                     &lt;/div&gt;
@@ -625,7 +634,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                         &lt;/div&gt;
 &nbsp;
                         {/* Save History */}
-                        &lt;div className="p-4 rounded-2xl bg-white/5 border border-white/10"&gt;
+                        &lt;div className={`p-4 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-white/5 border-white/10'}`}&gt;
                             &lt;div className="flex items-center gap-4"&gt;
                                 &lt;ToggleSwitch
                                     enabled={saveHistory}
@@ -633,8 +642,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                 /&gt;
                                 &lt;div className="flex items-center gap-3 flex-1"&gt;
                                     &lt;div className="flex-1 text-right"&gt;
-                                        &lt;h3 className="font-bold text-white"&gt;حفظ سجل الألعاب&lt;/h3&gt;
-                                        &lt;p className="text-sm text-surface-400 mt-1"&gt;
+                                        &lt;h3 className={`font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;حفظ سجل الألعاب&lt;/h3&gt;
+                                        &lt;p className={`text-sm mt-1 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;
                                             تتبع تقدمكم وذكرياتكم الجميلة معاً
                                         &lt;/p&gt;
                                     &lt;/div&gt;
@@ -646,7 +655,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                         &lt;/div&gt;
 &nbsp;
                         {/* Analytics */}
-                        &lt;div className="p-4 rounded-2xl bg-white/5 border border-white/10"&gt;
+                        &lt;div className={`p-4 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-white/5 border-white/10'}`}&gt;
                             &lt;div className="flex items-center gap-4"&gt;
                                 &lt;ToggleSwitch
                                     enabled={shareAnalytics}
@@ -654,8 +663,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                 /&gt;
                                 &lt;div className="flex items-center gap-3 flex-1"&gt;
                                     &lt;div className="flex-1 text-right"&gt;
-                                        &lt;h3 className="font-bold text-white"&gt;المساهمة في التطوير&lt;/h3&gt;
-                                        &lt;p className="text-sm text-surface-400 mt-1"&gt;
+                                        &lt;h3 className={`font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;المساهمة في التطوير&lt;/h3&gt;
+                                        &lt;p className={`text-sm mt-1 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;
                                             ساعدنا على تحسين التجربة (بيانات مجهولة)
                                         &lt;/p&gt;
                                     &lt;/div&gt;
@@ -708,7 +717,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                         &lt;Link href="/privacy-policy" className="block text-primary-400 hover:text-primary-300 transition-colors"&gt;
                             سياسة الخصوصية
                         &lt;/Link&gt;
-                        &lt;Link href="/terms" className="block text-surface-400 hover:text-white transition-colors"&gt;
+                        &lt;Link href="/terms" className={`block transition-colors ${theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-surface-400 hover:text-white'}`}&gt;
                             شروط الاستخدام
                         &lt;/Link&gt;
                     &lt;/div&gt;
@@ -724,7 +733,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-01T11:54:50.621Z
+                at 2026-01-12T11:01:16.464Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

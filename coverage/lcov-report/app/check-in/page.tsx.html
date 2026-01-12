@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/89</span>
+                <span class='fraction'>0/88</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/118</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/85</span>
+                <span class='fraction'>0/84</span>
             </div>
         
             
@@ -598,7 +598,17 @@
 <a name='L533'></a><a href='#L533'>533</a>
 <a name='L534'></a><a href='#L534'>534</a>
 <a name='L535'></a><a href='#L535'>535</a>
-<a name='L536'></a><a href='#L536'>536</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -618,6 +628,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -707,6 +720,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -776,7 +790,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -787,7 +801,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -823,7 +837,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -882,6 +896,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1153,6 +1173,9 @@ import {
     Moon
 } from <span class="cstat-no" title="statement not covered" >'lucide-react';</span>
 import Confetti from <span class="cstat-no" title="statement not covered" >'@/components/Confetti';</span>
+import { createClient } from '@/lib/supabase/client';
+import { useSettingsStore } from <span class="cstat-no" title="statement not covered" >'@/stores/settings-store';</span>
+import { useTranslation } from '@/hooks/useTranslation';
 import { useSound } from <span class="cstat-no" title="statement not covered" >'@/hooks/useSound';</span>
 import { useCheckIn, CheckIn } from <span class="cstat-no" title="statement not covered" >'@/hooks/useCheckIn';</span>
 import { analyzeMood } from <span class="cstat-no" title="statement not covered" >'@/lib/ai';</span>
@@ -1243,6 +1266,7 @@ interface AiResponse {
 }
 &nbsp;
 export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >CheckInPage() {</span></span>
+    const { theme } = <span class="cstat-no" title="statement not covered" >useSettingsStore();</span>
     const [qIndex, setQIndex] = <span class="cstat-no" title="statement not covered" >useState(0);</span>
     const [scores, setScores] = <span class="cstat-no" title="statement not covered" >useState&lt;Scores&gt;({});</span>
     const [isComplete, setIsComplete] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
@@ -1311,7 +1335,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 <span class="cstat-no" title="statement not covered" >            playSound('success');</span>
 &nbsp;
             // Save
-<span class="cstat-no" title="statement not covered" >            console.log('[CheckIn] Saving scores:', newScores);</span>
+&nbsp;
             const { error } = <span class="cstat-no" title="statement not covered" >await createCheckIn({</span>
                 mood: newScores.mood,
                 energy: newScores.energy,
@@ -1321,8 +1345,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                 shared_with_partner: shareWithPartner,
             });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >            if (error) <span class="cstat-no" title="statement not covered" >console.error('[CheckIn] Failed to save:', error);</span></span>
-            else <span class="cstat-no" title="statement not covered" >console.log('[CheckIn] Save successful');</span>
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (error) <span class="cstat-no" title="statement not covered" >console.error('[CheckIn] Failed to save:', error);</span></span>
+&nbsp;
 &nbsp;
             // Trigger AI
 <span class="cstat-no" title="statement not covered" >            try {</span>
@@ -1358,7 +1382,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
             // Fetch weekly history for graphs
             const { data: history } = <span class="cstat-no" title="statement not covered" >await getHistory(7);</span>
-<span class="cstat-no" title="statement not covered" >            console.log('[CheckIn] Weekly history fetched:', history);</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >            setWeeklyData(history || []);</span>
 &nbsp;
             // Allow animation to play for a bit
@@ -1373,7 +1397,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
         }
     };
 &nbsp;
-    return &lt;main className="min-h-screen p-4 pb-44 relative overflow-hidden font-sans bg-surface-900"&gt;
+    return &lt;main className={`min-h-screen p-4 pb-44 relative overflow-hidden font-sans ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900'}`}&gt;
         &lt;Confetti isActive={showConfetti &amp;&amp; isComplete} onComplete={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etShowConfetti(false)} /&gt;</span>
 &nbsp;
         {/* Back Link - Only in Survey Mode */}
@@ -1391,7 +1415,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             {/* SURVEY MODE */}
             {!isComplete &amp;&amp; loadingState === 'idle' &amp;&amp; (
                 &lt;div className="min-h-[60vh] flex flex-col justify-center"&gt;
-                    &lt;div className="w-full h-1 bg-surface-800 rounded-full mb-12 relative overflow-hidden"&gt;
+                    &lt;div className={`w-full h-1 rounded-full mb-12 relative overflow-hidden ${theme === 'light' ? 'bg-slate-200' : 'bg-surface-800'}`}&gt;
                         &lt;motion.div
                             className="absolute top-0 right-0 h-full bg-primary-500"
                             initial={{ width: 0 }}
@@ -1410,18 +1434,21 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                             &lt;div className={`inline-flex p-4 rounded-2xl ${currentQ.bgColor}/20 mb-6`}&gt;
                                 &lt;currentQ.icon className={`w-12 h-12 ${currentQ.color}`} /&gt;
                             &lt;/div&gt;
-                            &lt;h2 className="text-3xl font-bold text-white mb-8"&gt;{currentQ.label}&lt;/h2&gt;
+                            &lt;h2 className={`text-3xl font-bold mb-8 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;{currentQ.label}&lt;/h2&gt;
 &nbsp;
                             &lt;div className="grid gap-3"&gt;
                                 {currentQ.options.map(<span class="fstat-no" title="function not covered" >(o</span>pt) =&gt; (
 <span class="cstat-no" title="statement not covered" >                                    &lt;button</span>
                                         key={opt.val}
                                         onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >h</span>andleAnswer(opt.val)}</span>
-                                        className="w-full p-4 rounded-xl bg-surface-800 hover:bg-surface-700 border border-white/5 hover:border-primary-500/50 transition-all flex items-center justify-between group"
+                                        className={`w-full p-4 rounded-xl border transition-all flex items-center justify-between group ${theme === 'light'
+                                            ? 'bg-white hover:bg-slate-50 border-slate-200 hover:border-primary-300 shadow-sm'
+                                            : 'bg-surface-800 hover:bg-surface-700 border-white/5 hover:border-primary-500/50'
+                                            }`}
                                     &gt;
                                         &lt;span className="text-xl group-hover:scale-125 transition-transform"&gt;{opt.emoji}&lt;/span&gt;
-                                        &lt;span className="font-bold text-surface-200"&gt;{opt.label}&lt;/span&gt;
-                                        &lt;div className="w-6 h-6 rounded-full border-2 border-surface-600 group-hover:border-primary-500 group-hover:bg-primary-500/20" /&gt;
+                                        &lt;span className={`font-bold ${theme === 'light' ? 'text-slate-700' : 'text-surface-200'}`}&gt;{opt.label}&lt;/span&gt;
+                                        &lt;div className={`w-6 h-6 rounded-full border-2 ${theme === 'light' ? 'border-slat-300 group-hover:border-primary-500' : 'border-surface-600 group-hover:border-primary-500'} group-hover:bg-primary-500/20`} /&gt;
                                     &lt;/button&gt;
                                 ))}
                             &lt;/div&gt;
@@ -1436,7 +1463,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 bg-gradient-to-b from-surface-900 to-black flex flex-col items-center justify-center p-8 text-center"
+                    className={`fixed inset-0 z-50 flex flex-col items-center justify-center p-8 text-center ${theme === 'light' ? 'bg-gradient-to-b from-slate-50 to-white' : 'bg-gradient-to-b from-surface-900 to-black'}`}
                 &gt;
                     {/* Fluid Orb */}
                     &lt;div className="relative w-64 h-64 mb-8"&gt;
@@ -1458,10 +1485,10 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                         &lt;/motion.div&gt;
                     &lt;/div&gt;
 &nbsp;
-                    &lt;h2 className="text-2xl font-bold text-white mb-2 animate-pulse"&gt;
+                    &lt;h2 className={`text-2xl font-bold mb-2 animate-pulse ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;
                         جاري استشعار الحالة...
                     &lt;/h2&gt;
-                    &lt;p className="text-surface-400"&gt;تواصل مع ذاتك بينما نحلل البيانات&lt;/p&gt;
+                    &lt;p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}&gt;تواصل مع ذاتك بينما نحلل البيانات&lt;/p&gt;
                 &lt;/motion.div&gt;
             )}
 &nbsp;
@@ -1474,48 +1501,51 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                 &gt;
                     {/* Header */}
                     &lt;div className="text-center pt-8"&gt;
-                        &lt;div className="inline-block p-1 rounded-full border border-surface-700 bg-surface-800/50 backdrop-blur-sm mb-4"&gt;
+                        &lt;div className={`inline-block p-1 rounded-full border backdrop-blur-sm mb-4 ${theme === 'light'
+                            ? 'bg-primary-50 border-primary-100'
+                            : 'bg-surface-800/50 border-surface-700'
+                            }`}&gt;
                             &lt;span className="px-3 py-1 text-xs font-semibold text-primary-300"&gt;تم الحفظ بنجاح&lt;/span&gt;
                         &lt;/div&gt;
-                        &lt;h2 className="text-3xl font-bold text-white mb-2"&gt;ملخص يومك&lt;/h2&gt;
+                        &lt;h2 className={`text-3xl font-bold mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;ملخص يومك&lt;/h2&gt;
                     &lt;/div&gt;
 &nbsp;
                     {/* 1. TOP SECTION: STATS GRID */}
                     &lt;div className="flex flex-wrap gap-2 justify-center"&gt;
-                        &lt;div className="glass-card p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center bg-amber-500/5 border-amber-500/20"&gt;
+                        &lt;div className={`p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center rounded-2xl border ${theme === 'light' ? 'bg-amber-50 border-amber-100' : 'bg-amber-500/5 border-amber-500/20'}`}&gt;
                             &lt;Sun className="w-5 h-5 text-amber-400 mb-1" /&gt;
-                            &lt;span className="text-xl font-bold text-white"&gt;{scores.mood}/5&lt;/span&gt;
-                            &lt;span className="text-[10px] text-surface-400"&gt;المزاج&lt;/span&gt;
+                            &lt;span className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;{scores.mood}/5&lt;/span&gt;
+                            &lt;span className={`text-[10px] ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;المزاج&lt;/span&gt;
                         &lt;/div&gt;
-                        &lt;div className="glass-card p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center bg-blue-500/5 border-blue-500/20"&gt;
+                        &lt;div className={`p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center rounded-2xl border ${theme === 'light' ? 'bg-blue-50 border-blue-100' : 'bg-blue-500/5 border-blue-500/20'}`}&gt;
                             &lt;Zap className="w-5 h-5 text-blue-400 mb-1" /&gt;
-                            &lt;span className="text-xl font-bold text-white"&gt;{scores.energy}/5&lt;/span&gt;
-                            &lt;span className="text-[10px] text-surface-400"&gt;الطاقة&lt;/span&gt;
+                            &lt;span className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;{scores.energy}/5&lt;/span&gt;
+                            &lt;span className={`text-[10px] ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;الطاقة&lt;/span&gt;
                         &lt;/div&gt;
-                        &lt;div className="glass-card p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center bg-rose-500/5 border-rose-500/20"&gt;
+                        &lt;div className={`p-3 flex-1 min-w-[100px] flex flex-col items-center justify-center rounded-2xl border ${theme === 'light' ? 'bg-rose-50 border-rose-100' : 'bg-rose-500/5 border-rose-500/20'}`}&gt;
                             &lt;Brain className="w-5 h-5 text-rose-400 mb-1" /&gt;
-                            &lt;span className="text-xl font-bold text-white"&gt;{scores.stress}/5&lt;/span&gt;
-                            &lt;span className="text-[10px] text-surface-400"&gt;الراحة&lt;/span&gt;
+                            &lt;span className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;{scores.stress}/5&lt;/span&gt;
+                            &lt;span className={`text-[10px] ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;الراحة&lt;/span&gt;
                         &lt;/div&gt;
                         &lt;div className="w-full flex gap-2"&gt;
-                            &lt;div className="glass-card p-3 flex-1 flex flex-col items-center justify-center bg-indigo-500/5 border-indigo-500/20"&gt;
+                            &lt;div className={`p-3 flex-1 flex flex-col items-center justify-center rounded-2xl border ${theme === 'light' ? 'bg-indigo-50 border-indigo-100' : 'bg-indigo-500/5 border-indigo-500/20'}`}&gt;
                                 &lt;Moon className="w-5 h-5 text-indigo-400 mb-1" /&gt;
-                                &lt;span className="text-xl font-bold text-white"&gt;{scores.sleep}/5&lt;/span&gt;
-                                &lt;span className="text-[10px] text-surface-400"&gt;النوم&lt;/span&gt;
+                                &lt;span className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;{scores.sleep}/5&lt;/span&gt;
+                                &lt;span className={`text-[10px] ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;النوم&lt;/span&gt;
                             &lt;/div&gt;
-                            &lt;div className="glass-card p-3 flex-1 flex flex-col items-center justify-center bg-pink-500/5 border-pink-500/20"&gt;
+                            &lt;div className={`p-3 flex-1 flex flex-col items-center justify-center rounded-2xl border ${theme === 'light' ? 'bg-pink-50 border-pink-100' : 'bg-pink-500/5 border-pink-500/20'}`}&gt;
                                 &lt;Heart className="w-5 h-5 text-pink-400 mb-1" /&gt;
-                                &lt;span className="text-xl font-bold text-white"&gt;{scores.connection}/5&lt;/span&gt;
-                                &lt;span className="text-[10px] text-surface-400"&gt;التواصل&lt;/span&gt;
+                                &lt;span className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;{scores.connection}/5&lt;/span&gt;
+                                &lt;span className={`text-[10px] ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;التواصل&lt;/span&gt;
                             &lt;/div&gt;
                         &lt;/div&gt;
                     &lt;/div&gt;
 &nbsp;
                     {/* 2. MIDDLE SECTION: TODAY'S BARS */}
-                    &lt;div className="glass-card p-6"&gt;
+                    &lt;div className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
                         &lt;div className="flex items-center gap-2 mb-4"&gt;
                             &lt;BarChart3 className="w-4 h-4 text-surface-400" /&gt;
-                            &lt;h3 className="text-sm font-bold text-surface-300"&gt;مؤشرات اليوم&lt;/h3&gt;
+                            &lt;h3 className={`text-sm font-bold ${theme === 'light' ? 'text-slate-700' : 'text-surface-300'}`}&gt;مؤشرات اليوم&lt;/h3&gt;
                         &lt;/div&gt;
                         &lt;div className="space-y-3"&gt;
                             {QUESTIONS.map(<span class="fstat-no" title="function not covered" >(q</span>) =&gt; {
@@ -1534,8 +1564,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                 };
 <span class="cstat-no" title="statement not covered" >                                return (</span>
                                     &lt;div key={q.id} className="flex items-center gap-3"&gt;
-                                        &lt;span className="text-xs text-surface-400 w-16 whitespace-nowrap"&gt;{getShortLabel(q.label)}&lt;/span&gt;
-                                        &lt;div className="h-2 flex-1 bg-surface-800 rounded-full overflow-hidden"&gt;
+                                        &lt;span className={`text-xs w-16 whitespace-nowrap ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;{getShortLabel(q.label)}&lt;/span&gt;
+                                        &lt;div className={`h-2 flex-1 rounded-full overflow-hidden ${theme === 'light' ? 'bg-slate-100' : 'bg-surface-800'}`}&gt;
                                             &lt;motion.div
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${pct}%` }}
@@ -1551,10 +1581,10 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
                     {/* WEEKLY TREND GRAPH */}
                     {<span class="branch-0 cbranch-no" title="branch not covered" >weeklyData.length &gt; 1 &amp;&amp; (</span>
-                        &lt;div className="glass-card p-6"&gt;
+                        &lt;div className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
                             &lt;div className="flex items-center gap-2 mb-4"&gt;
                                 &lt;BarChart3 className="w-4 h-4 text-primary-400" /&gt;
-                                &lt;h3 className="text-sm font-bold text-white"&gt;تطور الأسبوع&lt;/h3&gt;
+                                &lt;h3 className={`text-sm font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;تطور الأسبوع&lt;/h3&gt;
                             &lt;/div&gt;
                             &lt;div className="space-y-3"&gt;
                                 {['mood', 'energy', 'stress', 'sleep', 'connection'].map(<span class="fstat-no" title="function not covered" >(m</span>etric) =&gt; {
@@ -1568,7 +1598,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                                 &lt;div className={`p-1.5 rounded-lg ${question.bgColor}/10`}&gt;
                                                     &lt;question.icon className={`w-3.5 h-3.5 ${question.color}`} /&gt;
                                                 &lt;/div&gt;
-                                                &lt;span className="text-xs font-medium text-surface-200"&gt;{question.label.split(' ').slice(1).join(' ')}&lt;/span&gt;
+                                                &lt;span className={`text-xs font-medium ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;{question.label.split(' ').slice(1).join(' ')}&lt;/span&gt;
                                             &lt;/div&gt;
 &nbsp;
                                             {/* Sparkline Bars */}
@@ -1599,8 +1629,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                 })}
                             &lt;/div&gt;
                             &lt;div className="flex justify-between mt-3 px-1"&gt;
-                                &lt;span className="text-xs text-surface-500"&gt;قبل 7 أيام&lt;/span&gt;
-                                &lt;span className="text-xs text-surface-500"&gt;اليوم&lt;/span&gt;
+                                &lt;span className={`text-xs ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}&gt;قبل 7 أيام&lt;/span&gt;
+                                &lt;span className={`text-xs ${theme === 'light' ? 'text-slate-400' : 'text-surface-500'}`}&gt;اليوم&lt;/span&gt;
                             &lt;/div&gt;
                         &lt;/div&gt;
                     )}
@@ -1609,34 +1639,34 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     &lt;div className="space-y-4"&gt;
                         &lt;div className="flex items-center gap-2 px-2"&gt;
                             &lt;Sparkles className="w-5 h-5 text-primary-400" /&gt;
-                            &lt;h3 className="text-lg font-bold text-white"&gt;رؤية (Roya)&lt;/h3&gt;
+                            &lt;h3 className={`text-lg font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;رؤية (Roya)&lt;/h3&gt;
                         &lt;/div&gt;
 &nbsp;
                         {/* Card 1: The Insight (Jawhar) */}
-                        &lt;div className="glass-card p-5 border-l-4 border-l-primary-500 bg-gradient-to-r from-surface-800 to-surface-800/50"&gt;
+                        &lt;div className={`p-5 border-l-4 border-l-primary-500 rounded-2xl ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card bg-gradient-to-r from-surface-800 to-surface-800/50'}`}&gt;
                             &lt;h4 className="text-sm font-bold text-primary-300 mb-2"&gt;الرؤية&lt;/h4&gt;
-                            &lt;p className="text-white leading-relaxed"&gt;
+                            &lt;p className={theme === 'light' ? 'text-slate-700 leading-relaxed' : 'text-white leading-relaxed'}&gt;
                                 {<span class="branch-0 cbranch-no" title="branch not covered" >aiData?.insight || &lt;</span>Loader2 className="w-4 h-4 animate-spin inline" /&gt;}
                             &lt;/p&gt;
                         &lt;/div&gt;
 &nbsp;
                         {/* Card 2: The Action (Khutwa) */}
-                        &lt;div className="glass-card p-5 border-l-4 border-l-blue-500 bg-gradient-to-r from-surface-800 to-surface-800/50"&gt;
+                        &lt;div className={`p-5 border-l-4 border-l-blue-500 rounded-2xl ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card bg-gradient-to-r from-surface-800 to-surface-800/50'}`}&gt;
                             &lt;h4 className="text-sm font-bold text-blue-300 mb-2"&gt;خطوة اليوم&lt;/h4&gt;
                             &lt;div className="flex items-start gap-3"&gt;
                                 &lt;CheckCircle className="w-5 h-5 text-blue-400 mt-0.5" /&gt;
-                                &lt;p className="text-white"&gt;
+                                &lt;p className={theme === 'light' ? 'text-slate-700' : 'text-white'}&gt;
                                     {aiData?.action || "..."}
                                 &lt;/p&gt;
                             &lt;/div&gt;
                         &lt;/div&gt;
 &nbsp;
                         {/* Card 3: The Quote (Hamsa) */}
-                        &lt;div className="glass-card p-5 border-l-4 border-l-rose-500 bg-gradient-to-r from-surface-800 to-surface-800/50 italic"&gt;
+                        &lt;div className={`p-5 border-l-4 border-l-rose-500 rounded-2xl italic ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card bg-gradient-to-r from-surface-800 to-surface-800/50'}`}&gt;
                             &lt;h4 className="text-sm font-bold text-rose-300 mb-2"&gt;همسة&lt;/h4&gt;
                             &lt;div className="flex gap-2"&gt;
                                 &lt;Quote className="w-4 h-4 text-rose-400 transform rotate-180" /&gt;
-                                &lt;p className="text-surface-200"&gt;
+                                &lt;p className={theme === 'light' ? 'text-slate-600' : 'text-surface-200'}&gt;
                                     {aiData?.quote || "..."}
                                 &lt;/p&gt;
                             &lt;/div&gt;
@@ -1645,7 +1675,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
                     {/* Actions */}
                     &lt;div className="flex gap-4 pt-4"&gt;
-                        &lt;Link href="/dashboard" className="flex-1 py-4 bg-surface-800 hover:bg-surface-700 rounded-xl font-bold text-white text-center transition-colors"&gt;
+                        &lt;Link href="/dashboard" className={`flex-1 py-4 rounded-xl font-bold text-center transition-colors ${theme === 'light' ? 'bg-slate-200 hover:bg-slate-300 text-slate-700' : 'bg-surface-800 hover:bg-surface-700 text-white'}`}&gt;
                             الرئيسية
                         &lt;/Link&gt;
                         &lt;button
@@ -1675,7 +1705,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-01T11:54:50.621Z
+                at 2026-01-12T11:01:16.464Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

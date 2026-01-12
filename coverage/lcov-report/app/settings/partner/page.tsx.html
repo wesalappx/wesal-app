@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/38</span>
+                <span class='fraction'>0/40</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>0/29</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/37</span>
+                <span class='fraction'>0/39</span>
             </div>
         
             
@@ -308,7 +308,9 @@
 <a name='L243'></a><a href='#L243'>243</a>
 <a name='L244'></a><a href='#L244'>244</a>
 <a name='L245'></a><a href='#L245'>245</a>
-<a name='L246'></a><a href='#L246'>246</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -317,7 +319,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -562,11 +566,13 @@ import Link from <span class="cstat-no" title="statement not covered" >'next/lin
 import { useRouter } from <span class="cstat-no" title="statement not covered" >'next/navigation';</span>
 import { usePairing } from <span class="cstat-no" title="statement not covered" >'@/hooks/usePairing';</span>
 import { createClient } from <span class="cstat-no" title="statement not covered" >'@/lib/supabase/client';</span>
+import { useSettingsStore } from <span class="cstat-no" title="statement not covered" >'@/stores/settings-store';</span>
 &nbsp;
 export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >PartnerPage() {</span></span>
     const router = <span class="cstat-no" title="statement not covered" >useRouter();</span>
     const supabase = <span class="cstat-no" title="statement not covered" >createClient();</span>
     const { getStatus } = <span class="cstat-no" title="statement not covered" >usePairing();</span>
+    const { theme } = <span class="cstat-no" title="statement not covered" >useSettingsStore();</span>
 &nbsp;
     const [showUnpairModal, setShowUnpairModal] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
     const [isUnpairing, setIsUnpairing] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
@@ -628,14 +634,14 @@ export default function <span class="cstat-no" title="statement not covered" ><s
     };
 &nbsp;
     return (
-        &lt;div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900"&gt;
+        &lt;div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}&gt;
             {/* Header */}
-            &lt;header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5"&gt;
+            &lt;header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}&gt;
                 &lt;div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4"&gt;
-                    &lt;Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors"&gt;
-                        &lt;ArrowRight className="w-6 h-6 text-white" /&gt;
+                    &lt;Link href="/settings" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}&gt;
+                        &lt;ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} /&gt;
                     &lt;/Link&gt;
-                    &lt;h1 className="text-xl font-bold text-white"&gt;إدارة الربط&lt;/h1&gt;
+                    &lt;h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;إدارة الربط&lt;/h1&gt;
                 &lt;/div&gt;
             &lt;/header&gt;
 &nbsp;
@@ -805,7 +811,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-01T11:54:50.621Z
+                at 2026-01-12T11:01:16.464Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

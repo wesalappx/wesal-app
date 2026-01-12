@@ -38,9 +38,9 @@ export async function POST(request: NextRequest) {
             .upsert({
                 couple_id,
                 plan_id,
-                status: 'active',
+                status: 'premium',
                 payment_id: id,
-                started_at: new Date().toISOString(),
+                starts_at: new Date().toISOString(),
                 ends_at: endDate,
                 updated_at: new Date().toISOString(),
             }, {

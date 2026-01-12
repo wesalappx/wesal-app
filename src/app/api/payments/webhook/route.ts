@@ -81,9 +81,9 @@ export async function POST(request: NextRequest) {
                     .upsert({
                         couple_id: coupleId,
                         plan_id: planId,
-                        status: 'active',
+                        status: 'premium',
                         lemon_subscription_id: payload.data.id,
-                        started_at: payload.data.attributes.created_at,
+                        starts_at: payload.data.attributes.created_at,
                         ends_at: payload.data.attributes.ends_at,
                         renews_at: payload.data.attributes.renews_at,
                         updated_at: new Date().toISOString(),

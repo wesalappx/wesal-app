@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/111</span>
+                <span class='fraction'>0/113</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/99</span>
+                <span class='fraction'>0/140</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/108</span>
+                <span class='fraction'>0/110</span>
             </div>
         
             
@@ -568,7 +568,11 @@
 <a name='L503'></a><a href='#L503'>503</a>
 <a name='L504'></a><a href='#L504'>504</a>
 <a name='L505'></a><a href='#L505'>505</a>
-<a name='L506'></a><a href='#L506'>506</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -593,8 +597,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -886,6 +892,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1098,6 +1106,7 @@ import SessionChat from <span class="cstat-no" title="statement not covered" >'@
 import SessionModeModal from <span class="cstat-no" title="statement not covered" >'@/components/SessionModeModal';</span>
 import { journeysData, getJourneySteps } from <span class="cstat-no" title="statement not covered" >'@/data/journeys';</span>
 import { sessionData } from <span class="cstat-no" title="statement not covered" >'@/app/game-session/data/gameContent';</span>
+import { useSettingsStore } from <span class="cstat-no" title="statement not covered" >'@/stores/settings-store';</span>
 &nbsp;
 function <span class="fstat-no" title="function not covered" >JourneyExerciseContent() {</span>
     const searchParams = <span class="cstat-no" title="statement not covered" >useSearchParams();</span>
@@ -1105,6 +1114,7 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
     const { progressMap, updateProgress } = <span class="cstat-no" title="statement not covered" >useJourneys();</span>
     const { user } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
     const { getStatus } = <span class="cstat-no" title="statement not covered" >usePairing();</span>
+    const { theme } = <span class="cstat-no" title="statement not covered" >useSettingsStore();</span>
 &nbsp;
     const journeyId = <span class="cstat-no" title="statement not covered" >searchParams.get('journey') || 'basics';</span>
     const stepParam = <span class="cstat-no" title="statement not covered" >searchParams.get('step');</span>
@@ -1276,17 +1286,17 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!journey || !currentStep) {</span>
         return (
-            &lt;main className="min-h-screen flex items-center justify-center bg-surface-900"&gt;
-                &lt;p className="text-surface-400"&gt;خطأ في تحميل التمرين&lt;/p&gt;
+            &lt;main className={`min-h-screen flex items-center justify-center ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900'}`}&gt;
+                &lt;p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}&gt;خطأ في تحميل التمرين&lt;/p&gt;
             &lt;/main&gt;
         );
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!question) {</span>
         return (
-            &lt;main className="min-h-screen flex items-center justify-center bg-surface-900"&gt;
+            &lt;main className={`min-h-screen flex items-center justify-center ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-900'}`}&gt;
                 &lt;div className="text-center"&gt;
-                    &lt;p className="text-surface-400 mb-4"&gt;لا توجد أسئلة لهذه الخطوة&lt;/p&gt;
+                    &lt;p className={`mb-4 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;لا توجد أسئلة لهذه الخطوة&lt;/p&gt;
                     &lt;button
                         onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >r</span>outer.push('/journeys')}</span>
                         className="px-6 py-3 bg-primary-500 rounded-xl text-white"
@@ -1301,7 +1311,7 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
     // Completion Screen
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (isFinished) {</span>
         return (
-            &lt;main className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950 flex flex-col items-center justify-center p-6 relative overflow-hidden"&gt;
+            &lt;main className={`min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950'}`}&gt;
                 {/* Celebration Background */}
                 &lt;div className="absolute inset-0 pointer-events-none"&gt;
                     &lt;div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]" /&gt;
@@ -1350,7 +1360,7 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="text-4xl font-bold text-white mb-3"
+                        className={`text-4xl font-bold mb-3 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}
                     &gt;
                         أحسنتم! 🎊
                     &lt;/motion.h1&gt;
@@ -1359,9 +1369,9 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="text-surface-300 text-lg mb-8"
+                        className={`text-lg mb-8 ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}
                     &gt;
-                        أكملتم "&lt;span className="text-primary-400 font-semibold"&gt;{currentStep.title}&lt;/span&gt;" بنجاح
+                        أكملتم "&lt;span className="text-primary-400 font-semibold"&gt;{currentStep?.title}&lt;/span&gt;" بنجاح
                     &lt;/motion.p&gt;
 &nbsp;
                     &lt;motion.div
@@ -1380,7 +1390,7 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
                         )}
                         &lt;button
                             onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >r</span>outer.push('/journeys')}</span>
-                            className="w-full py-4 bg-white/5 backdrop-blur-sm rounded-2xl font-bold text-white border border-white/10 hover:bg-white/10 transition-all"
+                            className={`w-full py-4 backdrop-blur-sm rounded-2xl font-bold border transition-all ${theme === 'light' ? 'bg-white/50 border-slate-200 text-slate-700 hover:bg-white' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
                         &gt;
                             العودة للرحلات
                         &lt;/button&gt;
@@ -1393,9 +1403,9 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
     const isWaiting = <span class="cstat-no" title="statement not covered" >isRemote &amp;&amp; !isConnected;</span>
 &nbsp;
     return (
-        &lt;main className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950 flex flex-col relative overflow-hidden"&gt;
+        &lt;main className={`min-h-screen flex flex-col relative overflow-hidden ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950'}`}&gt;
             {/* Premium Background Effects */}
-            &lt;div className="absolute inset-0 pointer-events-none overflow-hidden"&gt;
+            &lt;div className={`absolute inset-0 pointer-events-none overflow-hidden ${theme === 'light' ? 'opacity-30' : ''}`}&gt;
                 &lt;div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-radial from-primary-500/20 via-primary-500/5 to-transparent rounded-full blur-3xl" /&gt;
                 &lt;div className="absolute -bottom-20 -right-20 w-[500px] h-[500px] bg-gradient-radial from-accent-500/15 via-transparent to-transparent rounded-full blur-3xl" /&gt;
                 &lt;div className="absolute top-1/2 -left-20 w-[300px] h-[300px] bg-gradient-radial from-rose-500/10 via-transparent to-transparent rounded-full blur-3xl" /&gt;
@@ -1406,8 +1416,10 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
                 &lt;motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >r</span>outer.push('/journeys')}</span>
-                    className="w-11 h-11 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-surface-400 hover:text-white hover:bg-white/10 transition-all shadow-lg"
+                    className={`w-11 h-11 rounded-full backdrop-blur-xl border flex items-center justify-center transition-all shadow-lg ${theme === 'light' ? 'bg-white/80 border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-white' : 'bg-white/5 border-white/10 text-surface-400 hover:text-white hover:bg-white/10'}`}
                 &gt;
                     &lt;X className="w-5 h-5" /&gt;
                 &lt;/motion.button&gt;
@@ -1416,10 +1428,10 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
                 &lt;motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg"
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full backdrop-blur-xl border shadow-lg ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-white/5 border-white/10'}`}
                 &gt;
-                    &lt;journey.icon className={`w-4 h-4 ${journey.color}`} /&gt;
-                    &lt;span className="text-white font-semibold text-sm"&gt;{journey.title}&lt;/span&gt;
+                    &lt;journey.icon className={`w-4 h-4 ${journey?.color}`} /&gt;
+                    &lt;span className={`font-semibold text-sm ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;{journey?.title}&lt;/span&gt;
                 &lt;/motion.div&gt;
 &nbsp;
                 &lt;div className="w-11" /&gt;
@@ -1433,18 +1445,18 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
             &gt;
                 &lt;div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary-500/20 to-accent-500/20 border border-primary-500/30 text-primary-300 text-sm font-medium mb-3 shadow-lg shadow-primary-500/10"&gt;
                     &lt;Sparkles className="w-4 h-4" /&gt;
-                    الخطوة {stepIndex + 1} من {journey.totalSteps}
+                    الخطوة {stepIndex + 1} من {journey?.totalSteps}
                 &lt;/div&gt;
-                &lt;h2 className="text-xl font-bold text-white"&gt;{currentStep.title}&lt;/h2&gt;
+                &lt;h2 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;{currentStep?.title}&lt;/h2&gt;
             &lt;/motion.div&gt;
 &nbsp;
             {/* Progress Bar */}
             &lt;div className="px-6 pb-6 z-10"&gt;
                 &lt;div className="flex items-center justify-between text-xs mb-3"&gt;
-                    &lt;span className="text-surface-400 font-medium"&gt;السؤال {currentQuestionIndex + 1} من {questions.length}&lt;/span&gt;
+                    &lt;span className={`font-medium ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;السؤال {currentQuestionIndex + 1} من {questions.length}&lt;/span&gt;
                     &lt;span className="px-2 py-1 rounded-full bg-primary-500/20 text-primary-300 font-bold"&gt;{Math.round(progress)}%&lt;/span&gt;
                 &lt;/div&gt;
-                &lt;div className="h-2 bg-surface-800/80 rounded-full overflow-hidden shadow-inner"&gt;
+                &lt;div className={`h-2 rounded-full overflow-hidden shadow-inner ${theme === 'light' ? 'bg-slate-200' : 'bg-surface-800/80'}`}&gt;
                     &lt;motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
@@ -1470,8 +1482,8 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
                         &gt;
                             {/* Question Card */}
                             &lt;div className="relative"&gt;
-                                &lt;div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 via-accent-500/20 to-rose-500/20 rounded-[2rem] blur-xl opacity-50" /&gt;
-                                &lt;div className="relative bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-2xl rounded-3xl border border-white/20 p-7 shadow-2xl"&gt;
+                                {<span class="branch-0 cbranch-no" title="branch not covered" >theme !== 'light' &amp;&amp; &lt;</span>div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 via-accent-500/20 to-rose-500/20 rounded-[2rem] blur-xl opacity-50" /&gt;}
+                                &lt;div className={`relative backdrop-blur-2xl rounded-3xl border p-7 shadow-2xl ${theme === 'light' ? 'bg-white border-slate-100' : 'bg-gradient-to-b from-white/10 to-white/5 border-white/20'}`}&gt;
                                     &lt;div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full" /&gt;
                                     {<span class="branch-0 cbranch-no" title="branch not covered" >question.phase </span>&amp;&amp; (
                                         &lt;motion.div
@@ -1485,10 +1497,10 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
                                             &lt;/span&gt;
                                         &lt;/motion.div&gt;
                                     )}
-                                    &lt;h3 className="text-xl md:text-2xl font-bold text-white text-center leading-relaxed mb-5" dir="rtl"&gt;
+                                    &lt;h3 className={`text-xl md:text-2xl font-bold text-center leading-relaxed mb-5 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} dir="rtl"&gt;
                                         {question.text}
                                     &lt;/h3&gt;
-                                    &lt;p className="text-surface-300 text-sm text-center px-4 py-3 bg-surface-800/30 rounded-2xl border border-surface-700/50"&gt;
+                                    &lt;p className={`text-sm text-center px-4 py-3 rounded-2xl border ${theme === 'light' ? 'bg-slate-50 text-slate-600 border-slate-200' : 'text-surface-300 bg-surface-800/30 border-surface-700/50'}`}&gt;
                                         💡 {question.hint}
                                     &lt;/p&gt;
                                 &lt;/div&gt;
@@ -1511,14 +1523,14 @@ function <span class="fstat-no" title="function not covered" >JourneyExerciseCon
                 &lt;SessionChat
                     sessionId={session.id}
                     userId={user.id}
-                    partnerName={session.partner_id ? 'Partner' : undefined}
+                    partnerName={(session as any).partner_id ? 'Partner' : undefined}
                 /&gt;
             )}
 &nbsp;
             {/* Bottom Navigation */}
             {<span class="branch-0 cbranch-no" title="branch not covered" >!isWaiting &amp;&amp; (</span>
                 &lt;div className={`fixed bottom-0 left-0 right-0 z-20 ${isRemote ? 'mb-[70px]' : ''}`}&gt;
-                    &lt;div className="h-24 bg-gradient-to-t from-surface-950 via-surface-950/95 to-transparent pointer-events-none" /&gt;
+                    &lt;div className={`h-24 pointer-events-none ${theme === 'light' ? 'bg-gradient-to-t from-slate-50 via-slate-50/95 to-transparent' : 'bg-gradient-to-t from-surface-950 via-surface-950/95 to-transparent'}`} /&gt;
                     &lt;div className="absolute bottom-0 left-0 right-0 p-6 pb-8"&gt;
                         &lt;div className="max-w-lg mx-auto flex items-center gap-4"&gt;
                             &lt;motion.button
@@ -1585,7 +1597,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-01T11:54:50.621Z
+                at 2026-01-12T11:01:16.464Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

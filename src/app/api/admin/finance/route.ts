@@ -42,7 +42,7 @@ export async function GET(request: Request) {
         const { count: premiumCount } = await supabase
             .from('subscriptions')
             .select('*', { count: 'exact', head: true })
-            .eq('status', 'active');
+            .eq('status', 'premium');
 
         summary.total_premium_couples = premiumCount || 0;
 

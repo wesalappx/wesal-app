@@ -45,8 +45,8 @@ export async function POST(req: Request) {
                 .upsert({
                     couple_id: coupleData.id,
                     plan_id: 'premium_monthly',
-                    status: 'active',
-                    started_at: new Date().toISOString(),
+                    status: 'premium',
+                    starts_at: new Date().toISOString(),
                     ends_at: endsAt.toISOString(),
                     payment_id: 'ADMIN_GRANTED',
                 }, { onConflict: 'couple_id' });

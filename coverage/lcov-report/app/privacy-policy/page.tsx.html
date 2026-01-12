@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>0/150</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
@@ -342,13 +342,19 @@
 <a name='L277'></a><a href='#L277'>277</a>
 <a name='L278'></a><a href='#L278'>278</a>
 <a name='L279'></a><a href='#L279'>279</a>
-<a name='L280'></a><a href='#L280'>280</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -626,17 +632,20 @@
 import { motion } from <span class="cstat-no" title="statement not covered" >'framer-motion';</span>
 import Link from <span class="cstat-no" title="statement not covered" >'next/link';</span>
 import { ArrowRight, Shield, Clock, Trash2, Eye, Lock, FileText } from <span class="cstat-no" title="statement not covered" >'lucide-react';</span>
+import { useSettingsStore } from <span class="cstat-no" title="statement not covered" >'@/stores/settings-store';</span>
 &nbsp;
 export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >PrivacyPolicyPage() {</span></span>
+    const { theme } = <span class="cstat-no" title="statement not covered" >useSettingsStore();</span>
+&nbsp;
     return (
-        &lt;div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900"&gt;
+        &lt;div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}&gt;
             {/* Header */}
-            &lt;header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5"&gt;
+            &lt;header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}&gt;
                 &lt;div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4"&gt;
-                    &lt;Link href="/settings/privacy" className="p-2 rounded-full hover:bg-white/10 transition-colors"&gt;
-                        &lt;ArrowRight className="w-6 h-6 text-white" /&gt;
+                    &lt;Link href="/settings/privacy" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}&gt;
+                        &lt;ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} /&gt;
                     &lt;/Link&gt;
-                    &lt;h1 className="text-xl font-bold text-white"&gt;سياسة الخصوصية&lt;/h1&gt;
+                    &lt;h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;سياسة الخصوصية&lt;/h1&gt;
                 &lt;/div&gt;
             &lt;/header&gt;
 &nbsp;
@@ -648,45 +657,45 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                 &gt;
                     {/* Hero Section */}
                     &lt;div className="text-center mb-12"&gt;
-                        &lt;div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-primary-500/20 flex items-center justify-center"&gt;
-                            &lt;Shield className="w-10 h-10 text-primary-400" /&gt;
+                        &lt;div className={`w-20 h-20 mx-auto mb-6 rounded-3xl flex items-center justify-center ${theme === 'light' ? 'bg-primary-100' : 'bg-primary-500/20'}`}&gt;
+                            &lt;Shield className={`w-10 h-10 ${theme === 'light' ? 'text-primary-600' : 'text-primary-400'}`} /&gt;
                         &lt;/div&gt;
-                        &lt;h2 className="text-3xl font-bold text-white mb-3"&gt;خصوصيتك أولويتنا&lt;/h2&gt;
-                        &lt;p className="text-surface-300 text-lg"&gt;
+                        &lt;h2 className={`text-3xl font-bold mb-3 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;خصوصيتك أولويتنا&lt;/h2&gt;
+                        &lt;p className={`text-lg ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;
                             ملتزمون بحماية بياناتك وفقاً لنظام حماية البيانات الشخصية في المملكة العربية السعودية
                         &lt;/p&gt;
-                        &lt;p className="text-surface-500 text-sm mt-2"&gt;آخر تحديث: ديسمبر 2024&lt;/p&gt;
+                        &lt;p className={`text-sm mt-2 ${theme === 'light' ? 'text-slate-500' : 'text-surface-500'}`}&gt;آخر تحديث: ديسمبر 2024&lt;/p&gt;
                     &lt;/div&gt;
 &nbsp;
                     {/* Quick Summary */}
-                    &lt;div className="p-6 rounded-2xl bg-primary-500/10 border border-primary-500/20"&gt;
-                        &lt;h3 className="text-lg font-bold text-primary-300 mb-4 flex items-center gap-2"&gt;
+                    &lt;div className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/10 border-primary-500/20'}`}&gt;
+                        &lt;h3 className={`text-lg font-bold mb-4 flex items-center gap-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}&gt;
                             &lt;FileText className="w-5 h-5" /&gt;
                             ملخص سريع
                         &lt;/h3&gt;
-                        &lt;ul className="space-y-3 text-surface-200"&gt;
+                        &lt;ul className={`space-y-3 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             &lt;li className="flex items-start gap-3"&gt;
-                                &lt;Clock className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" /&gt;
-                                &lt;span&gt;حذف تلقائي للبيانات الحساسة بعد &lt;strong className="text-white"&gt;7 أيام&lt;/strong&gt;&lt;/span&gt;
+                                &lt;Clock className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme === 'light' ? 'text-pink-500' : 'text-primary-400'}`} /&gt;
+                                &lt;span&gt;حذف تلقائي للبيانات الحساسة بعد &lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;7 أيام&lt;/strong&gt;&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-3"&gt;
                                 &lt;Lock className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" /&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;لا نحفظ&lt;/strong&gt; محادثات حل النزاعات أبداً&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;لا نحفظ&lt;/strong&gt; محادثات حل النزاعات أبداً&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-3"&gt;
                                 &lt;Eye className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" /&gt;
-                                &lt;span&gt;بياناتك مشفرة ومحفوظة في &lt;strong className="text-white"&gt;السعودية&lt;/strong&gt;&lt;/span&gt;
+                                &lt;span&gt;بياناتك مشفرة ومحفوظة في &lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;السعودية&lt;/strong&gt;&lt;/span&gt;
                             &lt;/li&gt;
                         &lt;/ul&gt;
                     &lt;/div&gt;
 &nbsp;
                     {/* Section 1: Data Collection */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;1. البيانات التي نجمعها&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;1. البيانات التي نجمعها&lt;/h3&gt;
 &nbsp;
-                        &lt;div className="space-y-4 text-surface-200"&gt;
+                        &lt;div className={`space-y-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-white mb-2"&gt;بيانات الحساب:&lt;/h4&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;بيانات الحساب:&lt;/h4&gt;
                                 &lt;ul className="list-disc list-inside space-y-1 mr-4"&gt;
                                     &lt;li&gt;الاسم الكامل&lt;/li&gt;
                                     &lt;li&gt;البريد الإلكتروني أو رقم الهاتف&lt;/li&gt;
@@ -697,7 +706,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                             &lt;/div&gt;
 &nbsp;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-white mb-2"&gt;بيانات الاستخدام:&lt;/h4&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;بيانات الاستخدام:&lt;/h4&gt;
                                 &lt;ul className="list-disc list-inside space-y-1 mr-4"&gt;
                                     &lt;li&gt;التفاعل مع الألعاب والرحلات (تقدم فقط، لا محتوى)&lt;/li&gt;
                                     &lt;li&gt;فحوصات الحالة المزاجية اليومية (تحذف بعد 7 أيام)&lt;/li&gt;
@@ -707,8 +716,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                             &lt;/div&gt;
 &nbsp;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-white mb-2"&gt;بيانات لا نجمعها أبداً:&lt;/h4&gt;
-                                &lt;ul className="list-disc list-inside space-y-1 mr-4 text-emerald-300"&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;بيانات لا نجمعها أبداً:&lt;/h4&gt;
+                                &lt;ul className="list-disc list-inside space-y-1 mr-4 text-emerald-500"&gt;
                                     &lt;li&gt;محتوى محادثات حل النزاعات&lt;/li&gt;
                                     &lt;li&gt;رسائل خاصة بينك وبين شريكك&lt;/li&gt;
                                     &lt;li&gt;تفاصيل حميمية من الألعاب&lt;/li&gt;
@@ -719,169 +728,169 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 2: Data Usage */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;2. كيف نستخدم بياناتك&lt;/h3&gt;
-                        &lt;ul className="space-y-3 text-surface-200"&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;2. كيف نستخدم بياناتك&lt;/h3&gt;
+                        &lt;ul className={`space-y-3 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;•&lt;/span&gt;
+                                &lt;span className="text-primary-500 font-bold"&gt;•&lt;/span&gt;
                                 &lt;span&gt;تقديم خدمات التطبيق (الألعاب، الرحلات، المشورة)&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;•&lt;/span&gt;
+                                &lt;span className="text-primary-500 font-bold"&gt;•&lt;/span&gt;
                                 &lt;span&gt;تحسين التجربة عبر توصيات AI مخصصة&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;•&lt;/span&gt;
+                                &lt;span className="text-primary-500 font-bold"&gt;•&lt;/span&gt;
                                 &lt;span&gt;إرسال إشعارات مهمة (موافقة الشريك، تذكيرات)&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;•&lt;/span&gt;
+                                &lt;span className="text-primary-500 font-bold"&gt;•&lt;/span&gt;
                                 &lt;span&gt;الحفاظ على أمان الحساب&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;•&lt;/span&gt;
+                                &lt;span className="text-primary-500 font-bold"&gt;•&lt;/span&gt;
                                 &lt;span&gt;الامتثال للمتطلبات القانونية&lt;/span&gt;
                             &lt;/li&gt;
                         &lt;/ul&gt;
 &nbsp;
-                        &lt;div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20"&gt;
-                            &lt;p className="text-amber-200 text-sm"&gt;
+                        &lt;div className={`mt-6 p-4 rounded-xl border ${theme === 'light' ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20'}`}&gt;
+                            &lt;p className={`text-sm ${theme === 'light' ? 'text-amber-700' : 'text-amber-200'}`}&gt;
                                 &lt;strong&gt;ملاحظة:&lt;/strong&gt; لن نبيع أو نشارك بياناتك مع أطراف ثالثة لأغراض تسويقية أبداً.
                             &lt;/p&gt;
                         &lt;/div&gt;
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 3: Data Retention */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;3. مدة الاحتفاظ بالبيانات&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;3. مدة الاحتفاظ بالبيانات&lt;/h3&gt;
 &nbsp;
                         &lt;div className="space-y-4"&gt;
-                            &lt;div className="p-4 rounded-xl bg-surface-800/50 border border-surface-700"&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-surface-800/50 border-surface-700'}`}&gt;
                                 &lt;div className="flex items-center gap-3 mb-2"&gt;
                                     &lt;Clock className="w-5 h-5 text-blue-400" /&gt;
-                                    &lt;h4 className="font-bold text-white"&gt;فحوصات الحالة المزاجية&lt;/h4&gt;
+                                    &lt;h4 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;فحوصات الحالة المزاجية&lt;/h4&gt;
                                 &lt;/div&gt;
-                                &lt;p className="text-surface-300 text-sm"&gt;تحذف تلقائياً بعد &lt;strong className="text-white"&gt;7 أيام&lt;/strong&gt; من التسجيل&lt;/p&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;تحذف تلقائياً بعد &lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;7 أيام&lt;/strong&gt; من التسجيل&lt;/p&gt;
                             &lt;/div&gt;
 &nbsp;
-                            &lt;div className="p-4 rounded-xl bg-surface-800/50 border border-surface-700"&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-surface-800/50 border-surface-700'}`}&gt;
                                 &lt;div className="flex items-center gap-3 mb-2"&gt;
                                     &lt;Trash2 className="w-5 h-5 text-emerald-400" /&gt;
-                                    &lt;h4 className="font-bold text-white"&gt;جلسات حل النزاعات&lt;/h4&gt;
+                                    &lt;h4 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;جلسات حل النزاعات&lt;/h4&gt;
                                 &lt;/div&gt;
-                                &lt;p className="text-surface-300 text-sm"&gt;المحتوى &lt;strong className="text-emerald-300"&gt;غير محفوظ&lt;/strong&gt; - يحذف فوراً بعد انتهاء الجلسة&lt;/p&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;المحتوى &lt;strong className="text-emerald-500"&gt;غير محفوظ&lt;/strong&gt; - يحذف فوراً بعد انتهاء الجلسة&lt;/p&gt;
                             &lt;/div&gt;
 &nbsp;
-                            &lt;div className="p-4 rounded-xl bg-surface-800/50 border border-surface-700"&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-surface-800/50 border-surface-700'}`}&gt;
                                 &lt;div className="flex items-center gap-3 mb-2"&gt;
                                     &lt;FileText className="w-5 h-5 text-purple-400" /&gt;
-                                    &lt;h4 className="font-bold text-white"&gt;بيانات الحساب والتقدم&lt;/h4&gt;
+                                    &lt;h4 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;بيانات الحساب والتقدم&lt;/h4&gt;
                                 &lt;/div&gt;
-                                &lt;p className="text-surface-300 text-sm"&gt;تبقى حتى تحذف حسابك أو تطلب الحذف&lt;/p&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;تبقى حتى تحذف حسابك أو تطلب الحذف&lt;/p&gt;
                             &lt;/div&gt;
                         &lt;/div&gt;
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 4: PDPL Compliance */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;4. الامتثال لنظام حماية البيانات الشخصية (PDPL)&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;4. الامتثال لنظام حماية البيانات الشخصية (PDPL)&lt;/h3&gt;
 &nbsp;
-                        &lt;p className="text-surface-200 mb-4"&gt;
+                        &lt;p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             نلتزم التزاماً كاملاً بنظام حماية البيانات الشخصية في المملكة العربية السعودية:
                         &lt;/p&gt;
 &nbsp;
-                        &lt;ul className="space-y-3 text-surface-200"&gt;
+                        &lt;ul className={`space-y-3 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;✓&lt;/span&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;إقامة البيانات:&lt;/strong&gt; جميع بياناتك محفوظة في خوادم داخل المملكة&lt;/span&gt;
+                                &lt;span className="text-emerald-500 font-bold"&gt;✓&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;إقامة البيانات:&lt;/strong&gt; جميع بياناتك محفوظة في خوادم داخل المملكة&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;✓&lt;/span&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;التشفير:&lt;/strong&gt; بيانات حساسة مشفرة بمعايير عالمية (AES-256)&lt;/span&gt;
+                                &lt;span className="text-emerald-500 font-bold"&gt;✓&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;التشفير:&lt;/strong&gt; بيانات حساسة مشفرة بمعايير عالمية (AES-256)&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;✓&lt;/span&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;الموافقة الصريحة:&lt;/strong&gt; نطلب موافقتك قبل جمع أي بيانات&lt;/span&gt;
+                                &lt;span className="text-emerald-500 font-bold"&gt;✓&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;الموافقة الصريحة:&lt;/strong&gt; نطلب موافقتك قبل جمع أي بيانات&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;✓&lt;/span&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;حق الحذف:&lt;/strong&gt; يمكنك حذف حسابك وبياناتك في أي وقت&lt;/span&gt;
+                                &lt;span className="text-emerald-500 font-bold"&gt;✓&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;حق الحذف:&lt;/strong&gt; يمكنك حذف حسابك وبياناتك في أي وقت&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;✓&lt;/span&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;الشفافية:&lt;/strong&gt; نخبرك بوضوح ما نجمعه ولماذا&lt;/span&gt;
+                                &lt;span className="text-emerald-500 font-bold"&gt;✓&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;الشفافية:&lt;/strong&gt; نخبرك بوضوح ما نجمعه ولماذا&lt;/span&gt;
                             &lt;/li&gt;
                         &lt;/ul&gt;
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 5: Your Rights */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;5. حقوقك&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;5. حقوقك&lt;/h3&gt;
 &nbsp;
                         &lt;div className="grid gap-4"&gt;
-                            &lt;div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20"&gt;
-                                &lt;h4 className="font-bold text-primary-300 mb-2"&gt;حق الوصول&lt;/h4&gt;
-                                &lt;p className="text-surface-300 text-sm"&gt;يمكنك طلب نسخة من بياناتك في أي وقت&lt;/p&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/5 border-primary-500/20'}`}&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}&gt;حق الوصول&lt;/h4&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;يمكنك طلب نسخة من بياناتك في أي وقت&lt;/p&gt;
                             &lt;/div&gt;
 &nbsp;
-                            &lt;div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20"&gt;
-                                &lt;h4 className="font-bold text-primary-300 mb-2"&gt;حق التصحيح&lt;/h4&gt;
-                                &lt;p className="text-surface-300 text-sm"&gt;تعديل بياناتك الشخصية عبر الإعدادات&lt;/p&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/5 border-primary-500/20'}`}&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}&gt;حق التصحيح&lt;/h4&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;تعديل بياناتك الشخصية عبر الإعدادات&lt;/p&gt;
                             &lt;/div&gt;
 &nbsp;
-                            &lt;div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20"&gt;
-                                &lt;h4 className="font-bold text-primary-300 mb-2"&gt;حق الحذف&lt;/h4&gt;
-                                &lt;p className="text-surface-300 text-sm"&gt;حذف حسابك نهائياً من: الإعدادات → حذف الحساب&lt;/p&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/5 border-primary-500/20'}`}&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}&gt;حق الحذف&lt;/h4&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;حذف حسابك نهائياً من: الإعدادات → حذف الحساب&lt;/p&gt;
                             &lt;/div&gt;
 &nbsp;
-                            &lt;div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20"&gt;
-                                &lt;h4 className="font-bold text-primary-300 mb-2"&gt;حق الاعتراض&lt;/h4&gt;
-                                &lt;p className="text-surface-300 text-sm"&gt;رفض معالجة بياناتك لأغراض معينة&lt;/p&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/5 border-primary-500/20'}`}&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}&gt;حق الاعتراض&lt;/h4&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;رفض معالجة بياناتك لأغراض معينة&lt;/p&gt;
                             &lt;/div&gt;
                         &lt;/div&gt;
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 6: Security */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;6. الأمان&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;6. الأمان&lt;/h3&gt;
 &nbsp;
-                        &lt;p className="text-surface-200 mb-4"&gt;
+                        &lt;p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             نستخدم تدابير أمنية صارمة لحماية بياناتك:
                         &lt;/p&gt;
 &nbsp;
-                        &lt;ul className="space-y-2 text-surface-200"&gt;
+                        &lt;ul className={`space-y-2 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-emerald-400"&gt;→&lt;/span&gt;
+                                &lt;span className="text-emerald-500"&gt;→&lt;/span&gt;
                                 &lt;span&gt;تشفير جميع الاتصالات (HTTPS/TLS)&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-emerald-400"&gt;→&lt;/span&gt;
+                                &lt;span className="text-emerald-500"&gt;→&lt;/span&gt;
                                 &lt;span&gt;كلمات مرور مشفرة بخوارزمية Argon2 (غير قابلة للفك)&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-emerald-400"&gt;→&lt;/span&gt;
+                                &lt;span className="text-emerald-500"&gt;→&lt;/span&gt;
                                 &lt;span&gt;رموز JWT محدودة المدة لمنع الاختراق&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-emerald-400"&gt;→&lt;/span&gt;
+                                &lt;span className="text-emerald-500"&gt;→&lt;/span&gt;
                                 &lt;span&gt;مراقبة نشاط غير عادي وإشعارات أمنية&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-emerald-400"&gt;→&lt;/span&gt;
+                                &lt;span className="text-emerald-500"&gt;→&lt;/span&gt;
                                 &lt;span&gt;نسخ احتياطية يومية مشفرة&lt;/span&gt;
                             &lt;/li&gt;
                         &lt;/ul&gt;
                     &lt;/section&gt;
 &nbsp;
                     {/* Contact Section */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;تواصل معنا&lt;/h3&gt;
-                        &lt;p className="text-surface-200 mb-4"&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;تواصل معنا&lt;/h3&gt;
+                        &lt;p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             لأي استفسارات تتعلق بالخصوصية أو لممارسة حقوقك:
                         &lt;/p&gt;
-                        &lt;div className="p-4 rounded-xl bg-surface-800/50"&gt;
-                            &lt;p className="text-surface-300"&gt;&lt;strong className="text-white"&gt;البريد الإلكتروني:&lt;/strong&gt; privacy@wesal.sa&lt;/p&gt;
-                            &lt;p className="text-surface-300 mt-2"&gt;&lt;strong className="text-white"&gt;الرد خلال:&lt;/strong&gt; 48 ساعة عمل&lt;/p&gt;
+                        &lt;div className={`p-4 rounded-xl ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-800/50'}`}&gt;
+                            &lt;p className={theme === 'light' ? 'text-slate-600' : 'text-surface-300'}&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;البريد الإلكتروني:&lt;/strong&gt; privacy@wesal.sa&lt;/p&gt;
+                            &lt;p className={`mt-2 ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;الرد خلال:&lt;/strong&gt; 48 ساعة عمل&lt;/p&gt;
                         &lt;/div&gt;
                     &lt;/section&gt;
 &nbsp;
@@ -907,7 +916,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-01T11:54:50.621Z
+                at 2026-01-12T11:01:16.464Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

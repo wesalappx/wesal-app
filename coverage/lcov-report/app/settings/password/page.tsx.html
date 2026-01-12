@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/49</span>
+                <span class='fraction'>0/51</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>0/77</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/48</span>
+                <span class='fraction'>0/50</span>
             </div>
         
             
@@ -294,7 +294,9 @@
 <a name='L229'></a><a href='#L229'>229</a>
 <a name='L230'></a><a href='#L230'>230</a>
 <a name='L231'></a><a href='#L231'>231</a>
-<a name='L232'></a><a href='#L232'>232</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -302,7 +304,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -533,9 +537,11 @@ import { ArrowRight, Eye, EyeOff, Lock, Check, X, Loader2 } from <span class="cs
 import Link from <span class="cstat-no" title="statement not covered" >'next/link';</span>
 import { validationMessages, getPasswordStrength } from <span class="cstat-no" title="statement not covered" >'@/lib/validation-messages';</span>
 import { useAuth } from <span class="cstat-no" title="statement not covered" >'@/hooks/useAuth';</span>
+import { useSettingsStore } from <span class="cstat-no" title="statement not covered" >'@/stores/settings-store';</span>
 &nbsp;
 export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >PasswordChangePage() {</span></span>
     const { updatePassword } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
+    const { theme } = <span class="cstat-no" title="statement not covered" >useSettingsStore();</span>
 &nbsp;
     const [newPassword, setNewPassword] = <span class="cstat-no" title="statement not covered" >useState('');</span>
     const [confirmPassword, setConfirmPassword] = <span class="cstat-no" title="statement not covered" >useState('');</span>
@@ -594,14 +600,14 @@ export default function <span class="cstat-no" title="statement not covered" ><s
     };
 &nbsp;
     return (
-        &lt;div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900"&gt;
+        &lt;div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}&gt;
             {/* Header */}
-            &lt;header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5"&gt;
+            &lt;header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}&gt;
                 &lt;div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4"&gt;
-                    &lt;Link href="/settings" className="p-2 rounded-full hover:bg-white/10 transition-colors"&gt;
-                        &lt;ArrowRight className="w-6 h-6 text-white" /&gt;
+                    &lt;Link href="/settings" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}&gt;
+                        &lt;ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} /&gt;
                     &lt;/Link&gt;
-                    &lt;h1 className="text-xl font-bold text-white"&gt;تغيير كلمة المرور&lt;/h1&gt;
+                    &lt;h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;تغيير كلمة المرور&lt;/h1&gt;
                 &lt;/div&gt;
             &lt;/header&gt;
 &nbsp;
@@ -612,11 +618,11 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                         animate={{ opacity: 1, scale: 1 }}
                         className="text-center py-12"
                     &gt;
-                        &lt;div className="w-20 h-20 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center"&gt;
-                            &lt;Check className="w-10 h-10 text-emerald-400" /&gt;
+                        &lt;div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-emerald-100' : 'bg-emerald-500/20'}`}&gt;
+                            &lt;Check className={`w-10 h-10 ${theme === 'light' ? 'text-emerald-600' : 'text-emerald-400'}`} /&gt;
                         &lt;/div&gt;
-                        &lt;h2 className="text-2xl font-bold text-white mb-2"&gt;تم بنجاح!&lt;/h2&gt;
-                        &lt;p className="text-surface-400 mb-8"&gt;تم تغيير كلمة المرور بنجاح&lt;/p&gt;
+                        &lt;h2 className={`text-2xl font-bold mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;تم بنجاح!&lt;/h2&gt;
+                        &lt;p className={`mb-8 ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}&gt;تم تغيير كلمة المرور بنجاح&lt;/p&gt;
                         &lt;Link
                             href="/settings"
                             className="inline-block px-8 py-3 bg-primary-500 hover:bg-primary-600 rounded-xl text-white font-medium transition-colors"
@@ -633,10 +639,10 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     &gt;
                         {/* Security Icon */}
                         &lt;div className="text-center mb-8"&gt;
-                            &lt;div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary-500/20 flex items-center justify-center"&gt;
-                                &lt;Lock className="w-8 h-8 text-primary-400" /&gt;
+                            &lt;div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center ${theme === 'light' ? 'bg-primary-100' : 'bg-primary-500/20'}`}&gt;
+                                &lt;Lock className={`w-8 h-8 ${theme === 'light' ? 'text-primary-600' : 'text-primary-400'}`} /&gt;
                             &lt;/div&gt;
-                            &lt;p className="text-surface-400"&gt;أدخل كلمة المرور الجديدة&lt;/p&gt;
+                            &lt;p className={theme === 'light' ? 'text-slate-500' : 'text-surface-400'}&gt;أدخل كلمة المرور الجديدة&lt;/p&gt;
                         &lt;/div&gt;
 &nbsp;
                         {/* Submit Error */}
@@ -648,7 +654,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
                         {/* New Password */}
                         &lt;div className="space-y-2"&gt;
-                            &lt;label className="block text-sm font-medium text-surface-300 text-right"&gt;
+                            &lt;label className={`block text-sm font-medium text-right ${theme === 'light' ? 'text-slate-700' : 'text-surface-300'}`}&gt;
                                 كلمة المرور الجديدة
                             &lt;/label&gt;
                             &lt;div className="relative"&gt;
@@ -656,15 +662,15 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                     type={showNew ? 'text' : 'password'}
                                     value={newPassword}
                                     onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >setNewPassword(e.target.value)}</span>
-                                    className={`w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border text-white text-right placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all
-                    ${errors.newPassword ? 'border-red-500' : 'border-white/10'}`}
+                                    className={`w-full px-4 py-3 pr-12 rounded-xl border text-right focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all
+                      ${errors.newPassword ? 'border-red-500' : theme === 'light' ? 'bg-white border-slate-200 text-slate-900 placeholder-slate-400' : 'bg-white/5 border-white/10 text-white placeholder-surface-500'}`}
                                     placeholder="أدخل كلمة المرور الجديدة"
                                     dir="rtl"
                                 /&gt;
                                 &lt;button
                                     type="button"
                                     onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etShowNew(!showNew)}</span>
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white transition-colors"
+                                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-surface-400 hover:text-white'}`}
                                 &gt;
                                     {showNew ? <span class="branch-0 cbranch-no" title="branch not covered" >&lt;EyeOff className="w-5 h-5" /&gt; : &lt;E</span>ye className="w-5 h-5" /&gt;}
                                 &lt;/button&gt;
@@ -686,7 +692,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                                         : passwordStrength.score &lt;= 4
                                                             ? 'bg-yellow-500'
                                                             : 'bg-emerald-500'
-                                                    : 'bg-surface-700'
+                                                    : theme === 'light' ? 'bg-slate-200' : 'bg-surface-700'
                                                     }`}
                                             /&gt;
                                         ))}
@@ -700,7 +706,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
                         {/* Confirm Password */}
                         &lt;div className="space-y-2"&gt;
-                            &lt;label className="block text-sm font-medium text-surface-300 text-right"&gt;
+                            &lt;label className={`block text-sm font-medium text-right ${theme === 'light' ? 'text-slate-700' : 'text-surface-300'}`}&gt;
                                 تأكيد كلمة المرور
                             &lt;/label&gt;
                             &lt;div className="relative"&gt;
@@ -708,15 +714,15 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                     type={showConfirm ? 'text' : 'password'}
                                     value={confirmPassword}
                                     onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >setConfirmPassword(e.target.value)}</span>
-                                    className={`w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border text-white text-right placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all
-                    ${errors.confirmPassword ? 'border-red-500' : confirmPassword &amp;&amp; passwordsMatch ? 'border-emerald-500' : 'border-white/10'}`}
+                                    className={`w-full px-4 py-3 pr-12 rounded-xl border text-right focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all
+                      ${errors.confirmPassword ? 'border-red-500' : confirmPassword &amp;&amp; passwordsMatch ? 'border-emerald-500' : theme === 'light' ? 'bg-white border-slate-200 text-slate-900 placeholder-slate-400' : 'bg-white/5 border-white/10 text-white placeholder-surface-500'}`}
                                     placeholder="أعد إدخال كلمة المرور الجديدة"
                                     dir="rtl"
                                 /&gt;
                                 &lt;button
                                     type="button"
                                     onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etShowConfirm(!showConfirm)}</span>
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white transition-colors"
+                                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-surface-400 hover:text-white'}`}
                                 &gt;
                                     {showConfirm ? <span class="branch-0 cbranch-no" title="branch not covered" >&lt;EyeOff className="w-5 h-5" /&gt; : &lt;E</span>ye className="w-5 h-5" /&gt;}
                                 &lt;/button&gt;
@@ -763,7 +769,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-01T11:54:50.621Z
+                at 2026-01-12T11:01:16.464Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>0/202</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
@@ -436,13 +436,19 @@
 <a name='L371'></a><a href='#L371'>371</a>
 <a name='L372'></a><a href='#L372'>372</a>
 <a name='L373'></a><a href='#L373'>373</a>
-<a name='L374'></a><a href='#L374'>374</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -814,17 +820,20 @@
 import { motion } from <span class="cstat-no" title="statement not covered" >'framer-motion';</span>
 import Link from <span class="cstat-no" title="statement not covered" >'next/link';</span>
 import { ArrowRight, FileText, AlertCircle, CheckCircle, XCircle, Heart } from <span class="cstat-no" title="statement not covered" >'lucide-react';</span>
+import { useSettingsStore } from <span class="cstat-no" title="statement not covered" >'@/stores/settings-store';</span>
 &nbsp;
 export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >TermsOfServicePage() {</span></span>
+    const { theme } = <span class="cstat-no" title="statement not covered" >useSettingsStore();</span>
+&nbsp;
     return (
-        &lt;div className="min-h-screen bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900"&gt;
+        &lt;div className={`min-h-screen ${theme === 'light' ? 'bg-slate-50' : 'bg-gradient-to-b from-surface-900 via-surface-800 to-surface-900'}`}&gt;
             {/* Header */}
-            &lt;header className="sticky top-0 z-50 backdrop-blur-xl bg-surface-900/80 border-b border-white/5"&gt;
+            &lt;header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${theme === 'light' ? 'bg-white/80 border-slate-200' : 'bg-surface-900/80 border-white/5'}`}&gt;
                 &lt;div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4"&gt;
-                    &lt;Link href="/settings/privacy" className="p-2 rounded-full hover:bg-white/10 transition-colors"&gt;
-                        &lt;ArrowRight className="w-6 h-6 text-white" /&gt;
+                    &lt;Link href="/settings/privacy" className={`p-2 rounded-full transition-colors ${theme === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/10'}`}&gt;
+                        &lt;ArrowRight className={`w-6 h-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`} /&gt;
                     &lt;/Link&gt;
-                    &lt;h1 className="text-xl font-bold text-white"&gt;شروط الاستخدام&lt;/h1&gt;
+                    &lt;h1 className={`text-xl font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;شروط الاستخدام&lt;/h1&gt;
                 &lt;/div&gt;
             &lt;/header&gt;
 &nbsp;
@@ -836,39 +845,39 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                 &gt;
                     {/* Hero Section */}
                     &lt;div className="text-center mb-12"&gt;
-                        &lt;div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-accent-500/20 flex items-center justify-center"&gt;
-                            &lt;FileText className="w-10 h-10 text-accent-400" /&gt;
+                        &lt;div className={`w-20 h-20 mx-auto mb-6 rounded-3xl flex items-center justify-center ${theme === 'light' ? 'bg-accent-100' : 'bg-accent-500/20'}`}&gt;
+                            &lt;FileText className={`w-10 h-10 ${theme === 'light' ? 'text-accent-600' : 'text-accent-400'}`} /&gt;
                         &lt;/div&gt;
-                        &lt;h2 className="text-3xl font-bold text-white mb-3"&gt;شروط استخدام تطبيق وصال&lt;/h2&gt;
-                        &lt;p className="text-surface-300 text-lg"&gt;
+                        &lt;h2 className={`text-3xl font-bold mb-3 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}&gt;شروط استخدام تطبيق وصال&lt;/h2&gt;
+                        &lt;p className={`text-lg ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;
                             مرحباً بك في وصال - مساحتك الآمنة لتعزيز العلاقة الزوجية
                         &lt;/p&gt;
-                        &lt;p className="text-surface-500 text-sm mt-2"&gt;آخر تحديث: ديسمبر 2024&lt;/p&gt;
+                        &lt;p className={`text-sm mt-2 ${theme === 'light' ? 'text-slate-500' : 'text-surface-500'}`}&gt;آخر تحديث: ديسمبر 2024&lt;/p&gt;
                     &lt;/div&gt;
 &nbsp;
                     {/* Quick Agreement Notice */}
-                    &lt;div className="p-6 rounded-2xl bg-primary-500/10 border border-primary-500/20"&gt;
-                        &lt;h3 className="text-lg font-bold text-primary-300 mb-3 flex items-center gap-2"&gt;
+                    &lt;div className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-pink-50 border-pink-200' : 'bg-primary-500/10 border-primary-500/20'}`}&gt;
+                        &lt;h3 className={`text-lg font-bold mb-3 flex items-center gap-2 ${theme === 'light' ? 'text-pink-700' : 'text-primary-300'}`}&gt;
                             &lt;AlertCircle className="w-5 h-5" /&gt;
                             موافقتك
                         &lt;/h3&gt;
-                        &lt;p className="text-surface-200"&gt;
-                            باستخدامك لتطبيق &lt;strong className="text-white"&gt;وصال&lt;/strong&gt;، فإنك توافق على هذه الشروط.
+                        &lt;p className={theme === 'light' ? 'text-slate-600' : 'text-surface-200'}&gt;
+                            باستخدامك لتطبيق &lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;وصال&lt;/strong&gt;، فإنك توافق على هذه الشروط.
                             يرجى قراءتها بعناية. إذا كنت لا توافق، يُرجى عدم استخدام التطبيق.
                         &lt;/p&gt;
                     &lt;/div&gt;
 &nbsp;
                     {/* Section 1: Eligibility */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;1. الأهلية&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;1. الأهلية&lt;/h3&gt;
 &nbsp;
-                        &lt;div className="space-y-4 text-surface-200"&gt;
-                            &lt;div className="flex items-start gap-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20"&gt;
-                                &lt;CheckCircle className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" /&gt;
+                        &lt;div className={`space-y-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
+                            &lt;div className={`flex items-start gap-3 p-4 rounded-xl border ${theme === 'light' ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-500/10 border-emerald-500/20'}`}&gt;
+                                &lt;CheckCircle className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme === 'light' ? 'text-emerald-500' : 'text-emerald-400'}`} /&gt;
                                 &lt;div&gt;
-                                    &lt;p className="font-bold text-emerald-300 mb-1"&gt;يجب أن تكون:&lt;/p&gt;
-                                    &lt;ul className="list-disc list-inside space-y-1 mr-4 text-surface-300"&gt;
-                                        &lt;li&gt;عمرك &lt;strong className="text-white"&gt;18 عاماً أو أكثر&lt;/strong&gt;&lt;/li&gt;
+                                    &lt;p className={`font-bold mb-1 ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-300'}`}&gt;يجب أن تكون:&lt;/p&gt;
+                                    &lt;ul className={`list-disc list-inside space-y-1 mr-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;
+                                        &lt;li&gt;عمرك &lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;18 عاماً أو أكثر&lt;/strong&gt;&lt;/li&gt;
                                         &lt;li&gt;متزوج/ـة أو مخطوب/ـة&lt;/li&gt;
                                         &lt;li&gt;مقيم/ـة في المملكة العربية السعودية&lt;/li&gt;
                                         &lt;li&gt;قادر/ـة قانونياً على الدخول في عقود ملزمة&lt;/li&gt;
@@ -876,11 +885,11 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                 &lt;/div&gt;
                             &lt;/div&gt;
 &nbsp;
-                            &lt;div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20"&gt;
-                                &lt;XCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" /&gt;
+                            &lt;div className={`flex items-start gap-3 p-4 rounded-xl border ${theme === 'light' ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20'}`}&gt;
+                                &lt;XCircle className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme === 'light' ? 'text-red-500' : 'text-red-400'}`} /&gt;
                                 &lt;div&gt;
-                                    &lt;p className="font-bold text-red-300 mb-1"&gt;غير مسموح للقُصَّر:&lt;/p&gt;
-                                    &lt;p className="text-surface-300"&gt;
+                                    &lt;p className={`font-bold mb-1 ${theme === 'light' ? 'text-red-700' : 'text-red-300'}`}&gt;غير مسموح للقُصَّر:&lt;/p&gt;
+                                    &lt;p className={theme === 'light' ? 'text-slate-600' : 'text-surface-300'}&gt;
                                         لا يُسمح لمن هم دون 18 عاماً باستخدام التطبيق. نحتفظ بالحق في طلب إثبات العمر.
                                     &lt;/p&gt;
                                 &lt;/div&gt;
@@ -889,93 +898,93 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 2: Account Responsibilities */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;2. مسؤوليات الحساب&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;2. مسؤوليات الحساب&lt;/h3&gt;
 &nbsp;
-                        &lt;ul className="space-y-3 text-surface-200"&gt;
+                        &lt;ul className={`space-y-3 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;•&lt;/span&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;دقة المعلومات:&lt;/strong&gt; يجب تقديم معلومات صحيحة عند التسجيل&lt;/span&gt;
+                                &lt;span className="text-primary-500 font-bold"&gt;•&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;دقة المعلومات:&lt;/strong&gt; يجب تقديم معلومات صحيحة عند التسجيل&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;•&lt;/span&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;سرية كلمة المرور:&lt;/strong&gt; أنت مسؤول عن حماية كلمة مرورك&lt;/span&gt;
+                                &lt;span className="text-primary-500 font-bold"&gt;•&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;سرية كلمة المرور:&lt;/strong&gt; أنت مسؤول عن حماية كلمة مرورك&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;•&lt;/span&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;حساب واحد فقط:&lt;/strong&gt; لكل شخص حساب واحد فقط&lt;/span&gt;
+                                &lt;span className="text-primary-500 font-bold"&gt;•&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;حساب واحد فقط:&lt;/strong&gt; لكل شخص حساب واحد فقط&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;•&lt;/span&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;الإبلاغ عن الاختراق:&lt;/strong&gt; أخبرنا فوراً إذا شككت في اختراق حسابك&lt;/span&gt;
+                                &lt;span className="text-primary-500 font-bold"&gt;•&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;الإبلاغ عن الاختراق:&lt;/strong&gt; أخبرنا فوراً إذا شككت في اختراق حسابك&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400 font-bold"&gt;•&lt;/span&gt;
-                                &lt;span&gt;&lt;strong className="text-white"&gt;المسؤولية:&lt;/strong&gt; أنت مسؤول عن جميع الأنشطة تحت حسابك&lt;/span&gt;
+                                &lt;span className="text-primary-500 font-bold"&gt;•&lt;/span&gt;
+                                &lt;span&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;المسؤولية:&lt;/strong&gt; أنت مسؤول عن جميع الأنشطة تحت حسابك&lt;/span&gt;
                             &lt;/li&gt;
                         &lt;/ul&gt;
 &nbsp;
-                        &lt;div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20"&gt;
-                            &lt;p className="text-amber-200 text-sm"&gt;
+                        &lt;div className={`mt-6 p-4 rounded-xl border ${theme === 'light' ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20'}`}&gt;
+                            &lt;p className={`text-sm ${theme === 'light' ? 'text-amber-700' : 'text-amber-200'}`}&gt;
                                 &lt;strong&gt;تنبيه:&lt;/strong&gt; مشاركة حسابك مع أشخاص آخرين غير شريكك محظورة وقد تؤدي لإيقاف الحساب.
                             &lt;/p&gt;
                         &lt;/div&gt;
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 3: Acceptable Use */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;3. الاستخدام المقبول&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;3. الاستخدام المقبول&lt;/h3&gt;
 &nbsp;
                         &lt;div className="space-y-6"&gt;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-emerald-300 mb-3 flex items-center gap-2"&gt;
+                                &lt;h4 className={`font-bold mb-3 flex items-center gap-2 ${theme === 'light' ? 'text-emerald-600' : 'text-emerald-300'}`}&gt;
                                     &lt;CheckCircle className="w-5 h-5" /&gt;
                                     مسموح:
                                 &lt;/h4&gt;
-                                &lt;ul className="space-y-2 text-surface-200 mr-6"&gt;
+                                &lt;ul className={`space-y-2 mr-6 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                                     &lt;li className="flex items-start gap-2"&gt;
-                                        &lt;span className="text-emerald-400"&gt;✓&lt;/span&gt;
+                                        &lt;span className="text-emerald-500"&gt;✓&lt;/span&gt;
                                         &lt;span&gt;استخدام التطبيق لتحسين علاقتك الزوجية&lt;/span&gt;
                                     &lt;/li&gt;
                                     &lt;li className="flex items-start gap-2"&gt;
-                                        &lt;span className="text-emerald-400"&gt;✓&lt;/span&gt;
+                                        &lt;span className="text-emerald-500"&gt;✓&lt;/span&gt;
                                         &lt;span&gt;الربط مع شريك حياتك الشرعي&lt;/span&gt;
                                     &lt;/li&gt;
                                     &lt;li className="flex items-start gap-2"&gt;
-                                        &lt;span className="text-emerald-400"&gt;✓&lt;/span&gt;
+                                        &lt;span className="text-emerald-500"&gt;✓&lt;/span&gt;
                                         &lt;span&gt;مشاركة ملاحظات ومقترحات لتحسين التطبيق&lt;/span&gt;
                                     &lt;/li&gt;
                                 &lt;/ul&gt;
                             &lt;/div&gt;
 &nbsp;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-red-300 mb-3 flex items-center gap-2"&gt;
+                                &lt;h4 className={`font-bold mb-3 flex items-center gap-2 ${theme === 'light' ? 'text-red-600' : 'text-red-300'}`}&gt;
                                     &lt;XCircle className="w-5 h-5" /&gt;
                                     محظور:
                                 &lt;/h4&gt;
-                                &lt;ul className="space-y-2 text-surface-200 mr-6"&gt;
+                                &lt;ul className={`space-y-2 mr-6 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                                     &lt;li className="flex items-start gap-2"&gt;
-                                        &lt;span className="text-red-400"&gt;✗&lt;/span&gt;
+                                        &lt;span className="text-red-500"&gt;✗&lt;/span&gt;
                                         &lt;span&gt;استخدام التطبيق لأغراض غير شرعية أو غير أخلاقية&lt;/span&gt;
                                     &lt;/li&gt;
                                     &lt;li className="flex items-start gap-2"&gt;
-                                        &lt;span className="text-red-400"&gt;✗&lt;/span&gt;
+                                        &lt;span className="text-red-500"&gt;✗&lt;/span&gt;
                                         &lt;span&gt;محاولة اختراق أو إساءة استخدام النظام&lt;/span&gt;
                                     &lt;/li&gt;
                                     &lt;li className="flex items-start gap-2"&gt;
-                                        &lt;span className="text-red-400"&gt;✗&lt;/span&gt;
+                                        &lt;span className="text-red-500"&gt;✗&lt;/span&gt;
                                         &lt;span&gt;انتحال شخصية الآخرين أو تقديم معلومات مزيفة&lt;/span&gt;
                                     &lt;/li&gt;
                                     &lt;li className="flex items-start gap-2"&gt;
-                                        &lt;span className="text-red-400"&gt;✗&lt;/span&gt;
+                                        &lt;span className="text-red-500"&gt;✗&lt;/span&gt;
                                         &lt;span&gt;بيع أو نقل حسابك لشخص آخر&lt;/span&gt;
                                     &lt;/li&gt;
                                     &lt;li className="flex items-start gap-2"&gt;
-                                        &lt;span className="text-red-400"&gt;✗&lt;/span&gt;
+                                        &lt;span className="text-red-500"&gt;✗&lt;/span&gt;
                                         &lt;span&gt;استخدام أدوات آلية (bots) أو برامج ضارة&lt;/span&gt;
                                     &lt;/li&gt;
                                     &lt;li className="flex items-start gap-2"&gt;
-                                        &lt;span className="text-red-400"&gt;✗&lt;/span&gt;
+                                        &lt;span className="text-red-500"&gt;✗&lt;/span&gt;
                                         &lt;span&gt;نسخ أو إعادة إنتاج محتوى التطبيق دون إذن&lt;/span&gt;
                                     &lt;/li&gt;
                                 &lt;/ul&gt;
@@ -984,20 +993,20 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 4: Content and IP */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;4. المحتوى والملكية الفكرية&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;4. المحتوى والملكية الفكرية&lt;/h3&gt;
 &nbsp;
-                        &lt;div className="space-y-4 text-surface-200"&gt;
+                        &lt;div className={`space-y-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-white mb-2"&gt;محتوى التطبيق:&lt;/h4&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;محتوى التطبيق:&lt;/h4&gt;
                                 &lt;p&gt;
-                                    جميع المحتويات (الألعاب، الرحلات، النصوص، التصاميم) هي ملك حصري لـ &lt;strong className="text-white"&gt;وصال&lt;/strong&gt;
+                                    جميع المحتويات (الألعاب، الرحلات، النصوص، التصاميم) هي ملك حصري لـ &lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;وصال&lt;/strong&gt;
                                     ومحمية بموجب قوانين حقوق النشر السعودية والدولية.
                                 &lt;/p&gt;
                             &lt;/div&gt;
 &nbsp;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-white mb-2"&gt;محتواك الشخصي:&lt;/h4&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;محتواك الشخصي:&lt;/h4&gt;
                                 &lt;ul className="list-disc list-inside space-y-1 mr-4"&gt;
                                     &lt;li&gt;تحتفظ بملكية بياناتك الشخصية&lt;/li&gt;
                                     &lt;li&gt;تمنحنا ترخيصاً لاستخدام بياناتك لتحسين الخدمة (بشكل مجهول)&lt;/li&gt;
@@ -1005,8 +1014,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                 &lt;/ul&gt;
                             &lt;/div&gt;
 &nbsp;
-                            &lt;div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20"&gt;
-                                &lt;p className="text-blue-200 text-sm"&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20'}`}&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-blue-700' : 'text-blue-200'}`}&gt;
                                     &lt;strong&gt;AI المستخدم:&lt;/strong&gt; نستخدم تقنيات الذكاء الاصطناعي (DeepSeek) لتقديم نصائح شخصية.
                                     جميع الاستشارات مجهولة الهوية ولا ترتبط بهويتك الحقيقية.
                                 &lt;/p&gt;
@@ -1015,12 +1024,12 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 5: Premium Subscription */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;5. الاشتراك المدفوع&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;5. الاشتراك المدفوع&lt;/h3&gt;
 &nbsp;
-                        &lt;div className="space-y-4 text-surface-200"&gt;
+                        &lt;div className={`space-y-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-white mb-2"&gt;الأسعار والفواتير:&lt;/h4&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;الأسعار والفواتير:&lt;/h4&gt;
                                 &lt;ul className="list-disc list-inside space-y-1 mr-4"&gt;
                                     &lt;li&gt;الأسعار بالريال السعودي (SAR) وشاملة ضريبة القيمة المضافة&lt;/li&gt;
                                     &lt;li&gt;الدفع عبر Moyasar (بوابة دفع سعودية معتمدة)&lt;/li&gt;
@@ -1030,44 +1039,44 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                             &lt;/div&gt;
 &nbsp;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-white mb-2"&gt;الإلغاء:&lt;/h4&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;الإلغاء:&lt;/h4&gt;
                                 &lt;p&gt;
                                     يمكنك إلغاء اشتراكك في أي وقت من الإعدادات. سيستمر الاشتراك حتى نهاية الفترة المدفوعة.
                                 &lt;/p&gt;
                             &lt;/div&gt;
 &nbsp;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-white mb-2"&gt;فترة السماح:&lt;/h4&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;فترة السماح:&lt;/h4&gt;
                                 &lt;p&gt;
-                                    نوفر فترة سماح &lt;strong className="text-white"&gt;3 أيام&lt;/strong&gt; بعد فشل الدفع قبل إيقاف الميزات المميزة.
+                                    نوفر فترة سماح &lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;3 أيام&lt;/strong&gt; بعد فشل الدفع قبل إيقاف الميزات المميزة.
                                 &lt;/p&gt;
                             &lt;/div&gt;
                         &lt;/div&gt;
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 6: Disclaimers */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;6. إخلاء المسؤولية&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;6. إخلاء المسؤولية&lt;/h3&gt;
 &nbsp;
                         &lt;div className="space-y-4"&gt;
-                            &lt;div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20"&gt;
-                                &lt;h4 className="font-bold text-amber-300 mb-2"&gt;النصائح والمشورة:&lt;/h4&gt;
-                                &lt;p className="text-amber-200 text-sm"&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20'}`}&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-amber-700' : 'text-amber-300'}`}&gt;النصائح والمشورة:&lt;/h4&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-amber-600' : 'text-amber-200'}`}&gt;
                                     المشورة المقدمة عبر التطبيق &lt;strong&gt;ليست بديلاً&lt;/strong&gt; عن الاستشارة المهنية من مختص أسري أو نفسي.
                                     في حالات الأزمات الخطيرة، يُرجى طلب المساعدة المتخصصة.
                                 &lt;/p&gt;
                             &lt;/div&gt;
 &nbsp;
-                            &lt;div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20"&gt;
-                                &lt;h4 className="font-bold text-red-300 mb-2"&gt;عدم الضمان:&lt;/h4&gt;
-                                &lt;p className="text-red-200 text-sm"&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20'}`}&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-red-700' : 'text-red-300'}`}&gt;عدم الضمان:&lt;/h4&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-red-600' : 'text-red-200'}`}&gt;
                                     نقدم التطبيق "كما هو" دون أي ضمانات صريحة أو ضمنية. لا نضمن نتائج معينة من استخدام التطبيق.
                                 &lt;/p&gt;
                             &lt;/div&gt;
 &nbsp;
-                            &lt;div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20"&gt;
-                                &lt;h4 className="font-bold text-blue-300 mb-2"&gt;تحديد المسؤولية:&lt;/h4&gt;
-                                &lt;p className="text-blue-200 text-sm"&gt;
+                            &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20'}`}&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-blue-700' : 'text-blue-300'}`}&gt;تحديد المسؤولية:&lt;/h4&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-blue-600' : 'text-blue-200'}`}&gt;
                                     لن نكون مسؤولين عن أي أضرار غير مباشرة أو تبعية ناتجة عن استخدام التطبيق.
                                     مسؤوليتنا الإجمالية محدودة بالمبلغ المدفوع للاشتراك.
                                 &lt;/p&gt;
@@ -1076,17 +1085,17 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 7: Termination */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;7. إنهاء الخدمة&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;7. إنهاء الخدمة&lt;/h3&gt;
 &nbsp;
-                        &lt;div className="space-y-4 text-surface-200"&gt;
+                        &lt;div className={`space-y-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-white mb-2"&gt;حقك في الإنهاء:&lt;/h4&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;حقك في الإنهاء:&lt;/h4&gt;
                                 &lt;p&gt;يمكنك حذف حسابك في أي وقت من: الإعدادات → حذف الحساب&lt;/p&gt;
                             &lt;/div&gt;
 &nbsp;
                             &lt;div&gt;
-                                &lt;h4 className="font-bold text-white mb-2"&gt;حقنا في الإنهاء:&lt;/h4&gt;
+                                &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;حقنا في الإنهاء:&lt;/h4&gt;
                                 &lt;p className="mb-2"&gt;يحق لنا إيقاف أو حذف حسابك إذا:&lt;/p&gt;
                                 &lt;ul className="list-disc list-inside space-y-1 mr-4"&gt;
                                     &lt;li&gt;انتهكت هذه الشروط&lt;/li&gt;
@@ -1096,25 +1105,25 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                                 &lt;/ul&gt;
                             &lt;/div&gt;
 &nbsp;
-                            &lt;div className="p-4 rounded-xl bg-surface-800/50"&gt;
-                                &lt;p className="text-surface-300 text-sm"&gt;
-                                    &lt;strong className="text-white"&gt;ملاحظة:&lt;/strong&gt; في حالة الإيقاف لانتهاك الشروط، لن يتم استرداد المبالغ المدفوعة.
+                            &lt;div className={`p-4 rounded-xl ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-800/50'}`}&gt;
+                                &lt;p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;
+                                    &lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;ملاحظة:&lt;/strong&gt; في حالة الإيقاف لانتهاك الشروط، لن يتم استرداد المبالغ المدفوعة.
                                 &lt;/p&gt;
                             &lt;/div&gt;
                         &lt;/div&gt;
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 8: Governing Law */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;8. القانون الحاكم&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;8. القانون الحاكم&lt;/h3&gt;
 &nbsp;
-                        &lt;p className="text-surface-200 mb-4"&gt;
-                            تخضع هذه الشروط وتفسر وفقاً لـ &lt;strong className="text-white"&gt;قوانين المملكة العربية السعودية&lt;/strong&gt;.
+                        &lt;p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
+                            تخضع هذه الشروط وتفسر وفقاً لـ &lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;قوانين المملكة العربية السعودية&lt;/strong&gt;.
                         &lt;/p&gt;
 &nbsp;
-                        &lt;div className="p-4 rounded-xl bg-surface-800/50 border border-surface-700"&gt;
-                            &lt;h4 className="font-bold text-white mb-2"&gt;حل النزاعات:&lt;/h4&gt;
-                            &lt;p className="text-surface-300 text-sm"&gt;
+                        &lt;div className={`p-4 rounded-xl border ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-surface-800/50 border-surface-700'}`}&gt;
+                            &lt;h4 className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;حل النزاعات:&lt;/h4&gt;
+                            &lt;p className={`text-sm ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;
                                 في حالة نشوء أي نزاع، نشجع التواصل معنا أولاً لحله ودياً.
                                 إذا لم يتم التوصل لحل، يتم الاحتكام للجهات القضائية المختصة في المملكة.
                             &lt;/p&gt;
@@ -1122,49 +1131,49 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     &lt;/section&gt;
 &nbsp;
                     {/* Section 9: Changes to Terms */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4"&gt;9. التعديلات على الشروط&lt;/h3&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;9. التعديلات على الشروط&lt;/h3&gt;
 &nbsp;
-                        &lt;p className="text-surface-200 mb-4"&gt;
+                        &lt;p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             نحتفظ بالحق في تعديل هذه الشروط في أي وقت. التعديلات الجوهرية سنخطرك بها عبر:
                         &lt;/p&gt;
 &nbsp;
-                        &lt;ul className="space-y-2 text-surface-200"&gt;
+                        &lt;ul className={`space-y-2 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400"&gt;→&lt;/span&gt;
+                                &lt;span className="text-primary-500"&gt;→&lt;/span&gt;
                                 &lt;span&gt;إشعار داخل التطبيق&lt;/span&gt;
                             &lt;/li&gt;
                             &lt;li className="flex items-start gap-2"&gt;
-                                &lt;span className="text-primary-400"&gt;→&lt;/span&gt;
+                                &lt;span className="text-primary-500"&gt;→&lt;/span&gt;
                                 &lt;span&gt;رسالة على البريد الإلكتروني&lt;/span&gt;
                             &lt;/li&gt;
                         &lt;/ul&gt;
 &nbsp;
-                        &lt;p className="text-surface-200 mt-4"&gt;
+                        &lt;p className={`mt-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             استمرارك في استخدام التطبيق بعد التعديلات يعني موافقتك عليها.
                         &lt;/p&gt;
                     &lt;/section&gt;
 &nbsp;
                     {/* Contact Section */}
-                    &lt;section className="glass-card p-6"&gt;
-                        &lt;h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2"&gt;
-                            &lt;Heart className="w-6 h-6 text-primary-400" /&gt;
+                    &lt;section className={`p-6 rounded-2xl border ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'glass-card'}`}&gt;
+                        &lt;h3 className={`text-2xl font-bold mb-4 flex items-center gap-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;
+                            &lt;Heart className={`w-6 h-6 ${theme === 'light' ? 'text-pink-500' : 'text-primary-400'}`} /&gt;
                             تواصل معنا
                         &lt;/h3&gt;
-                        &lt;p className="text-surface-200 mb-4"&gt;
+                        &lt;p className={`mb-4 ${theme === 'light' ? 'text-slate-600' : 'text-surface-200'}`}&gt;
                             لأي استفسارات حول هذه الشروط:
                         &lt;/p&gt;
-                        &lt;div className="p-4 rounded-xl bg-surface-800/50"&gt;
-                            &lt;p className="text-surface-300"&gt;&lt;strong className="text-white"&gt;البريد الإلكتروني:&lt;/strong&gt; support@wesal.sa&lt;/p&gt;
-                            &lt;p className="text-surface-300 mt-2"&gt;&lt;strong className="text-white"&gt;الرد خلال:&lt;/strong&gt; 48 ساعة عمل&lt;/p&gt;
+                        &lt;div className={`p-4 rounded-xl ${theme === 'light' ? 'bg-slate-50' : 'bg-surface-800/50'}`}&gt;
+                            &lt;p className={theme === 'light' ? 'text-slate-600' : 'text-surface-300'}&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;البريد الإلكتروني:&lt;/strong&gt; support@wesal.sa&lt;/p&gt;
+                            &lt;p className={`mt-2 ${theme === 'light' ? 'text-slate-600' : 'text-surface-300'}`}&gt;&lt;strong className={theme === 'light' ? 'text-slate-800' : 'text-white'}&gt;الرد خلال:&lt;/strong&gt; 48 ساعة عمل&lt;/p&gt;
                         &lt;/div&gt;
                     &lt;/section&gt;
 &nbsp;
                     {/* Final Note */}
-                    &lt;div className="p-6 rounded-2xl bg-gradient-to-r from-primary-500/20 to-accent-500/20 border border-primary-500/30 text-center"&gt;
-                        &lt;Heart className="w-8 h-8 text-primary-400 mx-auto mb-3" /&gt;
-                        &lt;p className="text-white font-bold mb-2"&gt;شكراً لثقتك في وصال&lt;/p&gt;
-                        &lt;p className="text-surface-300 text-sm"&gt;نسعد بأن نكون جزءاً من رحلتكما في بناء علاقة زوجية أقوى وأسعد&lt;/p&gt;
+                    &lt;div className={`p-6 rounded-2xl text-center border ${theme === 'light' ? 'bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200' : 'bg-gradient-to-r from-primary-500/20 to-accent-500/20 border-primary-500/30'}`}&gt;
+                        &lt;Heart className={`w-8 h-8 mx-auto mb-3 ${theme === 'light' ? 'text-pink-500' : 'text-primary-400'}`} /&gt;
+                        &lt;p className={`font-bold mb-2 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}&gt;شكراً لثقتك في وصال&lt;/p&gt;
+                        &lt;p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-300'}`}&gt;نسعد بأن نكون جزءاً من رحلتكما في بناء علاقة زوجية أقوى وأسعد&lt;/p&gt;
                     &lt;/div&gt;
 &nbsp;
                     {/* Back Button */}
@@ -1189,7 +1198,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-01T11:54:50.621Z
+                at 2026-01-12T11:01:16.464Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
