@@ -9,9 +9,9 @@ interface Subscription {
     id: string;
     couple_id: string;
     plan_id: string;
-    status: 'active' | 'cancelled' | 'expired';
+    status: 'active' | 'premium' | 'cancelled' | 'expired' | 'trialing';
     started_at: string;
-    ends_at: string;
+    ends_at: string | null;
 }
 
 export function useSubscription() {
@@ -23,7 +23,10 @@ export function useSubscription() {
     const [error, setError] = useState<string | null>(null);
 
     // Check if premium features are available
-    const isPremium = subscription?.status === 'premium' && (!subscription.ends_at || new Date(subscription.ends_at) > new Date());
+    // Premium is valid if status is 'premium' or 'active' and not expired
+    const isPremium = subscription !== null &&
+        (subscription.status === 'premium' || subscription.status === 'active') &&
+        (!subscription.ends_at || new Date(subscription.ends_at) > new Date());
 
     // Fetch subscription status
     const fetchSubscription = useCallback(async () => {
@@ -49,16 +52,18 @@ export function useSubscription() {
                 return;
             }
 
-            // Then get subscription for this couple
+            // Then get subscription for this couple - check for premium OR active status
             const { data, error: subError } = await supabase
                 .from('subscriptions')
                 .select('*')
                 .eq('couple_id', coupleData.id)
-                .eq('status', 'premium')
+                .in('status', ['premium', 'active'])
+                .order('created_at', { ascending: false })
+                .limit(1)
                 .single();
 
             if (subError && subError.code !== 'PGRST116') { // Not "no rows" error
-                // No subscription found
+                console.error('Subscription fetch error:', subError);
             }
 
             setSubscription(data || null);

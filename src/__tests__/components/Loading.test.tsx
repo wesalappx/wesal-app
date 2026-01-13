@@ -4,14 +4,15 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
 // Mock Loading component since it uses client-side features
 jest.mock('@/components/Loading', () => ({
     __esModule: true,
-    default: ({ size = 'md', text }: { size?: string; text?: string }) => (
-        <div data-testid="loading" data-size={size}>
+    default: ({ message }: { message?: string }) => (
+        <div data-testid="loading">
             <div className="spinner" />
-            {text && <span>{text}</span>}
+            {message && <span>{message}</span>}
         </div>
     ),
 }));
@@ -24,22 +25,12 @@ describe('Loading Component', () => {
         expect(screen.getByTestId('loading')).toBeInTheDocument();
     });
 
-    it('should render with default size', () => {
-        render(<Loading />);
-        expect(screen.getByTestId('loading')).toHaveAttribute('data-size', 'md');
-    });
-
-    it('should render with custom size', () => {
-        render(<Loading size="lg" />);
-        expect(screen.getByTestId('loading')).toHaveAttribute('data-size', 'lg');
-    });
-
-    it('should render with loading text', () => {
-        render(<Loading text="جاري التحميل..." />);
+    it('should render with loading message', () => {
+        render(<Loading message="جاري التحميل..." />);
         expect(screen.getByText('جاري التحميل...')).toBeInTheDocument();
     });
 
-    it('should render without text when not provided', () => {
+    it('should render without message when not provided', () => {
         render(<Loading />);
         expect(screen.queryByText('جاري التحميل...')).not.toBeInTheDocument();
     });

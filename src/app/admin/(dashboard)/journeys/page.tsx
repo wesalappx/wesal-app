@@ -57,8 +57,24 @@ export default function AdminJourneysPage() {
             const res = await fetch('/api/admin/journeys');
             if (res.ok) {
                 const data = await res.json();
-                if (data.journeys) {
-                    setJourneys(data.journeys);
+                if (data.journeys && Array.isArray(data.journeys) && data.journeys.length > 0) {
+                    // Merge saved config with current state to preserve all fields
+                    setJourneys(prev => {
+                        const savedMap = new Map(data.journeys.map((j: Journey) => [j.id, j]));
+                        return prev.map(journey => {
+                            const saved = savedMap.get(journey.id) as Journey | undefined;
+                            if (saved) {
+                                // Use saved isPremium and isEnabled from database
+                                return {
+                                    ...journey,
+                                    isPremium: saved.isPremium,
+                                    isEnabled: saved.isEnabled !== undefined ? saved.isEnabled : journey.isEnabled,
+                                    completedByCount: saved.completedByCount || journey.completedByCount
+                                };
+                            }
+                            return journey;
+                        });
+                    });
                 }
             }
         } catch (err) {
@@ -163,16 +179,16 @@ export default function AdminJourneysPage() {
                             transition={{ delay: idx * 0.1 }}
                         >
                             <Card className={`overflow-hidden transition-all ${journey.isEnabled
-                                    ? 'bg-slate-900/40 border-slate-800 hover:border-violet-500/30'
-                                    : 'bg-slate-900/20 border-slate-800/50 opacity-60'
+                                ? 'bg-slate-900/40 border-slate-800 hover:border-violet-500/30'
+                                : 'bg-slate-900/20 border-slate-800/50 opacity-60'
                                 }`}>
                                 <CardContent className="p-0">
                                     {/* Main Row */}
                                     <div className="p-5 flex items-center gap-4">
                                         {/* Icon */}
                                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${journey.isEnabled
-                                                ? 'bg-gradient-to-br from-violet-500/20 to-purple-500/20'
-                                                : 'bg-slate-800/50'
+                                            ? 'bg-gradient-to-br from-violet-500/20 to-purple-500/20'
+                                            : 'bg-slate-800/50'
                                             }`}>
                                             <IconComponent className={`w-7 h-7 ${journey.isEnabled ? 'text-violet-400' : 'text-slate-500'}`} />
                                         </div>
@@ -207,8 +223,8 @@ export default function AdminJourneysPage() {
                                             <button
                                                 onClick={() => toggleEnabled(journey.id)}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${journey.isEnabled
-                                                        ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
-                                                        : 'bg-slate-800/50 text-slate-500 hover:bg-slate-700/50'
+                                                    ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
+                                                    : 'bg-slate-800/50 text-slate-500 hover:bg-slate-700/50'
                                                     }`}
                                             >
                                                 {journey.isEnabled ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
@@ -217,8 +233,8 @@ export default function AdminJourneysPage() {
                                             <button
                                                 onClick={() => togglePremium(journey.id)}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${journey.isPremium
-                                                        ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
-                                                        : 'bg-slate-800/50 text-slate-500 hover:bg-slate-700/50'
+                                                    ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
+                                                    : 'bg-slate-800/50 text-slate-500 hover:bg-slate-700/50'
                                                     }`}
                                             >
                                                 <Crown className="w-4 h-4" />

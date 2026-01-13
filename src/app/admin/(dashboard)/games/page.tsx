@@ -70,8 +70,24 @@ export default function AdminGamesPage() {
             const res = await fetch('/api/admin/games');
             if (res.ok) {
                 const data = await res.json();
-                if (data.games) {
-                    setGames(data.games);
+                if (data.games && Array.isArray(data.games) && data.games.length > 0) {
+                    // Merge saved config with current state to preserve all fields
+                    setGames(prev => {
+                        const savedMap = new Map(data.games.map((g: Game) => [g.id, g]));
+                        return prev.map(game => {
+                            const saved = savedMap.get(game.id) as Game | undefined;
+                            if (saved) {
+                                // Use saved isPremium and isEnabled from database
+                                return {
+                                    ...game,
+                                    isPremium: saved.isPremium,
+                                    isEnabled: saved.isEnabled !== undefined ? saved.isEnabled : game.isEnabled,
+                                    playCount: saved.playCount || game.playCount
+                                };
+                            }
+                            return game;
+                        });
+                    });
                 }
             }
         } catch (err) {
