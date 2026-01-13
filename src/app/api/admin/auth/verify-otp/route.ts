@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
 import { createAdminClient } from '@/lib/supabase/server';
 
+
+export const dynamic = 'force-dynamic';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
 
 export async function POST(request: Request) {

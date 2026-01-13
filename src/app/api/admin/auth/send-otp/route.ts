@@ -3,6 +3,8 @@ import { Resend } from 'resend';
 import { createAdminClient } from '@/lib/supabase/server';
 import { randomInt } from 'crypto';
 
+
+export const dynamic = 'force-dynamic';
 // Allowed admin emails (in production, store in database or env)
 const ALLOWED_ADMIN_EMAILS = [
     'wesalapp.x@gmail.com',

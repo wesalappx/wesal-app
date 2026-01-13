@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
+
+export const dynamic = 'force-dynamic';
 // GET - Fetch games configuration
 export async function GET() {
     try {

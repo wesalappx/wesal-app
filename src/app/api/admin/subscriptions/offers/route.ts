@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { verifyAdmin, unauthorizedResponse, hasPermission } from '@/lib/admin/middleware';
 
+
+export const dynamic = 'force-dynamic';
 // GET /api/admin/subscriptions/offers - Fetch all offers
 export async function GET(request: NextRequest) {
     const { isAdmin, admin, error } = await verifyAdmin(request);
