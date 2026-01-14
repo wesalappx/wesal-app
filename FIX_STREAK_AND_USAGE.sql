@@ -73,24 +73,35 @@ CREATE INDEX IF NOT EXISTS idx_streaks_couple_id ON public.streaks(couple_id);
 -- PART 2: FIX TIER LIMITS TABLE
 -- ============================================
 
--- Create tier_limits table if it doesn't exist
-CREATE TABLE IF NOT EXISTS public.tier_limits (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    tier TEXT NOT NULL CHECK (tier IN ('free', 'premium')),
-    feature TEXT NOT NULL,
-    limit_value INTEGER NOT NULL,
-    period TEXT NOT NULL CHECK (period IN ('day', 'week', 'month', 'total')),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(tier, feature)
-);
+-- Check if table exists, if so update it, if not create it
+DO $$
+BEGIN
+    -- Try to add check constraint if table exists but constraint is wrong
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'tier_limits') THEN
+        -- Table exists, just update/insert values
+        -- First, check what period values are valid
+        RAISE NOTICE 'tier_limits table already exists, inserting/updating values...';
+    ELSE
+        -- Create the table
+        CREATE TABLE public.tier_limits (
+            id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+            tier TEXT NOT NULL CHECK (tier IN ('free', 'premium')),
+            feature TEXT NOT NULL,
+            limit_value INTEGER NOT NULL,
+            period TEXT NOT NULL CHECK (period IN ('daily', 'weekly', 'monthly', 'day', 'week', 'month', 'total')),
+            created_at TIMESTAMPTZ DEFAULT NOW(),
+            UNIQUE(tier, feature)
+        );
+    END IF;
+END $$;
 
--- Insert default limits for free tier
+-- Insert default limits - use 'daily'/'weekly' format if 'day'/'week' fails
 INSERT INTO public.tier_limits (tier, feature, limit_value, period) VALUES
-    ('free', 'ai_chat', 5, 'day'),
-    ('free', 'conflict_ai', 2, 'week'),
-    ('free', 'whisper', 3, 'week'),
-    ('free', 'game_sessions', 5, 'day'),
-    ('free', 'insights', 1, 'day')
+    ('free', 'ai_chat', 5, 'daily'),
+    ('free', 'conflict_ai', 2, 'weekly'),
+    ('free', 'whisper', 3, 'weekly'),
+    ('free', 'game_sessions', 5, 'daily'),
+    ('free', 'insights', 1, 'daily')
 ON CONFLICT (tier, feature) DO UPDATE SET
     limit_value = EXCLUDED.limit_value,
     period = EXCLUDED.period;
@@ -227,8 +238,11 @@ BEGIN
     -- Calculate period start based on limit period
     CASE v_limit_record.period
         WHEN 'day' THEN v_period_start := DATE_TRUNC('day', NOW());
+        WHEN 'daily' THEN v_period_start := DATE_TRUNC('day', NOW());
         WHEN 'week' THEN v_period_start := DATE_TRUNC('week', NOW());
+        WHEN 'weekly' THEN v_period_start := DATE_TRUNC('week', NOW());
         WHEN 'month' THEN v_period_start := DATE_TRUNC('month', NOW());
+        WHEN 'monthly' THEN v_period_start := DATE_TRUNC('month', NOW());
         ELSE v_period_start := '1970-01-01'::TIMESTAMPTZ;
     END CASE;
 
@@ -247,10 +261,10 @@ BEGIN
         'remaining', v_remaining,
         'limit', v_limit_record.limit_value,
         'tier', v_tier,
-        'resets_at', CASE v_limit_record.period
-            WHEN 'day' THEN DATE_TRUNC('day', NOW()) + INTERVAL '1 day'
-            WHEN 'week' THEN DATE_TRUNC('week', NOW()) + INTERVAL '1 week'
-            WHEN 'month' THEN DATE_TRUNC('month', NOW()) + INTERVAL '1 month'
+        'resets_at', CASE 
+            WHEN v_limit_record.period IN ('day', 'daily') THEN DATE_TRUNC('day', NOW()) + INTERVAL '1 day'
+            WHEN v_limit_record.period IN ('week', 'weekly') THEN DATE_TRUNC('week', NOW()) + INTERVAL '1 week'
+            WHEN v_limit_record.period IN ('month', 'monthly') THEN DATE_TRUNC('month', NOW()) + INTERVAL '1 month'
             ELSE NULL
         END
     );
