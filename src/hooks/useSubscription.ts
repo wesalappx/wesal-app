@@ -99,8 +99,8 @@ export function useSubscription() {
                 return { success: false, error: 'Not paired' };
             }
 
-            // Call Moyasar payment API
-            const response = await fetch('/api/payments/create', {
+            // Call Beta Join API (Replaces Moyasar Payment for now)
+            const response = await fetch('/api/payments/join-beta', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -117,12 +117,12 @@ export function useSubscription() {
                 return { success: false, error: result.error };
             }
 
-            // Redirect to Moyasar payment page
-            if (result.paymentUrl) {
-                window.location.href = result.paymentUrl;
+            // Beta join success
+            if (result.success) {
+                return { success: true };
             }
 
-            return { success: true, paymentUrl: result.paymentUrl };
+            return { success: true };
 
         } catch (err: any) {
             return { success: false, error: err.message };

@@ -41,7 +41,7 @@ describe('Game Content Validation', () => {
                 expect(q.options).toHaveLength(3)
 
                 // Validate each option is a non-empty string
-                q.options.forEach(option => {
+                q.options.forEach((option: string) => {
                     expect(typeof option).toBe('string')
                     expect(option.length).toBeGreaterThan(0)
                 })
@@ -161,14 +161,14 @@ describe('Game Content Validation', () => {
 
     describe('Data Integrity', () => {
         it('should have unique IDs across all games', () => {
-            const allIds = []
+            const allIds: string[] = []
             Object.values(sessionData).forEach(gameData => {
                 gameData.forEach(item => {
                     allIds.push(item.id)
                 })
             })
 
-            const uniqueIds = new Set(allIds)
+            const uniqueIds = new Set<string>(allIds)
             expect(uniqueIds.size).toBe(allIds.length)
         })
 

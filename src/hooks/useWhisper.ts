@@ -50,7 +50,7 @@ export function useWhisper() {
                 setCoupleId(pairingStatus.coupleId);
                 if (pairingStatus.partner) {
                     setPartnerId(pairingStatus.partner.id);
-                    setPartnerName(pairingStatus.partner.display_name || pairingStatus.partner.username || 'Partner');
+                    setPartnerName(pairingStatus.partner.display_name || 'Partner');
                 }
             }
         }

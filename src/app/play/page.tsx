@@ -364,7 +364,7 @@ export default function PlayPage() {
                         setShowModeModal(false);
                         playSound('success');
                     }}
-                    rememberChoice={true} // Force remember in this context
+
                 />
             </div>
 

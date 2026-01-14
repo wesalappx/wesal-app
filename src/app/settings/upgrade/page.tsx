@@ -89,20 +89,14 @@ export default function UpgradePage() {
         fetchOffers();
     }, []);
 
+
+
     const handleUpgrade = async () => {
         setError(null);
         setIsUpgrading(true);
 
-        // TEMPORARY: Bypass payment until payment methods are approved
-        // This will directly grant premium access without payment
         try {
-            const response = await fetch('/api/payments/activate-free', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ planId: selectedPlan }),
-            });
-
-            const result = await response.json();
+            const result = await startUpgrade(selectedPlan, promoCode);
 
             if (result.success) {
                 // Redirect to success page
@@ -248,96 +242,23 @@ export default function UpgradePage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-8"
                 >
-                    {/* Active Offer Banner */}
-                    {activeOffer && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-purple-600/30 to-pink-600/30 border border-purple-500/30 backdrop-blur-sm"
-                        >
-                            <div className="flex items-center justify-center gap-2 mb-2">
-                                <Sparkles className="w-5 h-5 text-purple-400" />
-                                <span className="text-lg font-bold text-white">{activeOffer.name}</span>
-                            </div>
-                            <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-1">
-                                {activeOffer.discount_percent}% {isRTL ? 'خصم' : 'OFF'}
-                            </div>
-                            {activeOffer.code && (
-                                <div className="inline-block px-3 py-1 rounded-full bg-white/10 text-purple-300 text-sm font-mono">
-                                    {isRTL ? 'الكود: ' : 'Code: '}{activeOffer.code}
-                                </div>
-                            )}
-                            <p className="text-purple-300/70 text-xs mt-2">
-                                {isRTL ? 'ينتهي: ' : 'Expires: '}{new Date(activeOffer.valid_until).toLocaleDateString()}
-                            </p>
-                        </motion.div>
-                    )}
-
-                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center shadow-xl shadow-amber-500/30">
-                        <Crown className="w-10 h-10 text-white" />
+                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl shadow-indigo-500/30">
+                        <Sparkles className="w-10 h-10 text-white" />
                     </div>
 
                     <h2 className="text-3xl font-bold text-white mb-3">
-                        {isRTL ? 'وصال Premium' : 'Wesal Premium'}
+                        {isRTL ? 'برنامج الوصول المبكر' : 'Early Access Program'}
                     </h2>
 
-                    <p className="text-surface-300">
+                    <p className="text-surface-300 mb-6">
                         {isRTL
-                            ? 'افتحوا كل المميزات لتعزيز علاقتكم'
-                            : 'Unlock all features to strengthen your relationship'}
+                            ? 'انضموا إلينا في مرحلة الإطلاق التجريبي واحصلوا على جميع ميزات Premium مجاناً لفترة محدودة!'
+                            : 'Join our Beta launch and get all Premium features for FREE for a limited time!'}
                     </p>
-                </motion.div>
 
-                {/* Plan Selection */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="grid grid-cols-2 gap-3 mb-6"
-                >
-                    {/* Monthly Plan */}
-                    <button
-                        onClick={() => setSelectedPlan('premium_monthly')}
-                        className={`relative p-4 rounded-2xl border-2 transition-all text-center ${selectedPlan === 'premium_monthly'
-                            ? 'border-primary-500 bg-primary-500/10'
-                            : 'border-white/10 bg-white/5 hover:border-white/20'
-                            }`}
-                    >
-                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary-500 text-white text-xs font-bold">
-                            {isRTL ? 'الأكثر طلباً' : 'Most Popular'}
-                        </span>
-                        <p className="text-surface-400 text-sm mb-1">
-                            {isRTL ? 'شهري' : 'Monthly'}
-                        </p>
-                        <p className="text-2xl font-bold text-white">
-                            {formatPrice(monthlyPrice)}
-                        </p>
-                        <p className="text-surface-500 text-xs">
-                            {isRTL ? '/شهر' : '/month'}
-                        </p>
-                    </button>
-
-                    {/* Annual Plan */}
-                    <button
-                        onClick={() => setSelectedPlan('premium_annual')}
-                        className={`relative p-4 rounded-2xl border-2 transition-all text-center ${selectedPlan === 'premium_annual'
-                            ? 'border-primary-500 bg-primary-500/10'
-                            : 'border-white/10 bg-white/5 hover:border-white/20'
-                            }`}
-                    >
-                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-emerald-500 text-white text-xs font-bold">
-                            {isRTL ? `وفر ${pricing.savings || 99} ريال` : `Save ${pricing.savings || 99} SAR`}
-                        </span>
-                        <p className="text-surface-400 text-sm mb-1">
-                            {isRTL ? 'سنوي' : 'Annual'}
-                        </p>
-                        <p className="text-2xl font-bold text-white">
-                            {formatPrice(annualPrice)}
-                        </p>
-                        <p className="text-surface-500 text-xs">
-                            {isRTL ? '/سنة' : '/year'}
-                        </p>
-                    </button>
+                    <div className="inline-block px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-sm">
+                        {isRTL ? '✨ فترة مجانية بالكامل' : '✨ 100% Free During Beta'}
+                    </div>
                 </motion.div>
 
                 {/* Feature Comparison Table */}
@@ -348,33 +269,25 @@ export default function UpgradePage() {
                     className="glass-card p-4 mb-6 overflow-hidden"
                 >
                     <h3 className="text-white font-bold text-center mb-4">
-                        {isRTL ? 'مقارنة المميزات' : 'Feature Comparison'}
+                        {isRTL ? 'لماذا تنضم للبرنامج؟' : 'Why Join Beta?'}
                     </h3>
 
-                    {/* Table Header */}
-                    <div className="grid grid-cols-3 gap-2 mb-3 text-center text-sm">
-                        <div className="text-surface-400"></div>
-                        <div className="text-surface-400 font-medium">
-                            {isRTL ? 'مجاني' : 'Free'}
-                        </div>
-                        <div className="text-primary-400 font-bold">
-                            Premium
-                        </div>
-                    </div>
-
-                    {/* Features */}
                     <div className="space-y-3">
                         {comparisonFeatures.map((feature, idx) => (
-                            <div key={idx} className="grid grid-cols-3 gap-2 items-center text-sm">
+                            <div key={idx} className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-white/5 transition-colors">
                                 <div className="flex items-center gap-2">
-                                    <feature.icon className="w-4 h-4 text-surface-500" />
-                                    <span className="text-white text-xs">{feature.name[language]}</span>
+                                    <div className="p-1.5 rounded-md bg-surface-800">
+                                        <feature.icon className="w-4 h-4 text-purple-400" />
+                                    </div>
+                                    <span className="text-white font-medium">{feature.name[language]}</span>
                                 </div>
-                                <div className="text-center text-surface-400 text-xs">
-                                    {feature.free[language]}
-                                </div>
-                                <div className="text-center text-emerald-400 text-xs font-medium">
-                                    {feature.premium[language]}
+                                <div className="flex items-center gap-2">
+                                    <span className="text-surface-500 line-through text-xs opacity-70">
+                                        {isRTL ? 'مدفوع' : 'Paid'}
+                                    </span>
+                                    <span className="text-emerald-400 font-bold text-xs bg-emerald-500/10 px-2 py-0.5 rounded">
+                                        {isRTL ? 'مجاناً' : 'Free'}
+                                    </span>
                                 </div>
                             </div>
                         ))}
@@ -387,27 +300,6 @@ export default function UpgradePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                 >
-                    {/* Promo Code Input */}
-                    <div className="mb-4">
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={promoCode}
-                                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                                placeholder={isRTL ? 'كود الخصم (اختياري)' : 'Promo code (optional)'}
-                                className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-surface-500 focus:border-primary-500 focus:outline-none text-center font-mono"
-                            />
-                        </div>
-                        {activeOffer?.code && (
-                            <button
-                                onClick={() => setPromoCode(activeOffer.code || '')}
-                                className="mt-2 text-xs text-purple-400 hover:text-purple-300 transition-colors"
-                            >
-                                {isRTL ? `استخدم كود: ${activeOffer.code}` : `Use code: ${activeOffer.code}`}
-                            </button>
-                        )}
-                    </div>
-
                     {error && (
                         <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm text-center">
                             {error}
@@ -417,32 +309,23 @@ export default function UpgradePage() {
                     <button
                         onClick={handleUpgrade}
                         disabled={isUpgrading}
-                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary-500 to-accent-500 text-white font-bold text-lg flex items-center justify-center gap-3 shadow-xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all disabled:opacity-50"
+                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-lg flex items-center justify-center gap-3 shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
                     >
                         {isUpgrading ? (
                             <Loader2 className="w-6 h-6 animate-spin" />
                         ) : (
                             <>
-                                <Sparkles className="w-6 h-6" />
-                                {isRTL ? 'اشترك الآن' : 'Subscribe Now'}
-                                <span className="opacity-80">
-                                    - {formatPrice(selectedPlan === 'premium_monthly' ? monthlyPrice : annualPrice)}
-                                </span>
+                                <Crown className="w-6 h-6" />
+                                {isRTL ? 'انضم للنسخة التجريبية مجاناً' : 'Join Beta for Free'}
                             </>
                         )}
                     </button>
-                </motion.div>
 
-                {/* Trust badges */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-center text-surface-500 text-sm space-y-2 mt-6"
-                >
-                    <p>🔒 {isRTL ? 'دفع آمن عبر Lemon Squeezy' : 'Secure payment via Lemon Squeezy'}</p>
-                    <p>💳 {isRTL ? 'نقبل مدى، فيزا، ماستركارد' : 'We accept Mada, Visa, Mastercard'}</p>
-                    <p>🔄 {isRTL ? 'إلغاء في أي وقت' : 'Cancel anytime'}</p>
+                    <p className="text-center text-surface-500 text-xs mt-4 px-8 leading-relaxed">
+                        {isRTL
+                            ? 'بالنقر على الزر، ستحصلون على اشتراك Premium مجاني لمدة 6 أشهر كهدية منا لانضمامكم المبكر.'
+                            : 'By joining, you receive a free 6-month Premium subscription as a gift for being an early adopter.'}
+                    </p>
                 </motion.div>
             </main>
         </div>

@@ -332,9 +332,7 @@ function JourneyExerciseContent() {
             <header className="p-4 flex items-center justify-between z-10">
                 <motion.button
                     whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => router.push('/journeys')}
                     className={`w-11 h-11 rounded-full backdrop-blur-xl border flex items-center justify-center transition-all shadow-lg ${theme === 'light' ? 'bg-white/80 border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-white' : 'bg-white/5 border-white/10 text-surface-400 hover:text-white hover:bg-white/10'}`}
                 >

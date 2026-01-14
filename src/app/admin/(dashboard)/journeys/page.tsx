@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-    Map,
+    Map as MapIcon,
     Save,
     RefreshCw,
     Crown,
@@ -60,7 +60,7 @@ export default function AdminJourneysPage() {
                 if (data.journeys && Array.isArray(data.journeys) && data.journeys.length > 0) {
                     // Merge saved config with current state to preserve all fields
                     setJourneys(prev => {
-                        const savedMap = new Map(data.journeys.map((j: Journey) => [j.id, j]));
+                        const savedMap = new Map<string, Journey>((data.journeys as Journey[]).map((j) => [j.id, j]));
                         return prev.map(journey => {
                             const saved = savedMap.get(journey.id) as Journey | undefined;
                             if (saved) {
@@ -128,7 +128,7 @@ export default function AdminJourneysPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
-                        <Map className="w-8 h-8 text-violet-400" />
+                        <MapIcon className="w-8 h-8 text-violet-400" />
                         Journeys Management
                     </h1>
                     <p className="text-slate-400 mt-1">Control journey availability and premium status</p>
@@ -168,7 +168,7 @@ export default function AdminJourneysPage() {
             {/* Journeys List */}
             <div className="space-y-4">
                 {journeys.map((journey, idx) => {
-                    const IconComponent = journeyIcons[journey.id] || Map;
+                    const IconComponent = journeyIcons[journey.id] || MapIcon;
                     const isExpanded = expandedJourney === journey.id;
 
                     return (

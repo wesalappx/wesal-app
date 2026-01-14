@@ -13,6 +13,7 @@ export async function initErrorMonitoring() {
     if (SENTRY_DSN && !sentryLoaded) {
         try {
             // Dynamic import to avoid build errors if not installed
+            // @ts-ignore
             Sentry = await import('@sentry/nextjs').catch(() => null);
 
             if (Sentry) {
