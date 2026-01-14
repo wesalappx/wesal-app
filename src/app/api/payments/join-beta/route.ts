@@ -60,8 +60,7 @@ export async function POST(request: NextRequest) {
                     payment_id: 'beta_launch_grant',
                     starts_at: new Date().toISOString(),
                     ends_at: endsAt.toISOString(),
-                    updated_at: new Date().toISOString(),
-                    lemon_subscription_id: 'beta_user'
+                    updated_at: new Date().toISOString()
                 })
                 .eq('id', existingSub.id);
         } else {
@@ -75,8 +74,7 @@ export async function POST(request: NextRequest) {
                     status: 'premium',
                     payment_id: 'beta_launch_grant',
                     starts_at: new Date().toISOString(),
-                    ends_at: endsAt.toISOString(),
-                    lemon_subscription_id: 'beta_user'
+                    ends_at: endsAt.toISOString()
                 });
         }
 
