@@ -135,7 +135,7 @@ export default function ProfileEditPage() {
             }
 
             const { error } = await updateProfile({
-                displayName: name,
+                displayName: name.trim(),
                 avatarUrl: newAvatarUrl,
                 bio,
                 dateOfBirth,
@@ -236,7 +236,7 @@ export default function ProfileEditPage() {
                                 <input
                                     type="text"
                                     value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    onChange={(e) => setName(e.target.value.trimStart())}
                                     className={`w-full px-4 py-3 pr-12 rounded-xl border text-right placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all
                       ${errors.name ? 'border-red-500/50 focus:border-red-500' : theme === 'light' ? 'bg-white border-slate-200 text-slate-900' : 'bg-surface-900/50 border-surface-600 text-white'}`}
                                     placeholder="أدخل اسمك"

@@ -15,7 +15,8 @@ import {
     Sparkles,
     Gamepad2,
     Map,
-    Activity
+    Activity,
+    Gift
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -24,6 +25,7 @@ const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Couples', href: '/admin/couples', icon: Heart },
+    { name: 'Beta Access', href: '/admin/beta', icon: Gift },
     { name: 'Games', href: '/admin/games', icon: Gamepad2 },
     { name: 'Journeys', href: '/admin/journeys', icon: Map },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
