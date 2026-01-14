@@ -29,7 +29,42 @@ export async function GET() {
             console.error('Error fetching journeys:', error);
         }
 
-        return NextResponse.json({ journeys: data?.value || null });
+        // Default journeys
+        const defaultJourneys = [
+            { id: 'basics', title: { ar: 'أساسيات العلاقة', en: 'Relationship Basics' }, description: { ar: 'بناء الأساس', en: 'Build the foundation' }, totalSteps: 5, completedByCount: 0, isEnabled: true, isPremium: false },
+            { id: 'communication', title: { ar: 'فن التواصل', en: 'Art of Communication' }, description: { ar: 'تعلم التواصل الفعال', en: 'Learn effective communication' }, totalSteps: 5, completedByCount: 0, isEnabled: true, isPremium: false },
+            { id: 'future', title: { ar: 'تخطيط المستقبل', en: 'Future Planning' }, description: { ar: 'خططوا معاً', en: 'Plan together' }, totalSteps: 5, completedByCount: 0, isEnabled: true, isPremium: true },
+        ];
+
+        // Merge saved config with defaults
+        let journeys = defaultJourneys;
+        if (data?.value && Array.isArray(data.value)) {
+            const savedMap = new Map(data.value.map((j: any) => [j.id, j]));
+            journeys = defaultJourneys.map(defaultJourney => {
+                const saved = savedMap.get(defaultJourney.id);
+                return saved ? { ...defaultJourney, ...saved } : defaultJourney;
+            });
+        }
+
+        // Fetch actual completion counts from user_journey_progress table
+        const { data: progressCounts } = await supabase
+            .from('user_journey_progress')
+            .select('journey_id')
+            .eq('completed', true);
+
+        if (progressCounts) {
+            const countMap: Record<string, number> = {};
+            progressCounts.forEach((p: { journey_id: string }) => {
+                countMap[p.journey_id] = (countMap[p.journey_id] || 0) + 1;
+            });
+
+            journeys = journeys.map(journey => ({
+                ...journey,
+                completedByCount: countMap[journey.id] || journey.completedByCount || 0
+            }));
+        }
+
+        return NextResponse.json({ journeys });
 
     } catch (error: any) {
         console.error('Journeys fetch error:', error);
