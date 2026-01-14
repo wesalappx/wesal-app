@@ -117,10 +117,8 @@ export function useSubscription() {
                 return { success: false, error: result.error };
             }
 
-            // Beta join success
-            if (result.success) {
-                return { success: true };
-            }
+            // Beta join success - refetch subscription to update state
+            await fetchSubscription();
 
             return { success: true };
 
