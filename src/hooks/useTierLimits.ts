@@ -153,15 +153,13 @@ export function useTierLimits() {
             }
 
             try {
-                const { data, error } = await supabase.rpc('get_user_tier', {
-                    p_user_id: user.id
-                });
+                // Use API endpoint instead of RPC to bypass RLS issues
+                const response = await fetch('/api/subscription/status');
+                const data = await response.json();
 
-                if (!error && data) {
-                    setTier(data as SubscriptionTier);
+                if (data.isPremium) {
+                    setTier('premium');
                 } else {
-                    // RPC failed or no data - default to free to show locks
-                    console.log('Tier check failed, defaulting to free:', error?.message);
                     setTier('free');
                 }
             } catch (err) {
@@ -174,7 +172,7 @@ export function useTierLimits() {
         };
 
         fetchTier();
-    }, [user, supabase]);
+    }, [user]);
 
     // Check if user can use a feature
     const canUse = useCallback(async (feature: string): Promise<UsageInfo> => {

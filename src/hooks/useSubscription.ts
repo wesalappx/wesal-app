@@ -28,7 +28,7 @@ export function useSubscription() {
         (subscription.status === 'premium' || subscription.status === 'active') &&
         (!subscription.ends_at || new Date(subscription.ends_at) > new Date());
 
-    // Fetch subscription status
+    // Fetch subscription status via API (bypasses RLS)
     const fetchSubscription = useCallback(async () => {
         if (!user) {
             setIsLoading(false);
@@ -38,43 +38,22 @@ export function useSubscription() {
         try {
             setIsLoading(true);
 
-            // First get the couple_id from couples table
-            const { data: coupleData } = await supabase
-                .from('couples')
-                .select('id')
-                .or(`partner1_id.eq.${user.id},partner2_id.eq.${user.id}`)
-                .eq('status', 'ACTIVE')
-                .single();
+            // Use API endpoint that uses admin client (bypasses RLS)
+            const response = await fetch('/api/subscription/status');
+            const data = await response.json();
 
-            if (!coupleData?.id) {
-                // User is not in a couple - not an error, just no subscription
-                setIsLoading(false);
-                return;
+            if (data.subscription) {
+                setSubscription(data.subscription);
+            } else {
+                setSubscription(null);
             }
-
-            // Then get subscription for this couple - check for premium OR active status
-            const { data, error: subError } = await supabase
-                .from('subscriptions')
-                .select('*')
-                .eq('couple_id', coupleData.id)
-                .in('status', ['premium', 'active'])
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .single();
-
-            if (subError && subError.code !== 'PGRST116') { // Not "no rows" error
-                console.error('Subscription fetch error:', subError);
-            }
-
-            setSubscription(data || null);
         } catch (err: any) {
-            // Don't treat missing subscription as error
-            // Subscription check failed (might not have premium)
+            console.error('Subscription fetch error:', err);
             setSubscription(null);
         } finally {
             setIsLoading(false);
         }
-    }, [user, supabase]);
+    }, [user]);
 
     useEffect(() => {
         fetchSubscription();
