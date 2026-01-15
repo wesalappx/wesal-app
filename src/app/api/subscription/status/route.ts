@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
                 reason: 'No active couple found'
             });
         }
+        console.log('[SubStatus] Checking subscription for couple:', coupleData.id);
 
         // Get subscription for this couple
         const { data: subscription, error: subError } = await adminSupabase
@@ -48,6 +49,8 @@ export async function GET(request: NextRequest) {
             .limit(1)
             .single();
 
+        console.log('[SubStatus] Subscription query result:', { subscription, error: subError });
+
         if (subError && subError.code !== 'PGRST116') {
             console.error('Subscription check error:', subError);
         }
@@ -56,6 +59,8 @@ export async function GET(request: NextRequest) {
         const isPremium = subscription !== null &&
             (subscription.status === 'premium' || subscription.status === 'active') &&
             (!subscription.ends_at || new Date(subscription.ends_at) > new Date());
+
+        console.log('[SubStatus] Final result - isPremium:', isPremium);
 
         return NextResponse.json({
             isPremium,

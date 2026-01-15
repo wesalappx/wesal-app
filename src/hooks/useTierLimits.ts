@@ -147,23 +147,29 @@ export function useTierLimits() {
         const fetchTier = async () => {
             if (!user) {
                 // No user = free tier (show locks)
+                console.log('[TierLimits] No user, setting tier to free');
                 setTier('free');
                 setIsLoading(false);
                 return;
             }
 
             try {
+                console.log('[TierLimits] Fetching subscription status for user:', user.id);
                 // Use API endpoint instead of RPC to bypass RLS issues
                 const response = await fetch('/api/subscription/status');
                 const data = await response.json();
 
+                console.log('[TierLimits] API Response:', data);
+
                 if (data.isPremium) {
+                    console.log('[TierLimits] Setting tier to PREMIUM');
                     setTier('premium');
                 } else {
+                    console.log('[TierLimits] Setting tier to free, reason:', data.reason || data.error || 'No subscription');
                     setTier('free');
                 }
             } catch (err) {
-                console.error('Error fetching tier:', err);
+                console.error('[TierLimits] Error fetching tier:', err);
                 // On error, default to free to show locks
                 setTier('free');
             } finally {
