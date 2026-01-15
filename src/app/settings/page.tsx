@@ -60,20 +60,16 @@ export default function SettingsPage() {
                 isPaired
             });
 
-            // Subscription info
-            if (coupleId) {
-                const { data: sub } = await supabase
-                    .from('subscriptions')
-                    .select('*')
-                    .eq('couple_id', coupleId)
-                    .eq('status', 'premium')
-                    .single();
+            // Subscription info - use API to bypass RLS
+            try {
+                const subRes = await fetch('/api/subscription/status');
+                const subData = await subRes.json();
 
-                if (sub) {
+                if (subData.isPremium && subData.subscription) {
                     setSubscription({
                         isPremium: true,
-                        expiresAt: sub.expires_at,
-                        plan: sub.plan_type || 'premium'
+                        expiresAt: subData.subscription.ends_at,
+                        plan: subData.subscription.plan_id || 'premium'
                     });
                 } else {
                     setSubscription({
@@ -82,6 +78,13 @@ export default function SettingsPage() {
                         plan: 'free'
                     });
                 }
+            } catch (err) {
+                console.error('Error fetching subscription:', err);
+                setSubscription({
+                    isPremium: false,
+                    expiresAt: null,
+                    plan: 'free'
+                });
             }
         };
         fetchData();

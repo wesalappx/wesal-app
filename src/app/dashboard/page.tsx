@@ -135,42 +135,41 @@ export default function Dashboard() {
                 setPartnerName(partner.display_name || partner.email?.split('@')[0] || '');
             }
 
-            // Fetch subscription status
-            if (cId) {
-                const { data: sub } = await supabase
-                    .from('subscriptions')
+            // Fetch subscription status via API (bypasses RLS)
+            try {
+                const subRes = await fetch('/api/subscription/status');
+                const subData = await subRes.json();
+                setIsPremium(subData.isPremium === true);
+            } catch (err) {
+                console.error('Error fetching subscription:', err);
+                setIsPremium(false);
+            }
+
+            // Fetch pending sparks for partner (AI_PROPOSING)
+            const { data: { user: currentUser } } = await supabase.auth.getUser();
+            if (currentUser) {
+                const { data: sparks } = await supabase
+                    .from('secret_sparks')
                     .select('*')
-                    .eq('couple_id', cId)
-                    .eq('status', 'premium')
-                    .single();
-                setIsPremium(!!sub);
+                    .eq('partner_id', currentUser.id)
+                    .eq('status', 'AI_PROPOSING');
 
-                // Fetch pending sparks for partner (AI_PROPOSING)
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    const { data: sparks } = await supabase
-                        .from('secret_sparks')
-                        .select('*')
-                        .eq('partner_id', user.id)
-                        .eq('status', 'AI_PROPOSING');
+                if (sparks) setPendingSparks(sparks);
 
-                    if (sparks) setPendingSparks(sparks);
+                // Fetch my own sparks (ones I created) to see their status
+                const { data: myOwnSparks } = await supabase
+                    .from('secret_sparks')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .in('status', ['NEW', 'AI_PROPOSING', 'PARTNER_REPLIED', 'REVEALED', 'SOFT_REJECTED'])
+                    .order('created_at', { ascending: false })
+                    .limit(5);
 
-                    // Fetch my own sparks (ones I created) to see their status
-                    const { data: myOwnSparks } = await supabase
-                        .from('secret_sparks')
-                        .select('*')
-                        .eq('user_id', user.id)
-                        .in('status', ['NEW', 'AI_PROPOSING', 'PARTNER_REPLIED', 'REVEALED', 'SOFT_REJECTED'])
-                        .order('created_at', { ascending: false })
-                        .limit(5);
-
-                    if (myOwnSparks) setMySparks(myOwnSparks);
-                }
+                if (myOwnSparks) setMySparks(myOwnSparks);
             }
 
             // Fetch Partner Mood (Check-in)
-            if (paired && partner?.id) {
+            if (isPaired && partner?.id) {
                 const { data: checkIn } = await supabase
                     .from('check_ins')
                     .select('*')
