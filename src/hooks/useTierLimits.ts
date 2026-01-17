@@ -145,16 +145,20 @@ export function useTierLimits() {
     // Fetch user's tier on mount
     useEffect(() => {
         const fetchTier = async () => {
-            if (!user) {
-                // No user = free tier (show locks)
-                console.log('[TierLimits] No user, setting tier to free');
-                setTier('free');
-                setIsLoading(false);
-                return;
-            }
-
             try {
-                console.log('[TierLimits] Fetching subscription status for user:', user.id);
+                // Get session directly from Supabase (more reliable than store on initial load)
+                const { data: { session } } = await supabase.auth.getSession();
+
+                if (!session?.user) {
+                    // No session = free tier (show locks)
+                    console.log('[TierLimits] No session, setting tier to free');
+                    setTier('free');
+                    setIsLoading(false);
+                    return;
+                }
+
+                console.log('[TierLimits] User session found, fetching subscription status');
+
                 // Use API endpoint instead of RPC to bypass RLS issues
                 const response = await fetch('/api/subscription/status');
                 const data = await response.json();
@@ -178,7 +182,7 @@ export function useTierLimits() {
         };
 
         fetchTier();
-    }, [user]);
+    }, [supabase]);
 
     // Check if user can use a feature
     const canUse = useCallback(async (feature: string): Promise<UsageInfo> => {
