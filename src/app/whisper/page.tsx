@@ -137,8 +137,8 @@ export default function WhisperPage() {
                     {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
                 </Link>
                 <h1 className={`flex-1 text-center text-lg font-semibold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{isRTL ? 'همسة' : 'Whisper'}</h1>
-                {/* Usage Counter */}
-                {whisperUsage && whisperUsage.limit > 0 && (
+                {/* Usage Counter - Hidden for premium users */}
+                {!isPremium && whisperUsage && whisperUsage.limit > 0 && (
                     <div className={`px-2.5 py-1 rounded-full text-xs font-medium ${whisperUsage.remaining <= 1
                         ? 'bg-orange-500/20 text-orange-400'
                         : theme === 'light' ? 'bg-slate-200 text-slate-600' : 'bg-white/10 text-white/60'

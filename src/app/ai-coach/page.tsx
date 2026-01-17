@@ -1007,8 +1007,8 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
                             {isRTL ? 'خروج' : 'Exit'}
                         </button>
                     )}
-                    {/* Usage Counter Badge */}
-                    {aiUsage && aiUsage.limit > 0 && mode !== 'intimate' && (
+                    {/* Usage Counter Badge - Hidden for premium users */}
+                    {!isPremium && aiUsage && aiUsage.limit > 0 && mode !== 'intimate' && (
                         <div className={`px-3 py-1.5 rounded-full text-xs font-medium ${aiUsage.remaining <= 1
                             ? 'bg-orange-500/20 text-orange-400'
                             : 'bg-surface-700/50 text-surface-300'
