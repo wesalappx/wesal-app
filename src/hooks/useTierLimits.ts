@@ -63,10 +63,22 @@ const UPGRADE_PROMPTS: Record<string, UpgradePrompt> = {
     }
 };
 
+const TIER_CACHE_KEY = 'wesal_subscription_tier';
+
 export function useTierLimits() {
     const supabase = createClient();
     const { user } = useAuthStore();
-    const [tier, setTier] = useState<SubscriptionTier>('free'); // Default to free until we verify
+
+    // Initialize tier from localStorage cache to prevent flash of locked content
+    const [tier, setTier] = useState<SubscriptionTier>(() => {
+        if (typeof window !== 'undefined') {
+            const cached = localStorage.getItem(TIER_CACHE_KEY);
+            if (cached === 'premium' || cached === 'free') {
+                return cached;
+            }
+        }
+        return 'free'; // Default to free if no cache
+    });
     const [isLoading, setIsLoading] = useState(true);
     const [configLoading, setConfigLoading] = useState(true); // Track if config is still loading
     const [usageCache, setUsageCache] = useState<Record<string, UsageInfo>>({});
@@ -153,6 +165,7 @@ export function useTierLimits() {
                     // No session = free tier (show locks)
                     console.log('[TierLimits] No session, setting tier to free');
                     setTier('free');
+                    localStorage.setItem(TIER_CACHE_KEY, 'free');
                     setIsLoading(false);
                     return;
                 }
@@ -168,9 +181,11 @@ export function useTierLimits() {
                 if (data.isPremium) {
                     console.log('[TierLimits] Setting tier to PREMIUM');
                     setTier('premium');
+                    localStorage.setItem(TIER_CACHE_KEY, 'premium');
                 } else {
                     console.log('[TierLimits] Setting tier to free, reason:', data.reason || data.error || 'No subscription');
                     setTier('free');
+                    localStorage.setItem(TIER_CACHE_KEY, 'free');
                 }
             } catch (err) {
                 console.error('[TierLimits] Error fetching tier:', err);
