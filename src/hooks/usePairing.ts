@@ -217,6 +217,7 @@ export function usePairing() {
                     body_ar: `${currentUserName} قبل طلب الربط معك`,
                     body_en: `${currentUserName} accepted your pairing request`,
                     is_read: false,
+                    data: { url: '/dashboard' }
                 });
 
             // Notification for current user (code acceptor)
@@ -230,6 +231,7 @@ export function usePairing() {
                     body_ar: 'أنتما الآن مرتبطان. ابدءا رحلتكما معاً!',
                     body_en: 'You are now paired. Start your journey together!',
                     is_read: false,
+                    data: { url: '/dashboard' }
                 });
 
             return { success: true, couple, error: null };

@@ -106,7 +106,14 @@ export default function WhisperPage() {
 
             if (partnerId) {
                 await supabase.from('notifications').insert({
-                    user_id: partnerId, type: 'WHISPER', title: '💕', message: text, is_read: false
+                    user_id: partnerId,
+                    type: 'WHISPER',
+                    title_ar: '💕 همسة جديدة',
+                    title_en: '💕 New Whisper',
+                    body_ar: text,
+                    body_en: text,
+                    is_read: false,
+                    data: { url: '/dashboard' }
                 });
             }
 
