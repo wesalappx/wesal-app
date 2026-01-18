@@ -564,6 +564,7 @@ export default function Dashboard() {
                 partnerName={partnerName}
                 isOpen={showChat}
                 onClose={() => setShowChat(false)}
+                isPartnerOnline={partnerStatus === 'online'}
             />
             < MarriageAdviceModal isOpen={showAdviceModal} onClose={() => setShowAdviceModal(false)} />
             < CoolDownModal isOpen={showCoolDown} onClose={() => setShowCoolDown(false)} />

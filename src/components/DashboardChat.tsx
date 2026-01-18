@@ -18,12 +18,13 @@ interface DashboardChatProps {
     partnerName: string;
     isOpen: boolean;
     onClose: () => void;
+    isPartnerOnline?: boolean;
 }
 
 // Quick reactions
 const quickReactions = ['❤️', '😊', '😍', '👏', '🎉', '💕'];
 
-export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }: DashboardChatProps) {
+export default function DashboardChat({ coupleId, partnerName, isOpen, onClose, isPartnerOnline = false }: DashboardChatProps) {
     const supabase = createClient();
     const { user } = useAuth();
     const { language, theme } = useSettingsStore();
@@ -34,7 +35,6 @@ export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }
     const [showReactions, setShowReactions] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [isPartnerOnline, setIsPartnerOnline] = useState(false);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -83,34 +83,6 @@ export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }
             supabase.removeChannel(channel);
         };
     }, [coupleId]);
-
-    // Subscribe to presence channel for partner online status
-    useEffect(() => {
-        if (!coupleId || !user) return;
-
-        const channelName = `presence:couple:${coupleId}`;
-        const presenceChannel = supabase.channel(channelName);
-
-        presenceChannel
-            .on('presence', { event: 'sync' }, () => {
-                const state = presenceChannel.presenceState();
-                // Check if anyone other than me is in the channel
-                let partnerPresent = false;
-                Object.values(state).forEach((presences: any) => {
-                    presences.forEach((p: any) => {
-                        if (p.user_id && p.user_id !== user.id) {
-                            partnerPresent = true;
-                        }
-                    });
-                });
-                setIsPartnerOnline(partnerPresent);
-            })
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(presenceChannel);
-        };
-    }, [coupleId, user]);
 
     useEffect(() => {
         if (isOpen) {
