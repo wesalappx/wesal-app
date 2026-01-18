@@ -107,7 +107,12 @@ export function useNotes() {
 
     // Notes CRUD
     const createNote = async (title: string, content: string, category: Note['category'] = 'general') => {
-        if (!coupleId || !user) return { error: 'Not paired' };
+        console.log('[useNotes DEBUG] createNote called:', { title, content, category, coupleId, userId: user?.id });
+
+        if (!coupleId || !user) {
+            console.log('[useNotes DEBUG] createNote FAILED: Not paired', { coupleId, user: !!user });
+            return { error: 'Not paired' };
+        }
 
         const { data, error } = await supabase
             .from('notes')
@@ -120,6 +125,8 @@ export function useNotes() {
             })
             .select()
             .single();
+
+        console.log('[useNotes DEBUG] createNote result:', { data, error });
 
         if (data) {
             setNotes(prev => [data, ...prev]);
