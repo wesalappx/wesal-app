@@ -127,6 +127,8 @@ export default function Dashboard() {
         const fetchData = async () => {
             const { isPaired: paired, partner, coupleId: cId } = await getStatus();
 
+            console.log('[Dashboard] Pairing status:', { paired, coupleId: cId, partner });
+
             setIsPaired(paired);
             setCoupleId(cId || null);
 
