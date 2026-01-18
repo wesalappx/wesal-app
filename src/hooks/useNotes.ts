@@ -111,10 +111,7 @@ export function useNotes() {
         const validCategories: Note['category'][] = ['general', 'journey', 'budget', 'wishlist', 'memories'];
         const safeCategory = validCategories.includes(category) ? category : 'general';
 
-        console.log('[useNotes DEBUG] createNote called:', { title, content, category, safeCategory, coupleId, userId: user?.id });
-
         if (!coupleId || !user) {
-            console.log('[useNotes DEBUG] createNote FAILED: Not paired', { coupleId, user: !!user });
             return { error: 'Not paired' };
         }
 
@@ -129,8 +126,6 @@ export function useNotes() {
             })
             .select()
             .single();
-
-        console.log('[useNotes DEBUG] createNote result:', { data, error });
 
         if (data) {
             setNotes(prev => [data, ...prev]);
