@@ -163,27 +163,20 @@ export function useTierLimits() {
 
                 if (!session?.user) {
                     // No session = free tier (show locks)
-                    console.log('[TierLimits] No session, setting tier to free');
                     setTier('free');
                     localStorage.setItem(TIER_CACHE_KEY, 'free');
                     setIsLoading(false);
                     return;
                 }
 
-                console.log('[TierLimits] User session found, fetching subscription status');
-
                 // Use API endpoint instead of RPC to bypass RLS issues
                 const response = await fetch('/api/subscription/status');
                 const data = await response.json();
 
-                console.log('[TierLimits] API Response:', data);
-
                 if (data.isPremium) {
-                    console.log('[TierLimits] Setting tier to PREMIUM');
                     setTier('premium');
                     localStorage.setItem(TIER_CACHE_KEY, 'premium');
                 } else {
-                    console.log('[TierLimits] Setting tier to free, reason:', data.reason || data.error || 'No subscription');
                     setTier('free');
                     localStorage.setItem(TIER_CACHE_KEY, 'free');
                 }

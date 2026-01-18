@@ -13,8 +13,6 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Missing required fields (coupleId, userId)' }, { status: 400 });
         }
 
-        console.log(`[Beta Join] Processing for couple: ${coupleId}, user: ${userId}`);
-
         // Create admin client (bypasses RLS)
         const supabase = await createAdminClient();
 
@@ -51,7 +49,6 @@ export async function POST(request: NextRequest) {
 
         if (existingSub) {
             // Update existing subscription
-            console.log(`[Beta Join] Updating existing subscription: ${existingSub.id}`);
             result = await supabase
                 .from('subscriptions')
                 .update({
@@ -65,7 +62,6 @@ export async function POST(request: NextRequest) {
                 .eq('id', existingSub.id);
         } else {
             // Insert new subscription
-            console.log(`[Beta Join] Creating new subscription for couple: ${coupleId}`);
             result = await supabase
                 .from('subscriptions')
                 .insert({
@@ -86,7 +82,6 @@ export async function POST(request: NextRequest) {
             }, { status: 500 });
         }
 
-        console.log(`[Beta Join] SUCCESS - Beta access granted for couple ${coupleId}`);
         return NextResponse.json({ success: true, message: 'Welcome to the Beta!' });
 
     } catch (error: any) {
