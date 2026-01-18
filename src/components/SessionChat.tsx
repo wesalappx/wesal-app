@@ -32,6 +32,7 @@ export default function SessionChat({ sessionId, userId, partnerName, compact = 
     const [input, setInput] = useState('');
     const [unreadCount, setUnreadCount] = useState(0);
     const [showReactions, setShowReactions] = useState(false);
+    const [isPartnerOnline, setIsPartnerOnline] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -82,6 +83,33 @@ export default function SessionChat({ sessionId, userId, partnerName, compact = 
             supabase.removeChannel(channel);
         };
     }, [sessionId, isOpen, userId]);
+
+    // Subscribe to presence for partner online status
+    useEffect(() => {
+        if (!sessionId || !userId) return;
+
+        const channelName = `presence:session:${sessionId}`;
+        const presenceChannel = supabase.channel(channelName);
+
+        presenceChannel
+            .on('presence', { event: 'sync' }, () => {
+                const state = presenceChannel.presenceState();
+                let partnerPresent = false;
+                Object.values(state).forEach((presences: any) => {
+                    presences.forEach((p: any) => {
+                        if (p.user_id && p.user_id !== userId) {
+                            partnerPresent = true;
+                        }
+                    });
+                });
+                setIsPartnerOnline(partnerPresent);
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(presenceChannel);
+        };
+    }, [sessionId, userId]);
 
     useEffect(() => {
         if (isOpen) {
@@ -164,9 +192,11 @@ export default function SessionChat({ sessionId, userId, partnerName, compact = 
                                                 {partnerName || (isRTL ? 'الدردشة' : 'Chat')}
                                             </h3>
                                             <div className="flex items-center gap-1.5">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
-                                                <span className="text-emerald-400/80 text-xs font-medium">
-                                                    {isRTL ? 'متصل الآن' : 'Online'}
+                                                <span className={`w-1.5 h-1.5 rounded-full ${isPartnerOnline ? 'bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.5)]' : 'bg-surface-500'}`} />
+                                                <span className={`text-xs font-medium ${isPartnerOnline ? 'text-emerald-400/80' : 'text-surface-400'}`}>
+                                                    {isPartnerOnline
+                                                        ? (isRTL ? 'متصل الآن' : 'Online')
+                                                        : (isRTL ? 'غير متصل' : 'Offline')}
                                                 </span>
                                             </div>
                                         </div>

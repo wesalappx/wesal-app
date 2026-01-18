@@ -34,6 +34,7 @@ export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }
     const [showReactions, setShowReactions] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isPartnerOnline, setIsPartnerOnline] = useState(false);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -82,6 +83,34 @@ export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }
             supabase.removeChannel(channel);
         };
     }, [coupleId]);
+
+    // Subscribe to presence channel for partner online status
+    useEffect(() => {
+        if (!coupleId || !user) return;
+
+        const channelName = `presence:couple:${coupleId}`;
+        const presenceChannel = supabase.channel(channelName);
+
+        presenceChannel
+            .on('presence', { event: 'sync' }, () => {
+                const state = presenceChannel.presenceState();
+                // Check if anyone other than me is in the channel
+                let partnerPresent = false;
+                Object.values(state).forEach((presences: any) => {
+                    presences.forEach((p: any) => {
+                        if (p.user_id && p.user_id !== user.id) {
+                            partnerPresent = true;
+                        }
+                    });
+                });
+                setIsPartnerOnline(partnerPresent);
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(presenceChannel);
+        };
+    }, [coupleId, user]);
 
     useEffect(() => {
         if (isOpen) {
@@ -164,9 +193,11 @@ export default function DashboardChat({ coupleId, partnerName, isOpen, onClose }
                                 {partnerName || (isRTL ? 'الدردشة' : 'Chat')}
                             </h3>
                             <div className="flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                <span className="text-emerald-400/80 text-xs font-medium">
-                                    {isRTL ? 'متصل الآن' : 'Online'}
+                                <span className={`w-1.5 h-1.5 rounded-full ${isPartnerOnline ? 'bg-emerald-400 animate-pulse' : 'bg-surface-500'}`} />
+                                <span className={`text-xs font-medium ${isPartnerOnline ? 'text-emerald-400/80' : 'text-surface-400'}`}>
+                                    {isPartnerOnline
+                                        ? (isRTL ? 'متصل الآن' : 'Online')
+                                        : (isRTL ? 'غير متصل' : 'Offline')}
                                 </span>
                             </div>
                         </div>
