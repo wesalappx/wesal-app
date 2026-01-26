@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import AIProbeCard from '@/components/AIProbeCard';
 import SparkResultCard from '@/components/SparkResultCard';
+import KhatbaDashboard from '@/components/KhatbaDashboard';
+import { useRelationshipStage } from '@/hooks/useRelationshipStage';
 import {
     Heart,
     Gamepad2,
@@ -41,6 +43,7 @@ export default function Dashboard() {
     const { getStatus } = usePairing();
     const { theme } = useSettingsStore();
     const supabase = createClient();
+    const { stage, isLoading: stageLoading, isKhatba } = useRelationshipStage();
 
     const { t, language } = useTranslation();
     const isRTL = language === 'ar';
@@ -65,6 +68,7 @@ export default function Dashboard() {
     const [coupleId, setCoupleId] = useState<string | null>(null);
     const [partnerId, setPartnerId] = useState<string | null>(null);
     const [partnerMood, setPartnerMood] = useState<any>(null);
+
 
     // Actions grid - main activities
     const actions = [
@@ -264,6 +268,20 @@ export default function Dashboard() {
 
     if (!mounted) return null;
 
+    // Render Khatba Dashboard for pre-marriage users
+    if (isKhatba) {
+        return (
+            <KhatbaDashboard
+                userName={userName}
+                partnerName={partnerName}
+                isPaired={isPaired}
+                partnerStatus={partnerStatus}
+                isPremium={isPremium}
+            />
+        );
+    }
+
+    // Married Dashboard (Original)
     return (
         <main className={`min-h-screen pb-8 relative overflow-hidden font-sans transition-colors duration-500 ${theme === 'light' ? 'bg-transparent text-slate-800' : 'bg-surface-900 text-white'}`}>
             {/* Background Gradient & Brand Blobs */}
