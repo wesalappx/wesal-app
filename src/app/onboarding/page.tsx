@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Copy, Users, Check, Loader2, ArrowRight, Share2, Sparkles } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/stores/auth-store';
+import { createClient } from '@/lib/supabase/client';
 
 type Mode = 'choice' | 'generate' | 'enter' | 'success';
 
@@ -21,10 +22,29 @@ export default function OnboardingPage() {
     const [copied, setCopied] = useState(false);
     const [partnerName, setPartnerName] = useState('');
 
-    // Check if already paired on mount
+    // Check if already paired on mount, and check for relationship stage
     useEffect(() => {
         const checkPairingStatus = async () => {
             try {
+                // First check if user has selected a relationship stage
+                const supabase = createClient();
+                const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+                if (currentUser) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('relationship_stage')
+                        .eq('id', currentUser.id)
+                        .single();
+
+                    // If no relationship stage is set, redirect to stage-select first
+                    if (!profile?.relationship_stage) {
+                        router.push('/onboarding/stage-select');
+                        return;
+                    }
+                }
+
+                // Then check pairing status
                 const status = await api.pairing.getStatus();
                 if (status.isPaired && status.partner) {
                     setPartner(status.partner);
