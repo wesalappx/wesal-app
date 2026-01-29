@@ -307,8 +307,15 @@ export default function Dashboard() {
             <div className="px-5 pt-8 pb-4">
                 <header className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 relative ${isPremium ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-surface-900 rounded-xl shadow-lg shadow-amber-500/30' : ''}`}>
-                            <img src="/wesal-logo.svg" alt="Wesal" className={`w-full h-full object-contain drop-shadow-lg ${isPremium ? 'filter brightness-110' : ''}`} />
+                        <div className="w-10 h-10 relative">
+                            <img
+                                src="/wesal-logo.svg"
+                                alt="Wesal"
+                                className="w-full h-full object-contain"
+                                style={isPremium ? {
+                                    filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.8)) drop-shadow(0 0 12px rgba(251, 191, 36, 0.5)) brightness(1.1)'
+                                } : {}}
+                            />
                         </div>
                         <div className="flex items-center gap-2">
                             <span className={`text-xl font-bold tracking-wide ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
