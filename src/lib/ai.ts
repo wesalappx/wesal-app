@@ -232,7 +232,8 @@ async function callGeminiChat(messages: ChatMessage[]): Promise<string> {
         }
 
         const data = await response.json();
-        const content = data.choices?.[0]?.message?.content;
+        // API returns { content: string } directly, not OpenAI format
+        const content = data.content || data.choices?.[0]?.message?.content;
 
         if (!content) {
             console.error('No content in AI chat response:', data);
@@ -319,7 +320,8 @@ async function callGemini(prompt: string, systemRole: string): Promise<string> {
         }
 
         const data = await response.json();
-        const content = data.choices?.[0]?.message?.content;
+        // API returns { content: string } directly, not OpenAI format
+        const content = data.content || data.choices?.[0]?.message?.content;
 
         if (!content) {
             console.error('No content in AI response:', data);

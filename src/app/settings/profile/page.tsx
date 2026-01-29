@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Camera, User, Mail, Calendar, Check, Loader2, AlertCircle, FileText } from 'lucide-react';
+import { ArrowRight, Camera, User, Mail, Calendar, Check, Loader2, AlertCircle, FileText, Heart, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { createClient } from '@/lib/supabase/client';
 import { useSettingsStore } from '@/stores/settings-store';
+import { useRelationshipStage, RelationshipStage } from '@/hooks/useRelationshipStage';
 
 export default function ProfileEditPage() {
     const { user, updateProfile } = useAuth();
@@ -29,6 +30,11 @@ export default function ProfileEditPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [success, setSuccess] = useState(false);
 
+    // Relationship stage
+    const { stage, updateStage, isLoading: stageLoading } = useRelationshipStage();
+    const [selectedStage, setSelectedStage] = useState<RelationshipStage>('married');
+    const [stageUpdating, setStageUpdating] = useState(false);
+
     // Load user data on mount
     useEffect(() => {
         if (user) {
@@ -40,6 +46,13 @@ export default function ProfileEditPage() {
             setAvatarUrl(user.user_metadata?.avatar_url || null);
         }
     }, [user]);
+
+    // Sync stage with hook
+    useEffect(() => {
+        if (!stageLoading) {
+            setSelectedStage(stage);
+        }
+    }, [stage, stageLoading]);
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
@@ -316,6 +329,64 @@ export default function ProfileEditPage() {
                                     👩 أنثى
                                 </button>
                             </div>
+                        </div>
+
+                        {/* Relationship Stage */}
+                        <div className="space-y-2">
+                            <label className={`block text-sm font-bold text-right ${theme === 'light' ? 'text-slate-700' : 'text-surface-300'}`}>
+                                نوع العلاقة
+                            </label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    disabled={stageUpdating}
+                                    onClick={async () => {
+                                        if (selectedStage === 'khatba') return;
+                                        setStageUpdating(true);
+                                        try {
+                                            await updateStage('khatba');
+                                            setSelectedStage('khatba');
+                                        } catch (e) {
+                                            console.error('Failed to update stage:', e);
+                                        } finally {
+                                            setStageUpdating(false);
+                                        }
+                                    }}
+                                    className={`py-3 rounded-xl border font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${selectedStage === 'khatba'
+                                        ? 'bg-violet-500/20 border-violet-500 text-violet-400'
+                                        : theme === 'light' ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-surface-800/50 border-surface-600 text-surface-300 hover:bg-surface-700/50'
+                                        }`}
+                                >
+                                    <Users className="w-4 h-4" />
+                                    خِطبة
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={stageUpdating}
+                                    onClick={async () => {
+                                        if (selectedStage === 'married') return;
+                                        setStageUpdating(true);
+                                        try {
+                                            await updateStage('married');
+                                            setSelectedStage('married');
+                                        } catch (e) {
+                                            console.error('Failed to update stage:', e);
+                                        } finally {
+                                            setStageUpdating(false);
+                                        }
+                                    }}
+                                    className={`py-3 rounded-xl border font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${selectedStage === 'married'
+                                        ? 'bg-rose-500/20 border-rose-500 text-rose-400'
+                                        : theme === 'light' ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-surface-800/50 border-surface-600 text-surface-300 hover:bg-surface-700/50'
+                                        }`}
+                                >
+                                    <Heart className="w-4 h-4" />
+                                    متزوجين
+                                </button>
+                            </div>
+                            <p className={`text-xs text-right ${theme === 'light' ? 'text-slate-500' : 'text-surface-500'}`}>
+                                تغيير نوع العلاقة يغير الميزات المتاحة في لوحة التحكم
+                            </p>
                         </div>
 
                         {/* Email Field - Read Only */}

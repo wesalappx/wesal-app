@@ -307,14 +307,12 @@ export default function Dashboard() {
                         <div className="w-10 h-10 relative">
                             <img src="/wesal-logo.svg" alt="Wesal" className="w-full h-full object-contain drop-shadow-lg" />
                         </div>
-                        <div>
+                        <div className="flex items-center gap-2">
                             <span className={`text-xl font-bold tracking-wide ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                                 {language === 'ar' ? 'وصال' : 'Wesal'}
                             </span>
                             {isPremium && (
-                                <span className="ml-2 inline-flex items-center gap-1 text-xs text-amber-500 font-medium">
-                                    <Crown className="w-3 h-3" /> Premium
-                                </span>
+                                <Crown className="w-4 h-4 text-amber-500" />
                             )}
                         </div>
                     </div>

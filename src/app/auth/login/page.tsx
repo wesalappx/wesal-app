@@ -143,7 +143,7 @@ export default function LoginPage() {
     }
 
     return (
-        <main className="min-h-[100dvh] w-full flex flex-col items-center justify-center py-10 px-4 sm:px-6 font-sans relative">
+        <main className="min-h-[100dvh] w-full flex flex-col items-center justify-center py-10 px-4 sm:px-6 font-sans relative overflow-y-auto" style={{ paddingTop: 'max(2.5rem, env(safe-area-inset-top))', paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom))' }}>
             {/* Vibrant Mesh Gradient Background */}
             <div className="fixed inset-0 pointer-events-none -z-10">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/80 via-purple-50/50 to-rose-50/80 animate-gradient-xy" />
