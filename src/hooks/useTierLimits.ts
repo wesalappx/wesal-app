@@ -194,6 +194,16 @@ export function useTierLimits() {
 
     // Check if user can use a feature
     const canUse = useCallback(async (feature: string): Promise<UsageInfo> => {
+        // Wait for tier to load before checking (prevents race condition)
+        // This ensures the first AI request doesn't fail due to tier not loaded
+        let waitAttempts = 0;
+        const maxWaitAttempts = 10; // Max 1 second wait (10 * 100ms)
+
+        while (isLoading && waitAttempts < maxWaitAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            waitAttempts++;
+        }
+
         // Premium users have unlimited access
         if (tier === 'premium') {
             return {
@@ -253,7 +263,7 @@ export function useTierLimits() {
                 tier: 'free'
             };
         }
-    }, [user, supabase, tier, usageCache]);
+    }, [user, supabase, tier, usageCache, isLoading]);
 
     // Track feature usage
     const trackUsage = useCallback(async (feature: string): Promise<{ success: boolean; remaining: number }> => {
