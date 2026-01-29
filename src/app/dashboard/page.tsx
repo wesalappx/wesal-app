@@ -277,6 +277,9 @@ export default function Dashboard() {
                 isPaired={isPaired}
                 partnerStatus={partnerStatus}
                 isPremium={isPremium}
+                coupleId={coupleId}
+                partnerId={partnerId}
+                partnerMood={partnerMood}
             />
         );
     }

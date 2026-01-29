@@ -9,6 +9,7 @@ import {
     Sparkles,
     Bot,
     ArrowLeft,
+    ArrowRight,
     Bell,
     Calendar,
     MessageCircleHeart,
@@ -18,14 +19,16 @@ import {
     ImagePlus,
     HelpCircle,
     Gamepad2,
-    Crown
+    Crown,
+    Snowflake,
+    Shield,
+    Lightbulb
 } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { usePairing } from '@/hooks/usePairing';
-import { createClient } from '@/lib/supabase/client';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useNotifications } from '@/hooks/useNotifications';
+import CoolDownModal from '@/components/CoolDownModal';
+import DashboardChat from '@/components/DashboardChat';
 
 interface KhatbaDashboardProps {
     userName: string;
@@ -33,6 +36,9 @@ interface KhatbaDashboardProps {
     isPaired: boolean;
     partnerStatus: 'online' | 'offline';
     isPremium: boolean;
+    coupleId?: string | null;
+    partnerId?: string | null;
+    partnerMood?: any;
 }
 
 export default function KhatbaDashboard({
@@ -40,67 +46,51 @@ export default function KhatbaDashboard({
     partnerName,
     isPaired,
     partnerStatus,
-    isPremium
+    isPremium,
+    coupleId,
+    partnerId,
+    partnerMood
 }: KhatbaDashboardProps) {
     const { theme } = useSettingsStore();
     const { t, language } = useTranslation();
     const isRTL = language === 'ar';
     const { unreadCount } = useNotifications();
-    const [compatibilityScore, setCompatibilityScore] = useState<number | null>(null);
+    const [showCoolDown, setShowCoolDown] = useState(false);
+    const [showChat, setShowChat] = useState(false);
 
-    // Khatba-specific actions grid
-    const khatbaActions = [
+    // Khatba-specific actions grid (matches married dashboard layout)
+    const actions = [
         {
             id: 'compatibility',
-            title: language === 'ar' ? 'اختبار التوافق' : 'Compatibility Test',
-            desc: language === 'ar' ? 'اكتشفوا نقاط الاتفاق' : 'Discover alignment',
-            icon: CheckCircle2,
-            gradient: 'from-emerald-500 to-teal-600',
+            title: language === 'ar' ? 'تقارب' : 'Connect',
+            desc: language === 'ar' ? 'اختبار التوافق' : 'Compatibility',
+            icon: Heart,
+            gradient: 'from-rose-500 to-pink-600',
             href: '/compatibility'
         },
         {
-            id: 'budget',
-            title: language === 'ar' ? 'ميزانية الزواج' : 'Wedding Budget',
-            desc: language === 'ar' ? 'خططوا معاً' : 'Plan together',
-            icon: Wallet,
-            gradient: 'from-amber-500 to-orange-600',
-            href: '/budget'
+            id: 'counselor',
+            title: language === 'ar' ? 'المستشار' : 'Counselor',
+            desc: language === 'ar' ? 'نصائح الخطوبة' : 'Engagement tips',
+            icon: Shield,
+            gradient: 'from-violet-500 to-purple-600',
+            href: '/conflict'
         },
         {
-            id: 'vision',
-            title: language === 'ar' ? 'رؤيتنا المستقبلية' : 'Our Future',
-            desc: language === 'ar' ? 'بيتنا وأحلامنا' : 'Home & Dreams',
-            icon: ImagePlus,
-            gradient: 'from-pink-500 to-rose-600',
-            href: '/vision-board'
+            id: 'play',
+            title: language === 'ar' ? 'لعب وتحدي' : 'Play',
+            desc: language === 'ar' ? 'ألعاب التعارف' : 'Icebreakers',
+            icon: Gamepad2,
+            gradient: 'from-amber-500 to-orange-600',
+            href: '/play?mode=khatba'
         },
         {
             id: 'questions',
-            title: language === 'ar' ? 'أسئلة مهمة' : 'Key Questions',
-            desc: language === 'ar' ? 'المواضيع الجادة' : 'Serious topics',
-            icon: HelpCircle,
-            gradient: 'from-violet-500 to-purple-600',
+            title: language === 'ar' ? 'نصائح' : 'Advice',
+            desc: language === 'ar' ? 'أسئلة مهمة' : 'Key questions',
+            icon: Lightbulb,
+            gradient: 'from-emerald-500 to-teal-600',
             href: '/dealbreakers'
-        }
-    ];
-
-    // Shared features (also available in Khatba mode)
-    const sharedFeatures = [
-        {
-            id: 'ai-coach',
-            title: language === 'ar' ? 'رفيق وصال' : 'Wesal AI',
-            desc: language === 'ar' ? 'استشارة ذكية' : 'Smart advice',
-            icon: Bot,
-            gradient: 'from-primary-500 to-accent-500',
-            href: '/ai-coach'
-        },
-        {
-            id: 'games',
-            title: language === 'ar' ? 'ألعاب التعارف' : 'Icebreakers',
-            desc: language === 'ar' ? 'كسر الجمود' : 'Break the ice',
-            icon: Gamepad2,
-            gradient: 'from-cyan-500 to-blue-600',
-            href: '/play?mode=khatba'
         }
     ];
 
@@ -131,27 +121,31 @@ export default function KhatbaDashboard({
                     ? 'bg-purple-200/60'
                     : 'bg-purple-500/5'
                     }`} />
+                <div className={`absolute top-1/3 left-0 w-72 h-72 rounded-full blur-3xl opacity-40 mix-blend-multiply filter transition-all duration-1000 ${theme === 'light'
+                    ? 'bg-rose-200/50'
+                    : 'bg-rose-500/5'
+                    }`} />
             </div>
 
-            {/* Header */}
+            {/* Header - Same structure as married dashboard */}
             <div className="px-5 pt-8 pb-4">
                 <header className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 relative">
                             <img src="/wesal-logo.svg" alt="Wesal" className="w-full h-full object-contain drop-shadow-lg" />
                         </div>
-                        <div>
-                            <span className={`text-xl font-bold tracking-wide ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
-                                {language === 'ar' ? 'وصال' : 'Wesal'}
-                            </span>
-                            <span className="mx-2 text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 font-medium">
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                                {isPremium && (
+                                    <Crown className="w-4 h-4 text-amber-500" />
+                                )}
+                                <span className={`text-xl font-bold tracking-wide ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
+                                    {language === 'ar' ? 'وصال' : 'Wesal'}
+                                </span>
+                            </div>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 font-medium w-fit">
                                 {language === 'ar' ? 'خطوبة' : 'Engaged'}
                             </span>
-                            {isPremium && (
-                                <span className="inline-flex items-center gap-1 text-xs text-amber-500 font-medium">
-                                    <Crown className="w-3 h-3" /> Premium
-                                </span>
-                            )}
                         </div>
                     </div>
 
@@ -159,6 +153,13 @@ export default function KhatbaDashboard({
                         <Link href="/notes" className={`w-10 h-10 rounded-2xl flex items-center justify-center backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/50 border-white/40 hover:bg-white/80' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}>
                             <StickyNote className="w-5 h-5 text-amber-500" />
                         </Link>
+                        {/* Chat Button - Same as married dashboard */}
+                        <button
+                            onClick={() => setShowChat(true)}
+                            className={`w-10 h-10 rounded-2xl flex items-center justify-center backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/50 border-white/40 hover:bg-white/80' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}
+                        >
+                            <MessageCircleHeart className="w-5 h-5 text-pink-500" />
+                        </button>
                         <Link href="/calendar" className={`w-10 h-10 rounded-2xl flex items-center justify-center backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/50 border-white/40 hover:bg-white/80' : 'bg-surface-800/60 border-surface-700/50 hover:bg-surface-700/60'}`}>
                             <Calendar className="w-5 h-5 text-blue-500" />
                         </Link>
@@ -192,41 +193,84 @@ export default function KhatbaDashboard({
                 </div>
             </div>
 
-            {/* Main Content */}
+            {/* Main Content - Same structure as married dashboard */}
             <div className="px-5 mt-4 space-y-6">
-                {/* Compatibility Score Card (Hero) */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`rounded-2xl p-6 backdrop-blur-xl border relative overflow-hidden ${theme === 'light' ? 'bg-gradient-to-br from-violet-50/80 to-purple-50/80 border-violet-100 shadow-lg' : 'bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-violet-500/30'}`}
-                >
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h2 className={`text-lg font-bold mb-1 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
-                                {language === 'ar' ? 'نسبة التوافق' : 'Compatibility Score'}
-                            </h2>
-                            <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
-                                {language === 'ar' ? 'أجيبوا على الأسئلة لتعرفوا' : 'Answer questions to discover'}
-                            </p>
-                        </div>
-                        <div className="text-center">
-                            {compatibilityScore !== null ? (
-                                <div className="text-4xl font-bold text-violet-500">{compatibilityScore}%</div>
-                            ) : (
-                                <Link href="/compatibility" className="px-4 py-2 rounded-xl bg-violet-500 text-white font-medium text-sm hover:bg-violet-600 transition-colors">
-                                    {language === 'ar' ? 'ابدأ الاختبار' : 'Start Test'}
-                                </Link>
-                            )}
+                {/* Partner Mood - Same as married dashboard */}
+                {partnerMood && (
+                    <div className={`rounded-2xl p-5 backdrop-blur-xl border transition-all ${theme === 'light' ? 'bg-white/60 border-white/50 shadow-lg shadow-indigo-100/50' : 'bg-surface-800/50 border-surface-700/30'}`}>
+                        <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400/20 to-purple-500/20 flex items-center justify-center">
+                                <span className="text-3xl">
+                                    {partnerMood.mood === 5 ? '🤩' : partnerMood.mood === 4 ? '🙂' : partnerMood.mood === 3 ? '😐' : partnerMood.mood === 2 ? '😞' : '😢'}
+                                </span>
+                            </div>
+                            <div>
+                                <h3 className={`font-bold mb-1 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                    {language === 'ar' ? `مزاج ${partnerName}` : `${partnerName}'s Mood`}
+                                </h3>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
+                                    {partnerMood.mood >= 4
+                                        ? (language === 'ar' ? 'مبسوط اليوم! 😉' : 'Feeling good! 😉')
+                                        : partnerMood.mood <= 2
+                                            ? (language === 'ar' ? 'يحتاج اهتمام ❤️' : 'Needs love ❤️')
+                                            : (language === 'ar' ? 'الوضع مستقر 👍' : 'Doing okay 👍')}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </motion.div>
+                )}
 
-                {/* Khatba Actions Grid */}
+                {/* Wesal AI Bar - Same as married dashboard */}
+                <Link href="/ai-coach" className="block">
+                    <motion.div
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className={`rounded-2xl p-4 backdrop-blur-xl border transition-all cursor-pointer ${theme === 'light'
+                            ? 'bg-gradient-to-r from-violet-50/80 to-purple-50/80 border-violet-100 shadow-lg shadow-violet-500/5'
+                            : 'bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-violet-500/30 hover:border-violet-500/50'}`}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/25">
+                                <Bot className="w-6 h-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                    {language === 'ar' ? 'رفيق وصال' : 'Wesal AI'}
+                                </h3>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
+                                    {language === 'ar' ? 'اضغط للدردشة مع رفيقك الذكي' : 'Tap to chat with your AI companion'}
+                                </p>
+                            </div>
+                            <ArrowLeft className={`w-5 h-5 ${theme === 'light' ? 'text-violet-500' : 'text-violet-400'} ${isRTL ? '' : 'rotate-180'}`} />
+                        </div>
+                    </motion.div>
+                </Link>
+
+                {/* Check-in CTA - Same as married dashboard */}
+                <Link href="/check-in">
+                    <div className={`rounded-2xl p-4 relative overflow-hidden group backdrop-blur-xl border transition-all ${theme === 'light' ? 'bg-white/60 border-white/50 shadow-md hover:shadow-lg' : 'bg-surface-800/50 border-surface-700/30 hover:border-violet-500/30'}`}>
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h3 className={`font-bold mb-1 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                    {language === 'ar' ? 'تسجيل الحالة اليومي' : 'Daily Check-in'}
+                                </h3>
+                                <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
+                                    {language === 'ar' ? `شارك ${partnerName} مشاعرك` : `Share your feelings with ${partnerName}`}
+                                </p>
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-110 transition-transform">
+                                {isRTL ? <ArrowLeft className="w-6 h-6 text-white" /> : <ArrowRight className="w-6 h-6 text-white" />}
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+
+                {/* Actions Grid - Same layout as married dashboard */}
                 <h2 className={`text-lg font-bold px-1 ${theme === 'light' ? 'text-slate-700' : 'text-surface-200'}`}>
-                    {language === 'ar' ? 'أدوات التعارف' : 'Getting to Know Each Other'}
+                    {language === 'ar' ? 'نشاطات' : 'Activities'}
                 </h2>
-                <div className="grid grid-cols-2 gap-4">
-                    {khatbaActions.map((action, idx) => (
+                <div className="grid grid-cols-2 gap-6">
+                    {actions.map((action, idx) => (
                         <Link href={action.href} key={action.id}>
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
@@ -239,7 +283,7 @@ export default function KhatbaDashboard({
                                 <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${action.gradient} flex items-center justify-center shadow-lg mb-4`}>
                                     <action.icon className="w-6 h-6 text-white" />
                                 </div>
-                                <h3 className={`font-bold text-base mb-1 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                <h3 className={`font-bold text-lg mb-1 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
                                     {action.title}
                                 </h3>
                                 <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
@@ -250,40 +294,71 @@ export default function KhatbaDashboard({
                     ))}
                 </div>
 
-                {/* Shared Features */}
-                <h2 className={`text-lg font-bold px-1 mt-6 ${theme === 'light' ? 'text-slate-700' : 'text-surface-200'}`}>
-                    {language === 'ar' ? 'أدوات مشتركة' : 'Shared Features'}
-                </h2>
-                <div className="grid grid-cols-2 gap-4">
-                    {sharedFeatures.map((feature, idx) => (
-                        <Link href={feature.href} key={feature.id}>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: (khatbaActions.length + idx) * 0.1 }}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                className={`rounded-2xl p-4 flex items-center gap-3 backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/60 border-white/50 hover:bg-white/80' : 'bg-surface-800/50 border-surface-700/30'}`}
-                            >
-                                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg`}>
-                                    <feature.icon className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
-                                        {feature.title}
-                                    </h3>
-                                    <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
-                                        {feature.desc}
-                                    </p>
-                                </div>
-                            </motion.div>
-                        </Link>
-                    ))}
+                {/* Breathe & Budget Cards */}
+                <div className="grid grid-cols-2 gap-6 mt-4">
+                    <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setShowCoolDown(true)}
+                        className={`rounded-2xl p-4 flex items-center gap-3 backdrop-blur-xl border transition-all cursor-pointer shadow-sm ${theme === 'light' ? 'bg-white/60 border-white/50 hover:bg-white/80' : 'bg-surface-800/50 border-surface-700/30'}`}
+                    >
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg">
+                            <Snowflake className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h3 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                {language === 'ar' ? 'تنفس' : 'Breathe'}
+                            </h3>
+                            <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
+                                {language === 'ar' ? 'استرخاء' : 'Relax'}
+                            </p>
+                        </div>
+                    </motion.div>
+
+                    <Link href="/budget">
+                        <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={`rounded-2xl p-4 flex items-center gap-3 backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/60 border-white/50 hover:bg-white/80' : 'bg-surface-800/50 border-surface-700/30'}`}
+                        >
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+                                <Wallet className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                                <h3 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                    {language === 'ar' ? 'الميزانية' : 'Budget'}
+                                </h3>
+                                <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
+                                    {language === 'ar' ? 'خطط الزفاف' : 'Wedding plans'}
+                                </p>
+                            </div>
+                        </motion.div>
+                    </Link>
                 </div>
 
-                {/* Whisper / Mood Check-in */}
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                    <Link href="/check-in">
+                {/* Vision Board & Journeys Row */}
+                <div className="grid grid-cols-2 gap-6 mt-4">
+                    <Link href="/vision-board">
+                        <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={`rounded-2xl p-4 flex items-center gap-3 backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/60 border-white/50 hover:bg-white/80' : 'bg-surface-800/50 border-surface-700/30'}`}
+                        >
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
+                                <ImagePlus className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                                <h3 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
+                                    {language === 'ar' ? 'رؤيتنا' : 'Vision'}
+                                </h3>
+                                <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
+                                    {language === 'ar' ? 'أحلامنا معاً' : 'Our dreams'}
+                                </p>
+                            </div>
+                        </motion.div>
+                    </Link>
+
+                    <Link href="/journeys">
                         <motion.div
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
@@ -294,30 +369,10 @@ export default function KhatbaDashboard({
                             </div>
                             <div>
                                 <h3 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
-                                    {language === 'ar' ? 'كيف حالك' : 'Check-in'}
+                                    {language === 'ar' ? 'رحلات' : 'Journeys'}
                                 </h3>
                                 <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
-                                    {language === 'ar' ? 'شارك مزاجك' : 'Share mood'}
-                                </p>
-                            </div>
-                        </motion.div>
-                    </Link>
-
-                    <Link href="/whisper">
-                        <motion.div
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className={`rounded-2xl p-4 flex items-center gap-3 backdrop-blur-xl border transition-all shadow-sm ${theme === 'light' ? 'bg-white/60 border-white/50 hover:bg-white/80' : 'bg-surface-800/50 border-surface-700/30'}`}
-                        >
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
-                                <MessageCircleHeart className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h3 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>
-                                    {language === 'ar' ? 'همسة' : 'Whisper'}
-                                </h3>
-                                <p className={`text-xs ${theme === 'light' ? 'text-slate-500' : 'text-surface-400'}`}>
-                                    {language === 'ar' ? 'رسالة حب' : 'Love note'}
+                                    {language === 'ar' ? 'تقارب أكثر' : 'Grow closer'}
                                 </p>
                             </div>
                         </motion.div>
@@ -341,6 +396,25 @@ export default function KhatbaDashboard({
                     </div>
                 </div>
             </div>
+
+            {/* Cool Down Modal */}
+            <AnimatePresence>
+                {showCoolDown && (
+                    <CoolDownModal onClose={() => setShowCoolDown(false)} />
+                )}
+            </AnimatePresence>
+
+            {/* Dashboard Chat - Same as married dashboard */}
+            <AnimatePresence>
+                {showChat && coupleId && (
+                    <DashboardChat
+                        coupleId={coupleId}
+                        partnerId={partnerId || ''}
+                        partnerName={partnerName}
+                        onClose={() => setShowChat(false)}
+                    />
+                )}
+            </AnimatePresence>
         </main>
     );
 }

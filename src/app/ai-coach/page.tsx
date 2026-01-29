@@ -792,9 +792,9 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'}.`;
 
             const data = await response.json();
 
-            // API returns OpenAI format: data.choices[0].message.content
-            const rawContent = data.choices?.[0]?.message?.content
-                || data.content
+            // API returns { content: string } directly, not OpenAI format
+            const rawContent = data.content
+                || data.choices?.[0]?.message?.content
                 || data.message
                 || 'عذراً، لم أتمكن من معالجة طلبك. حاول مرة أخرى.';
 
