@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
     Heart,
-    Users,
     Sparkles,
     Bot,
     ArrowLeft,
@@ -14,12 +13,9 @@ import {
     Calendar,
     MessageCircleHeart,
     StickyNote,
-    CheckCircle2,
     Wallet,
     ImagePlus,
-    HelpCircle,
     Gamepad2,
-    Crown,
     Snowflake,
     Shield,
     Lightbulb
@@ -131,18 +127,13 @@ export default function KhatbaDashboard({
             <div className="px-5 pt-8 pb-4">
                 <header className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 relative">
-                            <img src="/wesal-logo.svg" alt="Wesal" className="w-full h-full object-contain drop-shadow-lg" />
+                        <div className={`w-10 h-10 relative ${isPremium ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-surface-900 rounded-xl shadow-lg shadow-amber-500/30' : ''}`}>
+                            <img src="/wesal-logo.svg" alt="Wesal" className={`w-full h-full object-contain drop-shadow-lg ${isPremium ? 'filter brightness-110' : ''}`} />
                         </div>
                         <div className="flex flex-col">
-                            <div className="flex items-center gap-2">
-                                {isPremium && (
-                                    <Crown className="w-4 h-4 text-amber-500" />
-                                )}
-                                <span className={`text-xl font-bold tracking-wide ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
-                                    {language === 'ar' ? 'وصال' : 'Wesal'}
-                                </span>
-                            </div>
+                            <span className={`text-xl font-bold tracking-wide ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
+                                {language === 'ar' ? 'وصال' : 'Wesal'}
+                            </span>
                             <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 font-medium w-fit">
                                 {language === 'ar' ? 'خطوبة' : 'Engaged'}
                             </span>
@@ -398,23 +389,18 @@ export default function KhatbaDashboard({
             </div>
 
             {/* Cool Down Modal */}
-            <AnimatePresence>
-                {showCoolDown && (
-                    <CoolDownModal onClose={() => setShowCoolDown(false)} />
-                )}
-            </AnimatePresence>
+            <CoolDownModal isOpen={showCoolDown} onClose={() => setShowCoolDown(false)} />
 
             {/* Dashboard Chat - Same as married dashboard */}
-            <AnimatePresence>
-                {showChat && coupleId && (
-                    <DashboardChat
-                        coupleId={coupleId}
-                        partnerId={partnerId || ''}
-                        partnerName={partnerName}
-                        onClose={() => setShowChat(false)}
-                    />
-                )}
-            </AnimatePresence>
+            {coupleId && (
+                <DashboardChat
+                    coupleId={coupleId}
+                    partnerName={partnerName}
+                    isOpen={showChat}
+                    onClose={() => setShowChat(false)}
+                    isPartnerOnline={partnerStatus === 'online'}
+                />
+            )}
         </main>
     );
 }
