@@ -311,10 +311,7 @@ export default function Dashboard() {
                             <img
                                 src="/wesal-logo.svg"
                                 alt="Wesal"
-                                className="w-full h-full object-contain"
-                                style={isPremium ? {
-                                    filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.8)) drop-shadow(0 0 12px rgba(251, 191, 36, 0.5)) brightness(1.1)'
-                                } : {}}
+                                className="w-full h-full object-contain drop-shadow-lg"
                             />
                         </div>
                         <div className="flex items-center gap-2">
@@ -343,8 +340,21 @@ export default function Dashboard() {
                             )}
                             <Bell className={`w-5 h-5 ${theme === 'light' ? 'text-slate-600' : 'text-surface-400'}`} />
                         </Link>
-                        <Link href="/settings" className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-primary-500/25">
-                            {userName.charAt(0).toUpperCase()}
+                        {/* Profile with Premium Frame */}
+                        <Link href="/settings" className="relative">
+                            {isPremium && (
+                                <>
+                                    {/* Gold Frame */}
+                                    <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 shadow-lg shadow-amber-500/30" />
+                                    {/* Crown */}
+                                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10">
+                                        <Crown className="w-4 h-4 text-amber-400 drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(251, 191, 36, 0.8))' }} />
+                                    </div>
+                                </>
+                            )}
+                            <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-primary-500/25 relative ${isPremium ? 'ring-2 ring-amber-400/50' : ''}`}>
+                                {userName.charAt(0).toUpperCase()}
+                            </div>
                         </Link>
                     </div>
                 </header>
