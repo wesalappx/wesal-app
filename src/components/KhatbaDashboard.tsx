@@ -169,15 +169,15 @@ export default function KhatbaDashboard({
                         <Link href="/settings" className="relative">
                             {isPremium && (
                                 <>
-                                    {/* Gold Frame */}
-                                    <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 shadow-lg shadow-amber-500/30" />
+                                    {/* Thin Gold Ring */}
+                                    <div className="absolute -inset-0.5 rounded-2xl ring-2 ring-amber-400 shadow-sm shadow-amber-500/40" />
                                     {/* Crown */}
                                     <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10">
                                         <Crown className="w-4 h-4 text-amber-400 drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(251, 191, 36, 0.8))' }} />
                                     </div>
                                 </>
                             )}
-                            <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-violet-500/25 relative ${isPremium ? 'ring-2 ring-amber-400/50' : ''}`}>
+                            <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-violet-500/25 relative`}>
                                 {userName.charAt(0).toUpperCase()}
                             </div>
                         </Link>
